@@ -1,3 +1,4 @@
+package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,10 +26,8 @@ public class DBContext {
         // 'encrypt=false' is explicitly added to bypass SSL Certificate validation issues commonly found in newer JDK versions.
         String url = "jdbc:sqlserver://" + SERVER_NAME + ":" + PORT_NUMBER
                 + ";databaseName=" + DB_NAME + ";user=" + USER_ID + ";password=" + PASSWORD + ";encrypt=false";
-
         // Dynamic loading of the Microsoft SQL Server JDBC Driver
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
         return DriverManager.getConnection(url);
     }
 
@@ -38,12 +37,11 @@ public class DBContext {
      */
     public static void main(String[] args) {
         System.out.println("=== Initiating Database Connection Test ===");
-
         // Utilizing Java's Try-With-Resources block to ensure automatic closure of the connection resource
         try ( Connection conn = DBContext.getConnection()) {
             if (conn != null && !conn.isClosed()) {
                 System.out.println("---------------------------------------------------------");
-                System.out.println("👉 DBContext: CONNECTION TO [SmartCarWash] SUCCESSFUL! 👈");
+                System.out.println("DBContext: CONNECTION TO [SmartCarWash] SUCCESSFUL!");
                 System.out.println("---------------------------------------------------------");
             }
         } catch (ClassNotFoundException e) {

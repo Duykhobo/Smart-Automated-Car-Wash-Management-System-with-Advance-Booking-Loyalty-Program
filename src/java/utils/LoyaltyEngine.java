@@ -1,4 +1,4 @@
-package com.autowashpro.utils;
+package utils;
 
 public class LoyaltyEngine {
     // Quy tắc: 1 điểm = 1000 VND

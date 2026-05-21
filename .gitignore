@@ -33,4 +33,3 @@ local.properties
 *.ipr
 out/
 .vscode/settings.json
-docs/

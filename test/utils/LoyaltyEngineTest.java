@@ -1,8 +1,9 @@
-package com.autowashpro.utils;
+package utils;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class LoyaltyEngineTest {
+
     @Test
     public void testCalculatePoints() {
         int points = LoyaltyEngine.calculatePoints(50000);

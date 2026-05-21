@@ -32,4 +32,5 @@ local.properties
 *.iml
 *.ipr
 out/
-.vscode/
+.vscode/settings.json
+docs/

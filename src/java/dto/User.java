@@ -4,24 +4,20 @@
  */
 package dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author Quan
- */
 public class User {
 
     private int userId;
     private String username;
     private String passwordHash;
     private String role;
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public User() {
     }
 
-    public User(int userId, String username, String passwordHash, String role, Date createdAt) {
+    public User(int userId, String username, String passwordHash, String role, Timestamp createdAt) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -45,7 +41,7 @@ public class User {
         return role;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
@@ -65,7 +61,7 @@ public class User {
         this.role = role;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 

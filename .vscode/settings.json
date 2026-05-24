@@ -1,3 +1,9 @@
 {
-  "workbench.colorTheme": "Dracula Theme"
+  "workbench.colorTheme": "Dracula Theme",
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "c:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\lib\\jsp-api.jar",
+    "c:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\lib\\servlet-api.jar",
+    "lib-test/**/*.jar"
+  ]
 }

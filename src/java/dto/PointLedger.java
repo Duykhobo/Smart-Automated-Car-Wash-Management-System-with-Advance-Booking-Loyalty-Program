@@ -4,12 +4,8 @@
  */
 package dto;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author Quan
- */
 public class PointLedger {
 
     private int ledgerId;
@@ -18,14 +14,14 @@ public class PointLedger {
     private Integer referenceId; // Có thể null
     private int pointsChange;
     private int pointsRemaining;
-    private Date earnedDate;
-    private Date expiryDate;
+    private Timestamp earnedDate;
+    private Timestamp expiryDate;
     private boolean isExpired;
 
     public PointLedger() {
     }
 
-    public PointLedger(int ledgerId, int customerId, String referenceType, Integer referenceId, int pointsChange, int pointsRemaining, Date earnedDate, Date expiryDate, boolean isExpired) {
+    public PointLedger(int ledgerId, int customerId, String referenceType, Integer referenceId, int pointsChange, int pointsRemaining, Timestamp earnedDate, Timestamp expiryDate, boolean isExpired) {
         this.ledgerId = ledgerId;
         this.customerId = customerId;
         this.referenceType = referenceType;
@@ -61,11 +57,11 @@ public class PointLedger {
         return pointsRemaining;
     }
 
-    public Date getEarnedDate() {
+    public Timestamp getEarnedDate() {
         return earnedDate;
     }
 
-    public Date getExpiryDate() {
+    public Timestamp getExpiryDate() {
         return expiryDate;
     }
 
@@ -97,11 +93,11 @@ public class PointLedger {
         this.pointsRemaining = pointsRemaining;
     }
 
-    public void setEarnedDate(Date earnedDate) {
+    public void setEarnedDate(Timestamp earnedDate) {
         this.earnedDate = earnedDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(Timestamp expiryDate) {
         this.expiryDate = expiryDate;
     }
 

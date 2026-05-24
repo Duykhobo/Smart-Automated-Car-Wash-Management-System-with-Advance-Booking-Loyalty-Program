@@ -4,12 +4,8 @@
  */
 package dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author Quan
- */
 public class Booking {
 
     private int bookingId;
@@ -17,8 +13,8 @@ public class Booking {
     private int serviceId;
     private Integer voucherId;
     private String licensePlate;
-    private Date bookingDate;
-    private Date scheduledTime;
+    private Timestamp bookingDate;
+    private Timestamp scheduledTime;
     private Double originalPrice;
     private Double discountAmount;
     private Double finalPrice;
@@ -28,7 +24,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(int bookingId, int customerId, int serviceId, Integer voucherId, String licensePlate, Date bookingDate, Date scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
+    public Booking(int bookingId, int customerId, int serviceId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
         this.bookingId = bookingId;
         this.customerId = customerId;
         this.serviceId = serviceId;
@@ -63,11 +59,11 @@ public class Booking {
         return licensePlate;
     }
 
-    public Date getBookingDate() {
+    public Timestamp getBookingDate() {
         return bookingDate;
     }
 
-    public Date getScheduledTime() {
+    public Timestamp getScheduledTime() {
         return scheduledTime;
     }
 
@@ -111,11 +107,11 @@ public class Booking {
         this.licensePlate = licensePlate;
     }
 
-    public void setBookingDate(Date bookingDate) {
+    public void setBookingDate(Timestamp bookingDate) {
         this.bookingDate = bookingDate;
     }
 
-    public void setScheduledTime(Date scheduledTime) {
+    public void setScheduledTime(Timestamp scheduledTime) {
         this.scheduledTime = scheduledTime;
     }
 

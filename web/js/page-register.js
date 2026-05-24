@@ -1,36 +1,21 @@
 function handleRegister(event) {
-    event.preventDefault(); // Chặn form submit vì chưa có Backend
-    
     // 1. Chạy Validation Front-end
     if (!validateForm()) {
+        event.preventDefault(); // Chặn submit nếu form không hợp lệ (báo đỏ)
         return false;
     }
-    
-    // 2. Mockup thành công ở FE (Chưa có Backend)
-    const serverAlert = document.getElementById('serverAlert');
+
+    // Form hợp lệ -> Để cho HTML tự submit lên Servlet!
     const submitBtn = document.querySelector('button[type="submit"]');
-    
     submitBtn.disabled = true;
     submitBtn.innerText = "Đang xử lý...";
-    
-    // Giả lập thời gian delay của server 1 giây
-    setTimeout(() => {
-        serverAlert.style.display = 'block';
-        serverAlert.style.borderLeftColor = '#4ade80';
-        serverAlert.style.color = '#4ade80';
-        serverAlert.style.backgroundColor = 'rgba(74, 222, 128, 0.1)';
-        serverAlert.innerText = "Đăng ký thành công! (Mockup Frontend)";
-        
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Đăng Ký Tài Khoản";
-    }, 1000);
-    
-    return false;
+
+    return true;
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const fields = ['fullname', 'phone', 'plate', 'password', 'confirm_password', 'terms'];
-    
+
     fields.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -77,11 +62,12 @@ function clearErrorInline(id) {
 
 function validateField(id) {
     const el = document.getElementById(id);
-    if (!el) return true;
-    
+    if (!el)
+        return true;
+
     const val = el.value.trim();
-    
-    switch(id) {
+
+    switch (id) {
         case 'fullname':
             if (val.length < 2) {
                 showErrorInline(id, "Họ và Tên phải có ít nhất 2 ký tự.");
@@ -120,7 +106,7 @@ function validateField(id) {
             }
             break;
     }
-    
+
     clearErrorInline(id);
     return true;
 }
@@ -128,13 +114,13 @@ function validateField(id) {
 function validateForm() {
     const fields = ['fullname', 'phone', 'plate', 'password', 'confirm_password', 'terms'];
     let isValid = true;
-    
+
     fields.forEach(id => {
         if (!validateField(id)) {
             isValid = false;
         }
     });
-    
+
     return isValid;
 }
 

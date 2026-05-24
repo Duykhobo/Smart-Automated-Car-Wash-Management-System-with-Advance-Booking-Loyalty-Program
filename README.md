@@ -10,22 +10,22 @@ Hệ thống quản lý dịch vụ rửa xe thông minh tích hợp tính năng
 
 ## Tính năng nổi bật
 
-- ** Xác thực & Bảo mật (Authentication & Security):** 
+-  Xác thực & Bảo mật (Authentication & Security):** 
   - Đăng nhập/Đăng ký mượt mà.
   - Mật khẩu được mã hóa an toàn tuyệt đối với thuật toán SHA-256.
   - Phân quyền chặt chẽ bằng `Filter` (Bảo vệ trang Admin & chặn khách vãng lai).
-- ** Kiến trúc MVC chuẩn mực:**
+-  Kiến trúc MVC chuẩn mực:**
   - Tách biệt hoàn toàn Model (DAO) - View (JSP) - Controller (Servlet).
   - Tích hợp thêm **Service Layer** chuyên xử lý nghiệp vụ phức tạp (Business Logic).
   - Tối ưu URL theo chuẩn PRG (Post-Redirect-Get) để giấu đuôi `.jsp`.
-- ** Giao diện hiện đại (Modern UI/UX):**
+-  Giao diện hiện đại (Modern UI/UX):**
   - Giao diện Dark Mode chuyên nghiệp.
   - Bố cục Split-Screen (chia đôi màn hình) cực kỳ bắt mắt cho màn hình Desktop.
   - Hoàn toàn tương thích và co giãn mượt mà trên Mobile (Responsive).
-- ** Tính năng cốt lõi (Core Features):** 
+-  Tính năng cốt lõi (Core Features):** 
   - Hệ thống đặt lịch rửa xe tự động hóa (Advance Booking).
   - Tích điểm thành viên, hạng thẻ và ưu đãi (Loyalty Program).
-- ** Tự động hóa kiểm thử (CI/CD & Testing):**
+-  Tự động hóa kiểm thử (CI/CD & Testing):**
   - Phủ test toàn bộ các tầng logic với **JUnit** và **Mockito**.
   - Tích hợp **GitHub Actions** tự động chạy CI mỗi khi có commit mới.
 

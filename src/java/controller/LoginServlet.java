@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import utils.HashUtil;
+import service.UserService;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -17,7 +17,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("login.jsp");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     @Override
@@ -35,10 +35,8 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
-
-        String hashedPass = HashUtil.hashPassword(password);
-        UserDAO userDAO = new UserDAO();
-        User user = userDAO.login(phone, hashedPass);
+        UserService userService = new UserService();
+        User user = userService.processLogin(phone, password);
 
         if (user != null) {
             // Đăng nhập thành công, lưu session

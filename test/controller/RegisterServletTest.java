@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import service.UserService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -39,10 +40,9 @@ public class RegisterServletTest {
         when(request.getParameter("password")).thenReturn("password123");
         when(request.getRequestDispatcher("login.jsp")).thenReturn(requestDispatcher);
 
-        // Giả lập UserDAO
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            when(mock.checkUserExists("0888888888")).thenReturn(false);
-            when(mock.registerCustomer(any(), any())).thenReturn(true);
+        // Giả lập UserService
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(1); // 1 = Thành công
         })) {
             servlet.doPost(request, response);
 
@@ -59,9 +59,9 @@ public class RegisterServletTest {
         when(request.getParameter("password")).thenReturn("password123");
         when(request.getRequestDispatcher("register.jsp")).thenReturn(requestDispatcher);
 
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            // Giả lập DB báo lỗi trùng SĐT
-            when(mock.checkUserExists("0999999999")).thenReturn(true);
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            // Giả lập DB báo lỗi trùng SĐT (0 = Trùng SĐT)
+            when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(0);
         })) {
             servlet.doPost(request, response);
 
@@ -79,10 +79,9 @@ public class RegisterServletTest {
         when(request.getParameter("password")).thenReturn("password123");
         when(request.getRequestDispatcher("register.jsp")).thenReturn(requestDispatcher);
 
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            when(mock.checkUserExists("0777777777")).thenReturn(false);
-            // Giả lập Database chết hoặc Transaction lỗi (trả về false)
-            when(mock.registerCustomer(any(), any())).thenReturn(false);
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            // Giả lập hệ thống bận (-1 = Lỗi)
+            when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(-1);
         })) {
             servlet.doPost(request, response);
 

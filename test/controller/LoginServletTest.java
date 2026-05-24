@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import service.UserService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -57,8 +58,8 @@ public class LoginServletTest {
         dummyUser.setUsername("0999999999");
         dummyUser.setRole("Customer");
 
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            when(mock.login(eq("0999999999"), anyString())).thenReturn(dummyUser);
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            when(mock.processLogin(eq("0999999999"), anyString())).thenReturn(dummyUser);
         })) {
             servlet.doPost(request, response);
 
@@ -76,8 +77,8 @@ public class LoginServletTest {
         dummyUser.setUsername("admin");
         dummyUser.setRole("Admin");
 
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            when(mock.login(eq("admin"), anyString())).thenReturn(dummyUser);
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            when(mock.processLogin(eq("admin"), anyString())).thenReturn(dummyUser);
         })) {
             servlet.doPost(request, response);
 
@@ -91,9 +92,9 @@ public class LoginServletTest {
         when(request.getParameter("phone")).thenReturn("0999999999");
         when(request.getParameter("password")).thenReturn("wrongpass");
 
-        try ( var mockedDAO = mockConstruction(UserDAO.class, (mock, context) -> {
-            // DAO trả về null do sai mật khẩu
-            when(mock.login(anyString(), anyString())).thenReturn(null);
+        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+            // Service trả về null do sai mật khẩu
+            when(mock.processLogin(anyString(), anyString())).thenReturn(null);
         })) {
             servlet.doPost(request, response);
 

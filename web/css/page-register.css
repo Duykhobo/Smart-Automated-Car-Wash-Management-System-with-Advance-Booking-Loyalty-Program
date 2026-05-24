@@ -2,15 +2,7 @@
    REGISTER PAGE CSS
    ========================================================= */
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Add a subtle radial gradient behind the main dark blue for depth */
-    background: radial-gradient(circle at top right, rgba(0, 212, 255, 0.05), transparent 40%),
-                var(--bg-main);
-    padding: 2rem 1rem;
-}
+/* Removed body styles to inherit from login.css (split-layout) */
 
 .mobile-container {
     width: 100%;

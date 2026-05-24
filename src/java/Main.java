@@ -1,7 +1,6 @@
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import utils.DBContext;
 
 public class Main {

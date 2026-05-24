@@ -4,25 +4,21 @@
  */
 package dto;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author Quan
- */
 public class WashRecord {
 
     private int washRecordId;
     private int bookingId;
-    private Date actualStartTime; // Có thể null
-    private Date actualEndTime;   // Có thể null
+    private Timestamp actualStartTime; // Có thể null
+    private Timestamp actualEndTime;   // Có thể null
     private Double lprConfidenceScore; // Có thể null
     private String operatorNotes;
 
     public WashRecord() {
     }
 
-    public WashRecord(int washRecordId, int bookingId, Date actualStartTime, Date actualEndTime, Double lprConfidenceScore, String operatorNotes) {
+    public WashRecord(int washRecordId, int bookingId, Timestamp actualStartTime, Timestamp actualEndTime, Double lprConfidenceScore, String operatorNotes) {
         this.washRecordId = washRecordId;
         this.bookingId = bookingId;
         this.actualStartTime = actualStartTime;
@@ -39,11 +35,11 @@ public class WashRecord {
         return bookingId;
     }
 
-    public Date getActualStartTime() {
+    public Timestamp getActualStartTime() {
         return actualStartTime;
     }
 
-    public Date getActualEndTime() {
+    public Timestamp getActualEndTime() {
         return actualEndTime;
     }
 
@@ -63,11 +59,11 @@ public class WashRecord {
         this.bookingId = bookingId;
     }
 
-    public void setActualStartTime(Date actualStartTime) {
+    public void setActualStartTime(Timestamp actualStartTime) {
         this.actualStartTime = actualStartTime;
     }
 
-    public void setActualEndTime(Date actualEndTime) {
+    public void setActualEndTime(Timestamp actualEndTime) {
         this.actualEndTime = actualEndTime;
     }
 

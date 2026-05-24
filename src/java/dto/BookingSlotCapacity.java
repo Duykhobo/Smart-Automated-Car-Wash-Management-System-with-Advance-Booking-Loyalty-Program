@@ -4,24 +4,21 @@
  */
 package dto;
 
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Time;
 
-/**
- *
- * @author Quan
- */
 public class BookingSlotCapacity {
 
     private int slotId;
     private Date slotDate;
-    private Date timeSlot;
+    private Time timeSlot;
     private int maxCapacity;
     private int currentBooked;
 
     public BookingSlotCapacity() {
     }
 
-    public BookingSlotCapacity(int slotId, Date slotDate, Date timeSlot, int maxCapacity, int currentBooked) {
+    public BookingSlotCapacity(int slotId, Date slotDate, Time timeSlot, int maxCapacity, int currentBooked) {
         this.slotId = slotId;
         this.slotDate = slotDate;
         this.timeSlot = timeSlot;
@@ -37,7 +34,7 @@ public class BookingSlotCapacity {
         return slotDate;
     }
 
-    public Date getTimeSlot() {
+    public Time getTimeSlot() {
         return timeSlot;
     }
 
@@ -57,7 +54,7 @@ public class BookingSlotCapacity {
         this.slotDate = slotDate;
     }
 
-    public void setTimeSlot(Date timeSlot) {
+    public void setTimeSlot(Time timeSlot) {
         this.timeSlot = timeSlot;
     }
 

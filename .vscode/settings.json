@@ -1,3 +1,5 @@
 {
-  "workbench.colorTheme": "GitHub Dark Default"
+  "workbench.colorTheme": "GitHub Dark Default",
+  "snyk.advanced.organization": "3c7afdf4-b817-4340-a362-f9722b27517e",
+  "snyk.advanced.autoSelectOrganization": true
 }

@@ -1,0 +1,41 @@
+/* dashboard.css */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Loyalty VIP Card */
+.loyalty-card {
+    background: linear-gradient(135deg, #1f2937, #121826);
+    border: 1px solid var(--primary);
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.loyalty-card:hover {
+    transform: translateY(-5px);
+}
+
+.pts-text {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin: 10px 0;
+}
+
+/* Booking Item */
+.booking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #374151;
+}
+
+.booking-item:last-child {
+    border-bottom: none;
+}

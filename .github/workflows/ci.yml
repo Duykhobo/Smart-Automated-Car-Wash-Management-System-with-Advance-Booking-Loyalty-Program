@@ -30,9 +30,9 @@ jobs:
           find src/java -name "*.java" > sources.txt
           javac -d build/classes @sources.txt
           
-          find test/java -name "*.java" > tests.txt
+          find test -name "*.java" > tests.txt
           javac -cp "build/classes:lib-test/junit.jar:lib-test/hamcrest.jar" -d build/test-classes @tests.txt
 
       - name: Chay Unit Test tu dong
         run: |
-          java -cp "build/classes:build/test-classes:lib-test/junit.jar:lib-test/hamcrest.jar" org.junit.runner.JUnitCore com.autowashpro.utils.LoyaltyEngineTest
+          java -cp "build/classes:build/test-classes:lib-test/junit.jar:lib-test/hamcrest.jar" org.junit.runner.JUnitCore utils.LoyaltyEngineTest

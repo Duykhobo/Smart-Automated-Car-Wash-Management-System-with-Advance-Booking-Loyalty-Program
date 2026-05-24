@@ -1,72 +1,71 @@
 # Smart Automated Car Wash Management System (AutoWash Pro)
 
-![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
-![JSP/Servlet](https://img.shields.io/badge/JSP%20%2F%20Servlet-007396?style=for-the-badge&logo=java&logoColor=white)
-![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![Tomcat](https://img.shields.io/badge/Apache%20Tomcat-F8DC75?style=for-the-badge&logo=apache-tomcat&logoColor=black)
-![JUnit](https://img.shields.io/badge/JUnit5%20%2F%20Mockito-25A162?style=for-the-badge&logo=testing-library&logoColor=white)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white) ![JSP/Servlet](https://img.shields.io/badge/JSP%20%2F%20Servlet-007396?style=for-the-badge&logo=java&logoColor=white) ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white) ![Tomcat](https://img.shields.io/badge/Apache%20Tomcat-F8DC75?style=for-the-badge&logo=apache-tomcat&logoColor=black) ![JUnit](https://img.shields.io/badge/JUnit5%20%2F%20Mockito-25A162?style=for-the-badge&logo=testing-library&logoColor=white)
 
-Hệ thống quản lý dịch vụ rửa xe thông minh tích hợp tính năng Đặt lịch trước (Advance Booking) và Chương trình khách hàng thân thiết (Loyalty Program). Dự án được thiết kế theo chuẩn kiến trúc MVC cấp doanh nghiệp dành cho môn học PRJ tại Đại học FPT (Học kỳ 4 - Summer 26).
+Hệ thống quản lý dịch vụ rửa xe tự động tích hợp tính năng Đặt lịch trước (Advance Booking) và Chương trình khách hàng thân thiết (Loyalty Program). Dự án được thiết kế theo chuẩn kiến trúc MVC cấp doanh nghiệp, phục vụ cho đồ án môn học PRJ tại Đại học FPT (Học kỳ 4 - Summer 2026).
 
-## Tính năng nổi bật
+## 1. Tính Năng Nổi Bật
 
--  Xác thực & Bảo mật (Authentication & Security):** 
-  - Đăng nhập/Đăng ký mượt mà.
-  - Mật khẩu được mã hóa an toàn tuyệt đối với thuật toán SHA-256.
-  - Phân quyền chặt chẽ bằng `Filter` (Bảo vệ trang Admin & chặn khách vãng lai).
--  Kiến trúc MVC chuẩn mực:**
-  - Tách biệt hoàn toàn Model (DAO) - View (JSP) - Controller (Servlet).
-  - Tích hợp thêm **Service Layer** chuyên xử lý nghiệp vụ phức tạp (Business Logic).
-  - Tối ưu URL theo chuẩn PRG (Post-Redirect-Get) để giấu đuôi `.jsp`.
--  Giao diện hiện đại (Modern UI/UX):**
-  - Giao diện Dark Mode chuyên nghiệp.
-  - Bố cục Split-Screen (chia đôi màn hình) cực kỳ bắt mắt cho màn hình Desktop.
-  - Hoàn toàn tương thích và co giãn mượt mà trên Mobile (Responsive).
--  Tính năng cốt lõi (Core Features):** 
-  - Hệ thống đặt lịch rửa xe tự động hóa (Advance Booking).
-  - Tích điểm thành viên, hạng thẻ và ưu đãi (Loyalty Program).
--  Tự động hóa kiểm thử (CI/CD & Testing):**
-  - Phủ test toàn bộ các tầng logic với **JUnit** và **Mockito**.
-  - Tích hợp **GitHub Actions** tự động chạy CI mỗi khi có commit mới.
+- **Xác thực & Bảo mật (Authentication & Security):** 
+  - Quy trình đăng nhập và đăng ký được tối ưu hóa.
+  - Bảo mật mật khẩu người dùng bằng thuật toán mã hóa SHA-256.
+  - Quản lý phân quyền (Role-based Access Control) thông qua `Filter`, đảm bảo an ninh cho khu vực quản trị (Admin).
+  
+- **Kiến trúc Hệ thống (Architecture):**
+  - Tuân thủ nghiêm ngặt mô hình MVC (Model - View - Controller).
+  - Phân tách Business Logic vào `Service Layer` để tăng cường khả năng bảo trì và mở rộng mã nguồn.
+  - Áp dụng mẫu thiết kế PRG (Post-Redirect-Get) trong định tuyến Servlet nhằm bảo mật URL và tránh trùng lặp dữ liệu.
 
-## Công nghệ sử dụng
+- **Trải nghiệm Người dùng (UI/UX):**
+  - Áp dụng ngôn ngữ thiết kế Dark Mode hiện đại.
+  - Xây dựng bố cục Split-Screen đáp ứng (Responsive) tốt trên cả thiết bị di động và máy tính để bàn.
 
-* **Backend:** Java 8+, Servlet API, JSP (JavaServer Pages), JDBC.
-* **Frontend:** HTML5, Vanilla CSS3 (Custom Properties, Flexbox, Animations), JavaScript.
-* **Database:** Microsoft SQL Server.
-* **Server:** Apache Tomcat 9.0.
-* **Tooling:** NetBeans IDE / VS Code, Apache Ant.
+- **Chức năng Cốt lõi (Core Features):** 
+  - Quản lý đặt lịch dịch vụ tự động hóa (Advance Booking).
+  - Quản lý điểm thưởng, phân hạng thành viên và chính sách ưu đãi (Loyalty Program).
 
-## Hướng dẫn cài đặt (Installation)
+- **Kiểm thử & Tích hợp liên tục (Testing & CI/CD):**
+  - Xây dựng hệ thống Unit Test và Integration Test sử dụng framework `JUnit` và `Mockito`.
+  - Tích hợp luồng kiểm duyệt mã nguồn tự động qua `GitHub Actions`.
 
-### 1. Chuẩn bị môi trường
-- Cài đặt Java Development Kit (JDK 8 trở lên).
-- Cài đặt Apache Tomcat 9.0+.
-- Cài đặt MS SQL Server.
+## 2. Công Nghệ Sử Dụng
 
-### 2. Cấu hình Cơ sở dữ liệu (Database)
+- **Backend:** Java 8+, Servlet API, JSP (JavaServer Pages), JDBC.
+- **Frontend:** HTML5, CSS3 (Vanilla), JavaScript.
+- **Database:** Microsoft SQL Server.
+- **Server:** Apache Tomcat 9.0.
+- **Tooling:** NetBeans IDE, Visual Studio Code, Apache Ant.
+
+## 3. Hướng Dẫn Cài Đặt
+
+### Yêu cầu hệ thống
+- Java Development Kit (JDK) 8 trở lên.
+- Apache Tomcat 9.0+.
+- Microsoft SQL Server.
+
+### Thiết lập Cơ sở dữ liệu
 1. Mở SQL Server Management Studio (SSMS).
-2. Tạo Database mới (Ví dụ: `AutoWashDB`).
-3. Mở thư mục dự án và chạy script SQL (file `.sql` có sẵn trong thư mục) để khởi tạo các bảng và dữ liệu mẫu.
+2. Tạo cơ sở dữ liệu mới (Ví dụ: `AutoWashDB`).
+3. Thực thi kịch bản SQL (`.sql`) được cung cấp trong thư mục dự án để khởi tạo cấu trúc bảng và dữ liệu mẫu.
 
-### 3. Cấu hình Dự án
-1. Clone dự án về máy: 
+### Thiết lập Dự án
+1. Sao chép mã nguồn từ kho lưu trữ:
    ```bash
    git clone https://github.com/Duykhobo/Smart-Automated-Car-Wash-Management-System-with-Advance-Booking-Loyalty-Program.git
    ```
-2. Mở dự án bằng NetBeans IDE.
-3. Import thư viện (Add JAR/Folder):
-   - Thêm bộ driver kết nối CSDL: `mssql-jdbc.jar`.
-   - Cấu hình thư viện Tomcat (`servlet-api.jar`).
-   - Cấu hình thư viện test (`mockito`, `junit`) trong mục **Compile Tests**.
-4. Mở file `DBContext.java` hoặc lớp DAO tương ứng, cập nhật thông tin kết nối (User, Password, Database Name, Port) cho phù hợp với máy cá nhân.
+2. Mở thư mục dự án bằng NetBeans IDE.
+3. Cấu hình thư viện phụ thuộc (Libraries):
+   - Thêm JDBC Driver: `mssql-jdbc.jar`.
+   - Cấu hình Servlet API: Thêm thư viện `Tomcat` tích hợp.
+   - Cấu hình kiểm thử (Compile Tests): Thêm `mockito-core`, `byte-buddy`, `objenesis`, và `junit`.
+4. Cập nhật thông tin kết nối CSDL (User, Password, Database Name, Port) tại lớp `DBContext.java` hoặc DAO tương ứng để phù hợp với môi trường cục bộ.
 
-### 4. Khởi chạy
-- Chuột phải vào project trong NetBeans $\rightarrow$ Chọn **Clean and Build**.
-- Chuột phải $\rightarrow$ Chọn **Run**. 
-- Truy cập vào: `http://localhost:8084/AutoWash/` để trải nghiệm hệ thống.
+### Khởi chạy ứng dụng
+1. Nhấp chuột phải vào dự án trong NetBeans, chọn **Clean and Build**.
+2. Chọn **Run** để khởi động máy chủ Tomcat.
+3. Truy cập ứng dụng qua đường dẫn mặc định: `http://localhost:8084/AutoWash/`
 
-## Tác giả
+## 4. Đội Ngũ Phát Triển
 
-* **Sinh viên thực hiện:** Thanh Duy, Thiên Quân, Minh Tân, Khánh Duy (FPT University)
-* **Khóa:** Semester 4 - Summer 2026
+- **Sinh viên thực hiện:** Thanh Duy, Thiên Quân, Minh Tân, Khánh Duy (Đại học FPT)
+- **Học kỳ:** Semester 4 - Summer 2026

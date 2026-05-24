@@ -9,11 +9,23 @@
         <!-- 1. Global CSS -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
         <!-- 2. Page Specific CSS -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/page-register.css">
     </head>
     <body>
+        <div class="split-layout">
+            <!-- Cột Trái (Brand/Giới thiệu - Chỉ hiện trên Desktop) -->
+            <div class="split-left">
+                <div class="brand-content">
+                    <h1>AutoWash Pro</h1>
+                    <p>Đăng ký thành viên để trải nghiệm hệ thống quản lý và đặt lịch rửa xe thông minh. Hưởng trọn ưu đãi từ chương trình Loyalty.</p>
+                </div>
+            </div>
+
+            <!-- Cột Phải (Form Đăng Ký) -->
+            <div class="split-right">
         <div class="mobile-container">
-            <a href="index.jsp" class="back-link">
+            <a href="index" class="back-link">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -89,9 +101,11 @@
             </form>
 
             <div class="login-link">
-                Bạn đã có tài khoản? <a href="login.jsp">Đăng nhập</a>
+                Bạn đã có tài khoản? <a href="login">Đăng nhập</a>
             </div>
         </div>
+        </div> <!-- End split-right -->
+        </div> <!-- End split-layout -->
 
         <script src="${pageContext.request.contextPath}/js/constants.js" charset="UTF-8"></script>
         <script src="${pageContext.request.contextPath}/js/page-register.js" charset="UTF-8"></script>

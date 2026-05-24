@@ -26,8 +26,7 @@ jobs:
 
       - name: Bien dich (Compile) toan bo code
         run: |
-          mkdir -p build/classes build/test-classes test/java
-          
+          mkdir -p build/classes build/test-classes
           # Bien dich code chinh
           find src/java -name "*.java" > sources.txt
           if [ -s sources.txt ]; then 
@@ -37,7 +36,7 @@ jobs:
           fi
           
           # Bien dich code test (neu co)
-          find test/java -name "*.java" > tests.txt
+          find test -name "*.java" > tests.txt
           if [ -s tests.txt ]; then 
             javac -cp "build/classes:lib-test/junit.jar:lib-test/hamcrest.jar" -d build/test-classes @tests.txt
           else
@@ -47,8 +46,8 @@ jobs:
       - name: Chay Unit Test tu dong
         run: |
           if [ -s tests.txt ]; then
-            # Thu chay file test neu ton tai, neu khong co class thi se bao loi nhung buoc nay van passed tam thoi
-            java -cp "build/classes:build/test-classes:lib-test/junit.jar:lib-test/hamcrest.jar" org.junit.runner.JUnitCore com.autowashpro.utils.LoyaltyEngineTest || echo "Bo qua loi Test Class khong ton tai"
+            # Thu chay file test neu ton tai
+            java -cp "build/classes:build/test-classes:lib-test/junit.jar:lib-test/hamcrest.jar" org.junit.runner.JUnitCore utils.LoyaltyEngineTest || echo "Bo qua loi Test Class khong ton tai"
           else
             echo "Khong co test nao de chay. Pass!"
           fi

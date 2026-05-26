@@ -4,8 +4,10 @@ import dao.UserDAO;
 import dto.Customer;
 import dto.User;
 import utils.HashUtil;
+import utils.ValidationUtil;
 
 public class UserService {
+
     private UserDAO userDAO;
 
     public UserService() {
@@ -19,6 +21,7 @@ public class UserService {
 
     /**
      * Xử lý nghiệp vụ Đăng ký tài khoản
+     *
      * @return 1 nếu thành công, 0 nếu bị trùng SĐT, -1 nếu lỗi hệ thống
      */
     public int processRegistration(String fullName, String phone, String licensePlate, String rawPassword) {
@@ -44,13 +47,13 @@ public class UserService {
 
     /**
      * Xử lý nghiệp vụ Đăng nhập
+     *
      * @return User object nếu đúng thông tin, null nếu sai.
      */
     public User processLogin(String phone, String rawPassword) {
-        if (phone == null || phone.trim().isEmpty() || rawPassword == null || rawPassword.trim().isEmpty()) {
+        if (ValidationUtil.isAnyEmpty(phone, rawPassword)) {
             return null;
         }
-        
         String hashedPass = HashUtil.hashPassword(rawPassword);
         return userDAO.login(phone, hashedPass);
     }

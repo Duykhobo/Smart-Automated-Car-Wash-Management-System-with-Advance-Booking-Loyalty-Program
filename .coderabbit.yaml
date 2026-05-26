@@ -1,0 +1,19 @@
+language: "vi-VN"
+tone_instructions: "Review code một cách thân thiện, mang tính xây dựng và đóng vai trò như một Senior Tech Lead. Giải thích rõ ràng nguyên nhân lỗi và đưa ra giải pháp cụ thể."
+early_access: false
+enable_free_tier: true
+inheritance:
+  default: true
+chat:
+  auto_reply: true
+knowledge_base:
+  opt_out: false
+code_generation:
+  opt_out: false
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  auto_review:
+    enabled: true
+    drafts: false

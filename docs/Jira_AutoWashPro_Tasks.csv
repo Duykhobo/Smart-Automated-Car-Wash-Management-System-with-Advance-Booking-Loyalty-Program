@@ -1,21 +1,21 @@
-﻿Issue Type,Summary,Description,Priority,Assignee,Components,Due Date
-Epic,Foundation & Authentication,"Khởi tạo cấu trúc dự án, database và luồng đăng nhập.",Highest,Dev 4,Backend,01/06/2026
-Task,Thiết kế & Khởi tạo Database SQL Server,Chạy script tạo bảng từ ERD. Tạo user/pass truy cập db.,Highest,Dev 1,Database,25/05/2026
-Task,Cấu hình DBContext & Connection Pool (HikariCP),"Thiết lập file cấu hình kết nối DB, đảm bảo không rò rỉ connection.",Highest,Dev 1,Backend,26/05/2026
-Task,Tạo các lớp Models/DTO,"Tạo Account, Customer, Booking, Voucher, PointLedger...",High,Dev 2,Backend,27/05/2026
-Story,Luồng Đăng ký tài khoản (Register),"Xử lý RegisterServlet, băm mật khẩu SHA-256, gọi DAO insert vào Account & Customer.",High,Dev 4,Backend,29/05/2026
-Story,Luồng Đăng nhập/Đăng xuất (Login),"Xử lý LoginServlet, tạo HttpSession lưu thông tin User.",High,Dev 4,Backend,01/06/2026
-Epic,Loyalty Engine (Đổi điểm & Hạng thẻ),"Xử lý tích điểm, thuật toán FIFO và sinh Voucher.",High,Dev 1,Loyalty,15/06/2026
-Task,Viết PointLedgerDAO (Thuật toán FIFO),"Viết các hàm getTotalAvailablePoints(), getFIFOPointsList(), deductPoints()",Highest,Dev 1,Database,
-Task,Viết VoucherDAO,"Hàm insertVoucher() sinh mã ngẫu nhiên, getAvailableVouchers()",High,Dev 1,Database,
-Story,Dashboard Điểm thưởng & Hạng thẻ,"LoyaltyDashboardServlet: Load số điểm, tiến trình lên hạng, hiển thị giao diện UI VIP.",Medium,Dev 3,Frontend,
-Story,Luồng Đổi điểm lấy Voucher (Transaction),"RedeemVoucherServlet: Trừ điểm FIFO, kiểm tra số dư, insert Voucher. Chạy trong 1 Transaction.",Highest,Dev 1,Backend,
-Epic,Booking Engine (Đặt lịch & Giữ chỗ),Luồng đặt lịch cốt lõi kết hợp thuật toán Rowlock chống quá tải.,Highest,Dev 2,Booking,30/06/2026
-Task,Viết BookingSlotCapacityDAO (Rowlock),Hàm getAvailableSlots() và checkAndLockSlot() dùng UPDLOCK ROWLOCK.,Highest,Dev 2,Database,
-Task,Viết ServiceDAO & BookingDAO,Hàm getAllServices() và insertBooking(),High,Dev 2,Database,
-Story,Giao diện chọn giờ Đặt lịch (AJAX),"BookingPageServlet và FetchSlotsServlet: Trả về JSON giờ trống theo ngày, giới hạn ngày theo hạng thẻ.",High,Dev 3,Frontend,
-Story,Luồng Thanh toán (Checkout Transaction),"CheckoutServlet: Mở Transaction, lock slot, áp dụng Voucher (mark as Used), tạo Booking, commit.",Highest,Dev 2,Backend,
-Epic,Admin Dashboard & LPR Integration,Báo cáo thống kê quản trị và API giả lập cổng nhận diện biển số.,Medium,Dev 4,Admin,15/07/2026
-Task,Viết ReportDAO & SQL Server Agent,Query thống kê doanh thu. Cấu hình job tự động rà soát hạ hạng lúc 00:00 đầu tháng.,High,Dev 4,Database,
-Story,Giao diện Admin Dashboard (Chart.js),"AdminDashboardServlet: Load số liệu từ ReportDAO, render biểu đồ lên admin.jsp.",Medium,Dev 4,Frontend,
-Story,API Giả lập Cổng LPR,"LPRMockServlet: Nhận LicensePlate dạng JSON, tìm Booking trong ngày, sinh WashRecord và trigger cộng điểm tích lũy.",High,Dev 4,Backend,
+Issue Type,Summary,Description,Priority,Assignee,Components,Due Date
+Epic,Foundation & Authentication,"Khởi tạo cấu trúc dự án, database và luồng đăng nhập.",Highest,Minh Tân,Backend,01/06/2026
+Task,Thiết kế & Khởi tạo Database SQL Server,Chạy script tạo bảng từ ERD. Tạo user/pass truy cập db.,Highest,Thiên Quân,Database,25/05/2026
+Task,Cấu hình DBContext & Connection Pool (HikariCP),"Thiết lập file cấu hình kết nối DB, đảm bảo không rò rỉ connection.",Highest,Thiên Quân,Backend,26/05/2026
+Task,Tạo các lớp Models/DTO,"Tạo Account, Customer, Booking, Voucher, PointLedger...",High,Thanh Duy,Backend,27/05/2026
+Story,Luồng Đăng ký tài khoản (Register),"Xử lý RegisterServlet, băm mật khẩu SHA-256, gọi DAO insert vào Account & Customer.",High,Minh Tân,Backend,29/05/2026
+Story,Luồng Đăng nhập/Đăng xuất (Login),"Xử lý LoginServlet, tạo HttpSession lưu thông tin User.",High,Minh Tân,Backend,01/06/2026
+Epic,Loyalty Engine (Đổi điểm & Hạng thẻ),"Xử lý tích điểm, thuật toán FIFO và sinh Voucher.",High,Thiên Quân,Loyalty,15/06/2026
+Task,Viết PointLedgerDAO (Thuật toán FIFO),"Viết các hàm getTotalAvailablePoints(), getFIFOPointsList(), deductPoints()",Highest,Thiên Quân,Database,
+Task,Viết VoucherDAO,"Hàm insertVoucher() sinh mã ngẫu nhiên, getAvailableVouchers()",High,Thiên Quân,Database,
+Story,Dashboard Điểm thưởng & Hạng thẻ,"LoyaltyDashboardServlet: Load số điểm, tiến trình lên hạng, hiển thị giao diện UI VIP.",Medium,Khánh Duy,Frontend,
+Story,Luồng Đổi điểm lấy Voucher (Transaction),"RedeemVoucherServlet: Trừ điểm FIFO, kiểm tra số dư, insert Voucher. Chạy trong 1 Transaction.",Highest,Thiên Quân,Backend,
+Epic,Booking Engine (Đặt lịch & Giữ chỗ),Luồng đặt lịch cốt lõi kết hợp thuật toán Rowlock chống quá tải.,Highest,Thanh Duy,Booking,30/06/2026
+Task,Viết BookingSlotCapacityDAO (Rowlock),Hàm getAvailableSlots() và checkAndLockSlot() dùng UPDLOCK ROWLOCK.,Highest,Thanh Duy,Database,
+Task,Viết ServiceDAO & BookingDAO,Hàm getAllServices() và insertBooking(),High,Thanh Duy,Database,
+Story,Giao diện chọn giờ Đặt lịch (AJAX),"BookingPageServlet và FetchSlotsServlet: Trả về JSON giờ trống theo ngày, giới hạn ngày theo hạng thẻ.",High,Khánh Duy,Frontend,
+Story,Luồng Thanh toán (Checkout Transaction),"CheckoutServlet: Mở Transaction, lock slot, áp dụng Voucher (mark as Used), tạo Booking, commit.",Highest,Thanh Duy,Backend,
+Epic,Admin Dashboard & LPR Integration,Báo cáo thống kê quản trị và API giả lập cổng nhận diện biển số.,Medium,Minh Tân,Admin,15/07/2026
+Task,Viết ReportDAO & SQL Server Agent,Query thống kê doanh thu. Cấu hình job tự động rà soát hạ hạng lúc 00:00 đầu tháng.,High,Minh Tân,Database,
+Story,Giao diện Admin Dashboard (Chart.js),"AdminDashboardServlet: Load số liệu từ ReportDAO, render biểu đồ lên admin.jsp.",Medium,Minh Tân,Frontend,
+Story,API Giả lập Cổng LPR,"LPRMockServlet: Nhận LicensePlate dạng JSON, tìm Booking trong ngày, sinh WashRecord và trigger cộng điểm tích lũy.",High,Minh Tân,Backend,

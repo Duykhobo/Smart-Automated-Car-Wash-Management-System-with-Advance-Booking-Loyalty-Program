@@ -6,7 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.MockedConstruction;
 import service.UserService;
+
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +45,7 @@ public class RegisterServletTest {
         when(request.getRequestDispatcher("login.jsp")).thenReturn(requestDispatcher);
 
         // Giả lập UserService
-        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+        try (MockedConstruction<UserService> mockedService = mockConstruction(UserService.class, (mock, context) -> {
             when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(1); // 1 = Thành công
         })) {
             servlet.doPost(request, response);
@@ -59,7 +63,7 @@ public class RegisterServletTest {
         when(request.getParameter("password")).thenReturn("password123");
         when(request.getRequestDispatcher("register.jsp")).thenReturn(requestDispatcher);
 
-        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+        try (MockedConstruction<UserService> mockedService = mockConstruction(UserService.class, (mock, context) -> {
             // Giả lập DB báo lỗi trùng SĐT (0 = Trùng SĐT)
             when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(0);
         })) {
@@ -79,7 +83,7 @@ public class RegisterServletTest {
         when(request.getParameter("password")).thenReturn("password123");
         when(request.getRequestDispatcher("register.jsp")).thenReturn(requestDispatcher);
 
-        try (var mockedService = mockConstruction(UserService.class, (mock, context) -> {
+        try (MockedConstruction<UserService> mockedService = mockConstruction(UserService.class, (mock, context) -> {
             // Giả lập hệ thống bận (-1 = Lỗi)
             when(mock.processRegistration(anyString(), anyString(), anyString(), anyString())).thenReturn(-1);
         })) {

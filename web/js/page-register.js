@@ -7,8 +7,13 @@ function handleRegister(event) {
 
     // Form hợp lệ -> Để cho HTML tự submit lên Servlet!
     const submitBtn = document.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
     submitBtn.innerText = "Đang xử lý...";
+    
+    // Dùng setTimeout để tránh vô hiệu hóa nút ngay lập tức trong luồng đồng bộ, 
+    // tránh làm trình duyệt dừng hoặc từ chối gửi form đi.
+    setTimeout(() => {
+        submitBtn.disabled = true;
+    }, 10);
 
     return true;
 }

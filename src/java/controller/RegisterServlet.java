@@ -57,6 +57,22 @@ public class RegisterServlet extends HttpServlet {
         String licensePlate = request.getParameter("plate");
         String rawPassword = request.getParameter("password");
         
+        // Edge case: Kiểm tra đầu vào trống hoặc null ở phía backend
+        if (fullName == null || fullName.trim().isEmpty() ||
+            phone == null || phone.trim().isEmpty() ||
+            licensePlate == null || licensePlate.trim().isEmpty() ||
+            rawPassword == null || rawPassword.trim().isEmpty()) {
+            
+            request.setAttribute("errorMessage", "Vui lòng điền đầy đủ tất cả thông tin đăng ký!");
+            Customer cus = new Customer();
+            cus.setFullName(fullName);
+            cus.setPhone(phone);
+            cus.setLicensePlate(licensePlate);
+            request.setAttribute("user", cus);
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
+        }
+        
         UserService userService = new UserService();
         int result = userService.processRegistration(fullName, phone, licensePlate, rawPassword);
 

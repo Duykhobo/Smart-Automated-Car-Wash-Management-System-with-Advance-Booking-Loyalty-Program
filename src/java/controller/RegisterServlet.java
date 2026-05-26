@@ -38,12 +38,22 @@ public class RegisterServlet extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Processes user registration submissions and forwards to the appropriate view.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Reads form parameters (fullname, phone, plate, password), enforces UTF-8 encoding,
+     * and validates that all required fields are present. If any field is missing or blank,
+     * sets "errorMessage", attaches a partially populated Customer as "user", and forwards to "register.jsp".
+     * Otherwise calls UserService.processRegistration(fullname, phone, plate, password) and:
+     * - when the result is 0: sets "errorMessage" indicating the phone is already registered,
+     *   attaches the submitted Customer as "user", and forwards to "register.jsp";
+     * - when the result is 1: sets "successMessage" indicating registration success and forwards to "login.jsp";
+     * - for any other result: sets a system-busy "errorMessage", attaches the submitted Customer as "user",
+     *   and forwards to "register.jsp".
+     *
+     * @param request  the HTTP request carrying form data
+     * @param response the HTTP response used for forwarding
+     * @throws ServletException if a servlet-specific error occurs during request forwarding
+     * @throws IOException if an I/O error occurs during request forwarding
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

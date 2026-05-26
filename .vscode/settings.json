@@ -1,5 +1,5 @@
 {
-  "workbench.colorTheme": "Dracula Theme",
+  "workbench.colorTheme": "GitHub Dark Default",
   "java.project.referencedLibraries": [
     "lib/**/*.jar",
     "c:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\lib\\jsp-api.jar",

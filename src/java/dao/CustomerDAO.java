@@ -10,6 +10,13 @@ import utils.DBContext;
 
 public class CustomerDAO {
     
+    /**
+     * Retrieve the Customer record that corresponds to the given account user ID.
+     *
+     * @param userID the account's UserID used to look up the customer
+     * @return the matching Customer object, or `null` if no record is found or an error occurs
+     * @throws ClassNotFoundException if the database driver or DB context cannot be initialized
+     */
     public Customer getCustomerByAccountId(int userID) throws ClassNotFoundException {
         // Chỉ cần gọi tên bảng "Customers"
         String sql = "SELECT * FROM Customers WHERE UserID = ?";

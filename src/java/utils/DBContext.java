@@ -1,7 +1,8 @@
 package utils;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBContext {
@@ -11,44 +12,72 @@ public class DBContext {
     private static final String DB_NAME = "SmartCarWash";
     private static final String USER_ID = "sa";
     private static final String PASSWORD = "12345";
+    
+    // Khai báo DataSource dùng chung (Singleton Pattern ngầm)
+    private static HikariDataSource dataSource;
 
-    /**
-     * Establishes a raw connection to the Microsoft SQL Server database.
-     *
-     * * @return Connection object linked to the specified Database
-     * @throws SQLException if a database access error occurs or the url is
-     * invalid
-     * @throws ClassNotFoundException if the SQL Server JDBC Driver is missing
-     * from the classpath
-     */
-    public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        // Constructing the connection string.
-        // 'encrypt=false' is explicitly added to bypass SSL Certificate validation issues commonly found in newer JDK versions.
-        String url = "jdbc:sqlserver://" + SERVER_NAME + ":" + PORT_NUMBER
-                + ";databaseName=" + DB_NAME + ";user=" + USER_ID + ";password=" + PASSWORD + ";encrypt=false";
-        // Dynamic loading of the Microsoft SQL Server JDBC Driver
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        return DriverManager.getConnection(url);
+    // Static block để khởi tạo Pool ngay khi class DBContext được load vào bộ nhớ lần đầu
+    static {
+        try {
+            HikariConfig config = new HikariConfig();
+            
+            // Cấu hình URL kết nối tới SQL Server
+            String url = "jdbc:sqlserver://" + SERVER_NAME + ":" + PORT_NUMBER
+                    + ";databaseName=" + DB_NAME + ";encrypt=false";
+            config.setJdbcUrl(url);
+            config.setUsername(USER_ID);
+            config.setPassword(PASSWORD);
+            config.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            
+            // --- CẤU HÌNH TỐI ƯU CHO HIKARICP ---
+            // Số connection tối đa giữ trong pool
+            config.setMaximumPoolSize(10); 
+            // Thời gian tối đa (ms) chịu đợi để mượn 1 connection, quá giờ ném Exception
+            config.setConnectionTimeout(30000); 
+            // Thời gian (ms) một connection được phép nằm không (nhàn rỗi) trước khi bị thu hồi
+            config.setIdleTimeout(600000); 
+            // Đặt tên pool để dễ debug sau này
+            config.setPoolName("AutoWash-DB-Pool");
+
+            // Khởi tạo Pool!
+            dataSource = new HikariDataSource(config);
+            
+            System.out.println("HikariCP Connection Pool đã được khởi tạo thành công!");
+            
+        } catch (Exception e) {
+            System.err.println("Lỗi nghiêm trọng khi khởi tạo HikariCP: ");
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Main method for rapid local Unit Testing. You can right-click this file
-     * inside your IDE (NetBeans) and select 'Run File'.
+     * Lấy một connection từ Pool thay vì tạo mới.
+     * CỰC KỲ QUAN TRỌNG: Lấy xong phải gọi conn.close() (trong DAO) 
+     * để trả connection lại cho Pool, nếu không Pool sẽ cạn kiệt.
      */
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+    
+    /**
+     * Dùng để đóng toàn bộ Pool khi Tomcat bị tắt (thường viết trong Listener)
+     */
+    public static void closePool() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+            System.out.println("Đã đóng HikariCP Connection Pool.");
+        }
+    }
+
+    // Hàm Main để Dev test local xem file jar đã nhận và kết nối được chưa
     public static void main(String[] args) {
-        System.out.println("=== Initiating Database Connection Test ===");
-        // Utilizing Java's Try-With-Resources block to ensure automatic closure of the connection resource
-        try ( Connection conn = DBContext.getConnection()) {
+        System.out.println("=== Test mượn Connection từ HikariCP Pool ===");
+        try (Connection conn = DBContext.getConnection()) {
             if (conn != null && !conn.isClosed()) {
-                System.out.println("---------------------------------------------------------");
-                System.out.println("DBContext: CONNECTION TO [SmartCarWash] SUCCESSFUL!");
-                System.out.println("---------------------------------------------------------");
+                System.out.println("Tuyệt vời! Đã lấy được connection: " + conn.toString());
             }
-        } catch (ClassNotFoundException e) {
-            System.err.println(" FAILURE: SQL Server JDBC Driver not found! (Verify if the .jar file exists in your WEB-INF/lib directory)");
-            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println(" FAILURE: Connection rejected. Please double-check the Port, Credentials, or verify if the Database exists in SSMS.");
+            System.err.println("Lỗi rồi, check lại cấu hình hoặc xem SQL Server đã bật chưa:");
             e.printStackTrace();
         }
     }

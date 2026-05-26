@@ -1,3 +1,9 @@
+/**
+ * Validate the registration form and prepare the submit button before form submission.
+ * If validation fails, the submission is prevented and the function returns `false`. If validation succeeds, the submit button text is changed to "Đang xử lý..." and the button is disabled shortly after to help prevent double submission.
+ * @param {Event} event - The form submit event.
+ * @returns {boolean} `true` if validation passed and submission may proceed, `false` if validation failed and submission was prevented.
+ */
 function handleRegister(event) {
     // 1. Chạy Validation Front-end
     if (!validateForm()) {

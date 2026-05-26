@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import service.UserService;
+import utils.ValidationUtil;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -30,7 +31,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         // Edge case: Thiếu thông tin
-        if (phone == null || phone.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+        if (ValidationUtil.isAnyEmpty(phone, password)) {
             request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
@@ -39,8 +40,14 @@ public class LoginServlet extends HttpServlet {
         User user = userService.processLogin(phone, password);
 
         if (user != null) {
-            // Đăng nhập thành công, lưu session
-            HttpSession session = request.getSession();
+            // Đăng nhập thành công, chống Session Fixation bằng cách xóa session cũ
+            HttpSession oldSession = request.getSession(false);
+            if (oldSession != null) {
+                oldSession.invalidate();
+            }
+            
+            // Tạo session mới hoàn toàn tinh khiết
+            HttpSession session = request.getSession(true);
             session.setAttribute("loggedInUser", user);
             
             // Phân quyền (Edge case: Admin vs Customer)

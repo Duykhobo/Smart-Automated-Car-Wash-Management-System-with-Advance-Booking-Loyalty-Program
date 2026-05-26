@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.UserService;
+import utils.ValidationUtil;
 
 /**
  *
@@ -57,6 +58,17 @@ public class RegisterServlet extends HttpServlet {
         String licensePlate = request.getParameter("plate");
         String rawPassword = request.getParameter("password");
         
+        if (ValidationUtil.isAnyEmpty(fullName, phone, licensePlate, rawPassword)) {
+            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ tất cả thông tin!");
+            Customer oldData = new Customer();
+            oldData.setFullName(fullName);
+            oldData.setPhone(phone);
+            oldData.setLicensePlate(licensePlate);
+            request.setAttribute("user", oldData);
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
+        }
+        
         UserService userService = new UserService();
         int result = userService.processRegistration(fullName, phone, licensePlate, rawPassword);
 
@@ -72,8 +84,8 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (result == 1) {
-            request.setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getSession().setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+            response.sendRedirect("login.jsp");
         } else {
             request.setAttribute("errorMessage", "Hệ thống đang bận, vui lòng thử lại sau!");
             Customer cus = new Customer();

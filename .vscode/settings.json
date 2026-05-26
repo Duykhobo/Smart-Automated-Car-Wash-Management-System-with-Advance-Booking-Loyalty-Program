@@ -4,6 +4,12 @@
     "lib/**/*.jar",
     "c:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\lib\\jsp-api.jar",
     "c:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\lib\\servlet-api.jar",
-    "lib-test/**/*.jar"
+    "lib-test/**/*.jar",
+    "web/WEB-INF/lib/HikariCP-4.0.3.jar",
+    "web/WEB-INF/lib/jsp-api.jar",
+    "web/WEB-INF/lib/servlet-api.jar",
+    "web/WEB-INF/lib/slf4j-api-1.7.36.jar",
+    "web/WEB-INF/lib/slf4j-simple-1.7.36.jar",
+    "web/WEB-INF/lib/sqljdbc4.jar"
   ]
 }

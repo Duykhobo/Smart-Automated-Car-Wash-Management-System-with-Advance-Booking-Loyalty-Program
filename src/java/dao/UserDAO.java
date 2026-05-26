@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import dto.Customer;
 import dto.User;
@@ -18,7 +19,7 @@ public class UserDAO {
             try ( ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
@@ -62,7 +63,7 @@ public class UserDAO {
             // 4. Nếu code chạy mượt tới đây không sinh lỗi -> Chốt hạ lưu vào DB!
             conn.commit();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Nếu có lỗi ở bất kỳ bước nào (trùng SDT, đứt cáp...) -> Hủy bỏ hết toàn bộ
             // quá trình trên
             if (conn != null) {
@@ -79,7 +80,7 @@ public class UserDAO {
                 try {
                     conn.setAutoCommit(true);
                     conn.close();
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
@@ -104,7 +105,7 @@ public class UserDAO {
                     return user;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;

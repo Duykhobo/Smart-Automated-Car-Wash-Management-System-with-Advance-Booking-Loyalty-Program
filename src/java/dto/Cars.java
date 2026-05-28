@@ -12,7 +12,7 @@ public class Cars {
     private Date UpdatedAt;
     private boolean isActive;
 
-    public Cars(int vehicleID, int customerID, String licensePlate, String vehicleType, Sring color, Date createdAt,
+    public Cars(int vehicleID, int customerID, String licensePlate, String vehicleType, String color, Date createdAt,
             Date updatedAt, boolean isActive) {
         VehicleID = vehicleID;
         CustomerID = customerID;

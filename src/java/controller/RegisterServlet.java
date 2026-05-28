@@ -4,9 +4,7 @@
  */
 package controller;
 
-import dao.UserDAO;
 import dto.Customer;
-import dto.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

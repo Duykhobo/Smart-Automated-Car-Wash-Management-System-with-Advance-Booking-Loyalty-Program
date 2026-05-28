@@ -1,6 +1,5 @@
 package controller;
 
-import dao.UserDAO;
 import dto.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -42,7 +41,7 @@ public class LoginServlet extends HttpServlet {
             // Đăng nhập thành công, lưu session
             HttpSession session = request.getSession();
             session.setAttribute("loggedInUser", user);
-            
+
             // Phân quyền (Edge case: Admin vs Customer)
             if ("Admin".equalsIgnoreCase(user.getRole())) {
                 response.sendRedirect("admin/dashboard.jsp");

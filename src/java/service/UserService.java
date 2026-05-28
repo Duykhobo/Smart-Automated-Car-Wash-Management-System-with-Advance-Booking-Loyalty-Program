@@ -51,7 +51,7 @@ public class UserService {
      * @return User object nếu đúng thông tin, null nếu sai.
      */
     public User processLogin(String phone, String rawPassword) {
-        if (ValidationUtil.isAnyEmpty(phone, rawPassword)) {
+        if (utils.ValidationUtil.isAnyEmpty(phone, rawPassword)) {
             return null;
         }
         String hashedPass = HashUtil.hashPassword(rawPassword);

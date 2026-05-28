@@ -4,9 +4,7 @@
  */
 package controller;
 
-import dao.UserDAO;
 import dto.Customer;
-import dto.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,22 +12,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.UserService;
+import utils.ValidationUtil;
 
 /**
  *
  * @author ThanhDuy
  */
-@WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
+@WebServlet(name = "RegisterServlet", urlPatterns = { "/register" })
 public class RegisterServlet extends HttpServlet {
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,12 +38,30 @@ public class RegisterServlet extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Processes user registration submissions and forwards to the appropriate view.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Reads form parameters (fullname, phone, plate, password), enforces UTF-8
+     * encoding,
+     * and validates that all required fields are present. If any field is missing
+     * or blank,
+     * sets "errorMessage", attaches a partially populated Customer as "user", and
+     * forwards to "register.jsp".
+     * Otherwise calls UserService.processRegistration(fullname, phone, plate,
+     * password) and:
+     * - when the result is 0: sets "errorMessage" indicating the phone is already
+     * registered,
+     * attaches the submitted Customer as "user", and forwards to "register.jsp";
+     * - when the result is 1: sets "successMessage" indicating registration success
+     * and forwards to "login.jsp";
+     * - for any other result: sets a system-busy "errorMessage", attaches the
+     * submitted Customer as "user",
+     * and forwards to "register.jsp".
+     *
+     * @param request  the HTTP request carrying form data
+     * @param response the HTTP response used for forwarding
+     * @throws ServletException if a servlet-specific error occurs during request
+     *                          forwarding
+     * @throws IOException      if an I/O error occurs during request forwarding
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -56,7 +74,20 @@ public class RegisterServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String licensePlate = request.getParameter("plate");
         String rawPassword = request.getParameter("password");
-        
+
+        // Edge case: Kiểm tra đầu vào trống hoặc null ở phía backend
+        if (ValidationUtil.isAnyEmpty(fullName, phone, licensePlate, rawPassword)) {
+
+            request.setAttribute("errorMessage", "Vui lòng điền đầy đủ tất cả thông tin đăng ký!");
+            Customer cus = new Customer();
+            cus.setFullName(fullName);
+            cus.setPhone(phone);
+            cus.setLicensePlate(licensePlate);
+            request.setAttribute("user", cus);
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
+        }
+
         UserService userService = new UserService();
         int result = userService.processRegistration(fullName, phone, licensePlate, rawPassword);
 

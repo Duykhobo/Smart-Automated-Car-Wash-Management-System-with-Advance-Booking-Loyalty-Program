@@ -10,7 +10,7 @@ import utils.DBContext;
 
 public class CustomerDAO {
     
-    public Customer getCustomerByAccountId(int userID) throws ClassNotFoundException {
+    public Customer getCustomerByAccountId(int userID) {
         // Chỉ cần gọi tên bảng "Customers"
         String sql = "SELECT * FROM Customers WHERE UserID = ?";
         
@@ -30,7 +30,7 @@ public class CustomerDAO {
                     String tierStatus = rs.getString("TierStatus");
                     int pointBalance = rs.getInt("PointsBalance");
                     
-                    // Đã sửa lại thành getDouble
+                    // Sửa lỗi getInt -> getDouble để tránh mất số thập phân
                     double totalSpend = rs.getDouble("TotalSpend"); 
                     int totalWashes = rs.getInt("TotalWashes");
                     Timestamp tierUpgradeDate = rs.getTimestamp("TierUpgradeDate");

@@ -8,7 +8,8 @@ import dao.CarDao;
 import dto.Cars;
 import dto.Customer;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.Date;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -45,7 +46,9 @@ public class CarCRUDController extends HttpServlet {
                     String licensePlate = request.getParameter("licensePlate");
                     String vehicleType = request.getParameter("vehicleType");
                     String color = request.getParameter("color");
-                    Cars car = new Cars(0, customerId, licensePlate, vehicleType, color, null, null, true);
+                    Date CreatedAt=new Date(System.currentTimeMillis());
+                    Date UpdatedAt=new Date(System.currentTimeMillis());
+                    Cars car=new Cars(customerId, licensePlate, vehicleType, color, CreatedAt, UpdatedAt, true);
                     boolean success = carDAO.insertCar(car);
                     if (success) {
                         request.getSession().setAttribute("MESSAGE", "Thêm xe mới thành công!");
@@ -75,7 +78,8 @@ public class CarCRUDController extends HttpServlet {
                     String licensePlate = request.getParameter("licensePlate");
                     String vehicleType = request.getParameter("vehicleType");
                     String color = request.getParameter("color");
-                    Cars car = new Cars(vehicleId, customerId, licensePlate, vehicleType, color, null, null, true);
+                    Date UpdatedAt = new Date(System.currentTimeMillis());
+                    Cars car = new Cars(vehicleId, customerId, licensePlate, vehicleType, color, null, UpdatedAt, true);
                     boolean success = carDAO.updateCar(car);
                     if (success) {
                         request.getSession().setAttribute("MESSAGE", "Cập nhật thông tin xe thành công!");

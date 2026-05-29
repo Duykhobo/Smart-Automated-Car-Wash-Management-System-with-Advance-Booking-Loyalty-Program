@@ -4,7 +4,6 @@ import dao.UserDAO;
 import dto.Customer;
 import dto.User;
 import utils.HashUtil;
-import utils.ValidationUtil;
 
 public class UserService {
 

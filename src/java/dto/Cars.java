@@ -23,7 +23,16 @@ public class Cars {
         UpdatedAt = updatedAt;
         this.isActive = isActive;
     }
-
+    //Contrustor nay dung khi them xe moi//
+    public Cars(int customerID, String licensePlate, String vehicleType, String color, Date createdAt, Date updatedAt, boolean isActive) {
+    this.CustomerID = customerID;
+    this.LicensePlate = licensePlate;
+    this.VehicleType = vehicleType;
+    this.Color = color;
+    this.CreatedAt = createdAt;
+    this.UpdatedAt = updatedAt;
+    this.isActive = isActive;
+}
     public int getVehicleID() {
         return VehicleID;   
     }

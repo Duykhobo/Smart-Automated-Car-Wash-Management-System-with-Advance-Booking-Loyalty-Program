@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
  * Filter này chặn mọi request (tùy urlPatterns) để kiểm tra đăng nhập.
  * Ở đây chặn các trang yêu cầu người dùng phải có tài khoản.
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/home.jsp", "/booking.jsp"})
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/dashboard", "/booking", "/profile", "/manage-cars"})
 public class AuthFilter implements Filter {
     
     @Override
@@ -41,8 +41,7 @@ public class AuthFilter implements Filter {
         } else {
             // Chưa đăng nhập -> đá về trang login với thông báo
             req.setAttribute("errorMessage", "Vui lòng đăng nhập để tiếp tục!");
-            req.getRequestDispatcher("/login.jsp").forward(request, response);
-            // Có thể dùng sendRedirect thay vì forward: res.sendRedirect(req.getContextPath() + "/login.jsp");
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 

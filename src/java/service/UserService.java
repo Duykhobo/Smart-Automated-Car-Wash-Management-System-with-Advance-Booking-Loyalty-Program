@@ -34,7 +34,7 @@ public class UserService {
         User user = new User();
         user.setUsername(phone);
         user.setPasswordHash(hashedPass);
-        user.setRole("Customer");
+        user.setRole("CUSTOMER");
 
         Customer cus = new Customer();
         cus.setFullName(fullName);

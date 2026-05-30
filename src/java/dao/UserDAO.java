@@ -28,7 +28,8 @@ public class UserDAO {
     // Hàm lưu vào cả 2 bảng bằng Transaction
     public boolean registerCustomer(User user, Customer cus) {
         String sqlInsertUser = "INSERT INTO Users (Username, PasswordHash, Role) VALUES (?, ?, ?)";
-        String sqlInsertCustomer = "INSERT INTO Customers (UserID, FullName, Phone, LicensePlate, TierStatus) VALUES (?, ?, ?, ?, 'Member')";
+        String sqlInsertCustomer = "INSERT INTO Customers (UserID, FullName, Phone) VALUES (?, ?, ?)";
+        String sqlInsertVehicle = "INSERT INTO Vehicles (CustomerID, LicensePlate) VALUES (?, ?)";
 
         Connection conn = null;
         try {
@@ -36,9 +37,7 @@ public class UserDAO {
             // 1. Tắt Auto-commit để bắt đầu Transaction
             conn.setAutoCommit(false);
             // 2. Insert vào bảng Users, đồng thời xin lấy lại UserID vừa được tạo
-            // (Statement.RETURN_GENERATED_KEYS)
-            try ( PreparedStatement psUser = conn.prepareStatement(sqlInsertUser,
-                    PreparedStatement.RETURN_GENERATED_KEYS)) {
+            try ( PreparedStatement psUser = conn.prepareStatement(sqlInsertUser, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 psUser.setString(1, user.getUsername());
                 psUser.setString(2, user.getPasswordHash());
                 psUser.setString(3, user.getRole());
@@ -49,12 +48,25 @@ public class UserDAO {
                         int generatedUserId = rsUser.getInt(1);
 
                         // 3. Có UserID rồi thì Insert tiếp vào bảng Customers
-                        try ( PreparedStatement psCustomer = conn.prepareStatement(sqlInsertCustomer)) {
+                        try ( PreparedStatement psCustomer = conn.prepareStatement(sqlInsertCustomer, PreparedStatement.RETURN_GENERATED_KEYS)) {
                             psCustomer.setInt(1, generatedUserId);
                             psCustomer.setString(2, cus.getFullName());
                             psCustomer.setString(3, cus.getPhone());
-                            psCustomer.setString(4, cus.getLicensePlate());
                             psCustomer.executeUpdate();
+                            
+                            // Lấy ID tự tăng của Customer vừa tạo
+                            try (ResultSet rsCustomer = psCustomer.getGeneratedKeys()) {
+                                if (rsCustomer.next()) {
+                                    int generatedCustomerId = rsCustomer.getInt(1);
+                                    
+                                    // 4. Có CustomerID rồi thì Insert Biển số vào bảng Vehicles
+                                    try ( PreparedStatement psVehicle = conn.prepareStatement(sqlInsertVehicle)) {
+                                        psVehicle.setInt(1, generatedCustomerId);
+                                        psVehicle.setString(2, cus.getLicensePlate());
+                                        psVehicle.executeUpdate();
+                                    }
+                                }
+                            }
                         }
                     }
                 }

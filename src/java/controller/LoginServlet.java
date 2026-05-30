@@ -16,7 +16,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class LoginServlet extends HttpServlet {
         // Edge case: Thiếu thông tin
         if (phone == null || phone.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
         UserService userService = new UserService();
@@ -44,15 +44,15 @@ public class LoginServlet extends HttpServlet {
 
             // Phân quyền (Edge case: Admin vs Customer)
             if ("Admin".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect("admin/dashboard.jsp");
+                response.sendRedirect("admin/dashboard");
             } else {
-                response.sendRedirect("home.jsp");
+                response.sendRedirect("dashboard");
             }
         } else {
             // Sai số điện thoại hoặc mật khẩu
             request.setAttribute("errorMessage", "Số điện thoại hoặc Mật khẩu không chính xác!");
             request.setAttribute("phone", phone); // Giữ lại SĐT
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 }

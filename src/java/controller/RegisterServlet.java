@@ -34,7 +34,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 
     /**
@@ -84,7 +84,7 @@ public class RegisterServlet extends HttpServlet {
             cus.setPhone(phone);
             cus.setLicensePlate(licensePlate);
             request.setAttribute("user", cus);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
             return;
         }
 
@@ -98,13 +98,13 @@ public class RegisterServlet extends HttpServlet {
             oldData.setPhone(phone);
             oldData.setLicensePlate(licensePlate);
             request.setAttribute("user", oldData);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
             return;
         }
 
         if (result == 1) {
             request.setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "Hệ thống đang bận, vui lòng thử lại sau!");
             Customer cus = new Customer();
@@ -112,7 +112,7 @@ public class RegisterServlet extends HttpServlet {
             cus.setPhone(phone);
             cus.setLicensePlate(licensePlate);
             request.setAttribute("user", cus);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
         }
     }
 }

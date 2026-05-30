@@ -32,3 +32,5 @@ local.properties
 *.ipr
 out/
 .vscode/settings.json
+.agent
+.github/prompts/

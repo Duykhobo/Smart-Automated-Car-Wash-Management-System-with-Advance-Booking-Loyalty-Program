@@ -14,11 +14,12 @@ public class Customer {
     private Double totalSpend;
     private int totalWashes;
     private Timestamp tierUpgradeDate;
+    private String avatar; // Thêm trường lưu đường dẫn ảnh đại diện
 
     public Customer() {
     }
 
-    public Customer(int customerId, int userId, String fullName, String phone, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate) {
+    public Customer(int customerId, int userId, String fullName, String phone, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate, String avatar) {
         this.customerId = customerId;
         this.userId = userId;
         this.fullName = fullName;
@@ -29,6 +30,7 @@ public class Customer {
         this.totalSpend = totalSpend;
         this.totalWashes = totalWashes;
         this.tierUpgradeDate = tierUpgradeDate;
+        this.avatar = avatar;
     }
 
     public int getCustomerId() {
@@ -109,5 +111,18 @@ public class Customer {
 
     public void setTierUpgradeDate(Timestamp tierUpgradeDate) {
         this.tierUpgradeDate = tierUpgradeDate;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" + "customerId=" + customerId + ", userId=" + userId + ", fullName=" + fullName + ", phone=" + phone + ", licensePlate=" + licensePlate + ", tierStatus=" + tierStatus + ", pointsBalance=" + pointsBalance + ", totalSpend=" + totalSpend + ", totalWashes=" + totalWashes + ", tierUpgradeDate=" + tierUpgradeDate + ", avatar=" + avatar + '}';
     }
 }

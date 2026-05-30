@@ -56,10 +56,10 @@ tailwind.config = {
         </div>
         
         <div class="flex flex-col sm:flex-row w-full max-w-md items-center justify-center gap-4 mt-4">
-            <button onclick="window.location.href='register'" type="button" class="flex h-14 items-center justify-center gap-2.5 px-8 w-full sm:w-auto bg-[#00d4ff] hover:bg-cyan-400 rounded-xl shadow-[0px_4px_24px_#00d4ff66] font-sans font-semibold text-base text-[#121826] transition-all hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-primary focus:ring-offset-2 focus:ring-offset-[#0b0f1a]">
+            <button onclick="window.location.href='${pageContext.request.contextPath}/auth/register'" type="button" class="flex h-14 items-center justify-center gap-2.5 px-8 w-full sm:w-auto bg-[#00d4ff] hover:bg-cyan-400 rounded-xl shadow-[0px_4px_24px_#00d4ff66] font-sans font-semibold text-base text-[#121826] transition-all hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-btn-primary focus:ring-offset-2 focus:ring-offset-[#0b0f1a]">
                 Đăng ký ngay
             </button>
-            <button onclick="window.location.href='login'" type="button" class="flex h-14 items-center justify-center gap-2.5 px-8 w-full sm:w-auto rounded-xl border border-solid border-gray-600 hover:bg-white/10 hover:border-gray-400 font-sans font-semibold text-base text-white bg-transparent transition-all hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0b0f1a]">
+            <button onclick="window.location.href='${pageContext.request.contextPath}/auth/login'" type="button" class="flex h-14 items-center justify-center gap-2.5 px-8 w-full sm:w-auto rounded-xl border border-solid border-gray-600 hover:bg-white/10 hover:border-gray-400 font-sans font-semibold text-base text-white bg-transparent transition-all hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0b0f1a]">
                 Đăng nhập
             </button>
         </div>
@@ -179,7 +179,7 @@ tailwind.config = {
             </p>
         </div>
         
-        <button onclick="window.location.href='register'" type="button" class="flex h-14 md:h-16 items-center justify-center px-10 w-full sm:w-auto bg-[#00d4ff] hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all rounded-2xl shadow-[0px_4px_24px_#00d4ff66] focus:outline-none focus:ring-2 focus:ring-btn-primary focus:ring-offset-2 focus:ring-offset-gray-900">
+        <button onclick="window.location.href='${pageContext.request.contextPath}/auth/register'" type="button" class="flex h-14 md:h-16 items-center justify-center px-10 w-full sm:w-auto bg-[#00d4ff] hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all rounded-2xl shadow-[0px_4px_24px_#00d4ff66] focus:outline-none focus:ring-2 focus:ring-btn-primary focus:ring-offset-2 focus:ring-offset-gray-900">
             <span class="font-sans font-bold text-[#1e1e1e] text-base md:text-lg tracking-wide uppercase">
                 TẠO TÀI KHOẢN MIỄN PHÍ
             </span>

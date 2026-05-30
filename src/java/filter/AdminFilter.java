@@ -12,10 +12,11 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import utils.AppConstants;
 
 /**
- * Filter này chặn toàn bộ các request vào thư mục /admin/*
- * Chỉ có user mang Role là "Admin" mới được phép truy cập.
+ * Filter này chặn toàn bộ các request vào thư mục /admin/* Chỉ có user mang
+ * Role là "Admin" mới được phép truy cập.
  */
 @WebFilter(filterName = "AdminFilter", urlPatterns = {"/admin/*"})
 public class AdminFilter implements Filter {
@@ -27,16 +28,17 @@ public class AdminFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        boolean loggedIn = session != null && session.getAttribute("loggedInUser") != null;
+        // Kiểm tra xem session có tồn tại và có chứa 'loggedInUser' không
+        boolean loggedIn = session != null && session.getAttribute(AppConstants.SESSION_USER_ACCOUNT) != null;
 
         if (loggedIn) {
-            User user = (User) session.getAttribute("loggedInUser");
-            if ("Admin".equalsIgnoreCase(user.getRole())) {
+            User user = (User) session.getAttribute(AppConstants.SESSION_USER_ACCOUNT);
+            if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
                 // Là Admin -> cho qua
                 chain.doFilter(request, response);
             } else {

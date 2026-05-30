@@ -3,188 +3,238 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.sql.Date;
-
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import dto.Cars;
 import utils.DBContext;
 
 public class CarDao {
- public List<Cars> getAllCars(int custid){
-      List<Cars> result=new ArrayList<>();
-      Connection cn=null;
-        try {
-            cn=DBContext.getConnection();
-            if(cn!=null){
-                String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [VehicleType], [Color], [CreatedAt], [UpdatedAt], [IsActive] "
-                           + "FROM [Vehicles] "
-                           + "WHERE [CustomerID] = ? AND [IsActive] = 1";
-                PreparedStatement st=cn.prepareStatement(sql);
-                st.setInt(1, custid);
-                ResultSet table=st.executeQuery();
-                if(table!=null){
-                    while(table.next()){
-                        int vehicleId = table.getInt("VehicleID");
-                        int Cusid=table.getInt("CustomerID");
-                        String licensePlate = table.getString("LicensePlate");
-                        String vehicleType = table.getString("VehicleType");
-                        String color = table.getString("Color");
-                    Date createdAt = table.getDate("CreatedAt");
-                        Date updatedAt = table.getDate("UpdatedAt");
-                        boolean isActive = table.getBoolean("IsActive");
-                        Cars c = new Cars(vehicleId, Cusid, licensePlate, vehicleType, color, createdAt, updatedAt, isActive);
-                       result.add(c);
-                    }
+    private static final Logger LOGGER = Logger.getLogger(CarDao.class.getName());
+
+    public List<Cars> getAllCars(int custid) throws SQLException {
+        List<Cars> result = new ArrayList<>();
+        // Sắp xếp IsDefault lên đầu tiên
+        String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [CreatedAt], [UpdatedAt], [IsActive] "
+                   + "FROM [Vehicles] "
+                   + "WHERE [CustomerID] = ? AND [IsActive] = 1 "
+                   + "ORDER BY [IsDefault] DESC, [CreatedAt] DESC";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setInt(1, custid);
+            try (ResultSet table = st.executeQuery()) {
+                while (table.next()) {
+                    int vehicleId = table.getInt("VehicleID");
+                    int cusId = table.getInt("CustomerID");
+                    String licensePlate = table.getString("LicensePlate");
+                    String brand = table.getString("Brand");
+                    String model = table.getString("Model");
+                    String vehicleType = table.getString("VehicleType");
+                    String color = table.getString("Color");
+                    String imageUrl = table.getString("ImageURL");
+                    boolean isDefault = table.getBoolean("IsDefault");
+                    Timestamp createdAt = table.getTimestamp("CreatedAt");
+                    Timestamp updatedAt = table.getTimestamp("UpdatedAt");
+                    boolean isActive = table.getBoolean("IsActive");
+                    
+                    Cars c = new Cars(vehicleId, cusId, licensePlate, brand, model, vehicleType, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
+                    result.add(c);
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching all cars for customer " + custid, e);
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            LOGGER.log(Level.SEVERE, "Unexpected error in getAllCars", e);
+            throw new SQLException(e);
         }
-      return result;
+        return result;
     }
-     public Cars getCarById(int vehicleId) {
+
+    public Cars getCarById(int vehicleId) throws SQLException {
         Cars car = null;
-        Connection cn = null;
-        PreparedStatement st = null;
-        ResultSet table = null;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [VehicleType], [Color], [CreatedAt], [UpdatedAt], [IsActive] "
-                           + "FROM [Vehicles] "
-                           + "WHERE [VehicleID] = ?";
-                st = cn.prepareStatement(sql);
-                st.setInt(1, vehicleId);
-                table = st.executeQuery();
+        String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [CreatedAt], [UpdatedAt], [IsActive] "
+                   + "FROM [Vehicles] "
+                   + "WHERE [VehicleID] = ?";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setInt(1, vehicleId);
+            try (ResultSet table = st.executeQuery()) {
                 if (table.next()) {
                     int customerId = table.getInt("CustomerID");
                     String licensePlate = table.getString("LicensePlate");
+                    String brand = table.getString("Brand");
+                    String model = table.getString("Model");
                     String vehicleType = table.getString("VehicleType");
                     String color = table.getString("Color");
-                    Date createdAt = table.getDate("CreatedAt");
-                    Date updatedAt = table.getDate("UpdatedAt");
+                    String imageUrl = table.getString("ImageURL");
+                    boolean isDefault = table.getBoolean("IsDefault");
+                    Timestamp createdAt = table.getTimestamp("CreatedAt");
+                    Timestamp updatedAt = table.getTimestamp("UpdatedAt");
                     boolean isActive = table.getBoolean("IsActive");
                     
-                    car = new Cars(vehicleId, customerId, licensePlate, vehicleType, color, createdAt, updatedAt, isActive);
+                    car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleType, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching car by ID " + vehicleId, e);
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (table != null) table.close();
-                if (st != null) st.close();
-                if (cn != null) cn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LOGGER.log(Level.SEVERE, "Unexpected error in getCarById", e);
+            throw new SQLException(e);
         }
         return car;
     }
-    //tao xe moi//
-    public boolean insertCar(Cars car) {
-        Connection cn = null;
-        PreparedStatement st = null;
-        boolean success = false;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "INSERT INTO [Vehicles] ([CustomerID], [LicensePlate], [VehicleType], [Color], [IsActive], [CreatedAt], [UpdatedAt]) "
-                           + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-                st = cn.prepareStatement(sql);
-                st.setInt(1, car.getCustomerID());
-                st.setString(2, car.getLicensePlate());
-                st.setString(3, car.getVehicleType());
-                st.setString(4, car.getColor());
-                st.setBoolean(5, true); // Active mặc định khi tạo mới
-                st.setDate(6, new Date(System.currentTimeMillis()));
-                st.setDate(7, new Date(System.currentTimeMillis()));
 
-                int rows = st.executeUpdate();
-                if (rows > 0) {
-                    success = true;
-                }
+    public boolean insertCar(Cars car) throws SQLException {
+        boolean success = false;
+        String sql = "INSERT INTO [Vehicles] ([CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [IsActive], [CreatedAt], [UpdatedAt]) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setInt(1, car.getCustomerId());
+            st.setString(2, car.getLicensePlate());
+            st.setString(3, car.getBrand());
+            st.setString(4, car.getModel());
+            st.setString(5, car.getVehicleType());
+            st.setString(6, car.getColor());
+            st.setString(7, car.getImageUrl());
+            st.setBoolean(8, car.getIsDefault());
+            st.setBoolean(9, true);
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            st.setTimestamp(10, now);
+            st.setTimestamp(11, now);
+
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error inserting new car: " + car.getLicensePlate(), e);
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (st != null) st.close();
-                if (cn != null) cn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LOGGER.log(Level.SEVERE, "Unexpected error in insertCar", e);
+            throw new SQLException(e);
         }
         return success;
     }
-    //chinh xua thong tin xe//
-    public boolean updateCar(Cars car) {
-        Connection cn = null;
-        PreparedStatement st = null;
+
+    public boolean updateCar(Cars car) throws SQLException {
         boolean success = false;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "UPDATE [Vehicles] "
-                           + "SET [LicensePlate] = ?, [VehicleType] = ?, [Color] = ?, [UpdatedAt] = ? "
-                           + "WHERE [VehicleID] = ? AND [CustomerID] = ?";
-                st = cn.prepareStatement(sql);
-                st.setString(1, car.getLicensePlate());
-                st.setString(2, car.getVehicleType());
-                st.setString(3, car.getColor());
-                st.setDate(4, new Date(System.currentTimeMillis())); // Cập nhật thời gian sửa
-                st.setInt(5, car.getVehicleID());
-                st.setInt(6, car.getCustomerID());
-                
-                int rows = st.executeUpdate();
-                if (rows > 0) {
-                    success = true;
-                }
+        String sql = "UPDATE [Vehicles] "
+                   + "SET [LicensePlate] = ?, [Brand] = ?, [Model] = ?, [VehicleType] = ?, [Color] = ?, [ImageURL] = ISNULL(?, [ImageURL]), [UpdatedAt] = ? "
+                   + "WHERE [VehicleID] = ? AND [CustomerID] = ?";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, car.getLicensePlate());
+            st.setString(2, car.getBrand());
+            st.setString(3, car.getModel());
+            st.setString(4, car.getVehicleType());
+            st.setString(5, car.getColor());
+            st.setString(6, car.getImageUrl()); 
+            st.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            st.setInt(8, car.getVehicleId());
+            st.setInt(9, car.getCustomerId());
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating car ID " + car.getVehicleId(), e);
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (st != null) st.close();
-                if (cn != null) cn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LOGGER.log(Level.SEVERE, "Unexpected error in updateCar", e);
+            throw new SQLException(e);
         }
         return success;
     }
-    //xoa xe chuyen isactive sang so 0//
-    public boolean softDeleteCar(int vehicleId, int customerId) {
-        Connection cn = null;
-        PreparedStatement st = null;
+
+    public boolean softDeleteCar(int vehicleId, int customerId) throws SQLException {
         boolean success = false;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "UPDATE [Vehicles] SET [IsActive] = 0, [UpdatedAt] = ? WHERE [VehicleID] = ? AND [CustomerID] = ?";
-                st = cn.prepareStatement(sql);
-                st.setDate(1, new Date(System.currentTimeMillis()));
-                st.setInt(2, vehicleId);
-                st.setInt(3, customerId);
-                
-                int rows = st.executeUpdate();
-                if (rows > 0) {
-                    success = true;
-                }
+        String sql = "UPDATE [Vehicles] SET [IsActive] = 0, [IsDefault] = 0, [UpdatedAt] = ? WHERE [VehicleID] = ? AND [CustomerID] = ?";
+        
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            st.setInt(2, vehicleId);
+            st.setInt(3, customerId);
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error soft deleting car ID " + vehicleId, e);
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (st != null) st.close();
-                if (cn != null) cn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LOGGER.log(Level.SEVERE, "Unexpected error in softDeleteCar", e);
+            throw new SQLException(e);
         }
         return success;
+    }
+    
+    // Hàm thiết lập xe mặc định bằng Transaction
+    public boolean setDefaultCar(int vehicleId, int customerId) {
+        Connection conn = null;
+        try {
+            conn = DBContext.getConnection();
+            conn.setAutoCommit(false);
+            
+            // 1. Gỡ mặc định tất cả xe của khách hàng này
+            String resetSql = "UPDATE [Vehicles] SET [IsDefault] = 0 WHERE [CustomerID] = ?";
+            try (PreparedStatement psReset = conn.prepareStatement(resetSql)) {
+                psReset.setInt(1, customerId);
+                psReset.executeUpdate();
+            }
+            
+            // 2. Set mặc định cho chiếc xe được chỉ định
+            String setSql = "UPDATE [Vehicles] SET [IsDefault] = 1 WHERE [VehicleID] = ? AND [CustomerID] = ?";
+            try (PreparedStatement psSet = conn.prepareStatement(setSql)) {
+                psSet.setInt(1, vehicleId);
+                psSet.setInt(2, customerId);
+                int updatedRows = psSet.executeUpdate();
+                
+                if (updatedRows == 0) {
+                    conn.rollback();
+                    return false; // Lỗi: Xe không tồn tại hoặc không phải của khách hàng này
+                }
+            }
+            
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error setting default car", e);
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Rollback failed", ex);
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close connection", e);
+                }
+            }
+        }
     }
 }

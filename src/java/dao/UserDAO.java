@@ -123,4 +123,28 @@ public class UserDAO {
         return null;
     }
 
+    public dto.Customer getCustomerByUserId(int userId) {
+        String sql = "SELECT * FROM Customers WHERE UserID = ?";
+        try (java.sql.Connection conn = DBContext.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dto.Customer cus = new dto.Customer();
+                    cus.setCustomerId(rs.getInt("CustomerID"));
+                    cus.setUserId(rs.getInt("UserID"));
+                    cus.setFullName(rs.getString("FullName"));
+                    cus.setPhone(rs.getString("Phone"));
+                    cus.setPointsBalance(rs.getInt("PointsBalance"));
+                    cus.setTotalSpend(rs.getDouble("TotalSpend"));
+                    cus.setTotalWashes(rs.getInt("TotalWashes"));
+                    cus.setTierUpgradeDate(rs.getTimestamp("TierUpgradeDate"));
+                    cus.setAvatar(rs.getString("Avatar"));
+                    return cus;
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

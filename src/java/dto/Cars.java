@@ -1,92 +1,140 @@
 package dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Cars {
-    private int VehicleID;
-    private int CustomerID;
-    private String LicensePlate;
-    private String VehicleType;
-    private String Color;
-    private Date CreatedAt;
-    private Date UpdatedAt;
+    private int vehicleId;
+    private int customerId;
+    private String licensePlate;
+    private String brand;
+    private String model;
+    private String vehicleType;
+    private String color;
+    private String imageUrl;
+    private boolean isDefault; // Đánh dấu xe mặc định
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private boolean isActive;
 
-    public Cars(int vehicleID, int customerID, String licensePlate, String vehicleType, String color, Date createdAt,
-            Date updatedAt, boolean isActive) {
-        VehicleID = vehicleID;
-        CustomerID = customerID;
-        LicensePlate = licensePlate;
-        VehicleType = vehicleType;
-        Color = color;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
+    public Cars() {
+    }
+
+    public Cars(int vehicleId, int customerId, String licensePlate, String brand, String model, String vehicleType, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
+        this.vehicleId = vehicleId;
+        this.customerId = customerId;
+        this.licensePlate = licensePlate;
+        this.brand = brand;
+        this.model = model;
+        this.vehicleType = vehicleType;
+        this.color = color;
+        this.imageUrl = imageUrl;
+        this.isDefault = isDefault;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.isActive = isActive;
     }
-    //Contrustor nay dung khi them xe moi//
-    public Cars(int customerID, String licensePlate, String vehicleType, String color, Date createdAt, Date updatedAt, boolean isActive) {
-    this.CustomerID = customerID;
-    this.LicensePlate = licensePlate;
-    this.VehicleType = vehicleType;
-    this.Color = color;
-    this.CreatedAt = createdAt;
-    this.UpdatedAt = updatedAt;
-    this.isActive = isActive;
-}
-    public int getVehicleID() {
-        return VehicleID;   
+
+    // Constructor nay dung khi them xe moi
+    public Cars(int customerId, String licensePlate, String brand, String model, String vehicleType, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
+        this.customerId = customerId;
+        this.licensePlate = licensePlate;
+        this.brand = brand;
+        this.model = model;
+        this.vehicleType = vehicleType;
+        this.color = color;
+        this.imageUrl = imageUrl;
+        this.isDefault = isDefault;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.isActive = isActive;
     }
 
-    public void setVehicleID(int vehicleID) {
-        VehicleID = vehicleID;
+    public int getVehicleId() {
+        return vehicleId;
     }
 
-    public int getCustomerID() {
-        return CustomerID;
+    public void setVehicleId(int vehicleId) {
+        this.vehicleId = vehicleId;
     }
 
-    public void setCustomerID(int customerID) {
-        CustomerID = customerID;
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public String getLicensePlate() {
-        return LicensePlate;
+        return licensePlate;
     }
 
     public void setLicensePlate(String licensePlate) {
-        LicensePlate = licensePlate;
+        this.licensePlate = licensePlate;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     public String getVehicleType() {
-        return VehicleType;
+        return vehicleType;
     }
 
     public void setVehicleType(String vehicleType) {
-        VehicleType = vehicleType;
+        this.vehicleType = vehicleType;
     }
 
     public String getColor() {
-        return Color;
+        return color;
     }
 
     public void setColor(String color) {
-        Color = color;
+        this.color = color;
     }
 
-    public Date getCreatedAt() {
-        return CreatedAt;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        CreatedAt = createdAt;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public Date getUpdatedAt() {
-        return UpdatedAt;
+    public boolean getIsDefault() {
+        return isDefault;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
-        UpdatedAt = updatedAt;
+    public void setIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public boolean isActive() {
@@ -96,5 +144,9 @@ public class Cars {
     public void setActive(boolean isActive) {
         this.isActive = isActive;
     }
-    
+
+    @Override
+    public String toString() {
+        return "Cars{" + "vehicleId=" + vehicleId + ", customerId=" + customerId + ", licensePlate=" + licensePlate + ", brand=" + brand + ", model=" + model + ", vehicleType=" + vehicleType + ", color=" + color + ", imageUrl=" + imageUrl + ", isDefault=" + isDefault + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", isActive=" + isActive + '}';
+    }
 }

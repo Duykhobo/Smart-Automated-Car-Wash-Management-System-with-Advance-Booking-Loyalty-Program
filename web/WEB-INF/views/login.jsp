@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -81,7 +82,7 @@ tailwind.config = {
             <form action="${pageContext.request.contextPath}/auth/login" method="POST" novalidate class="space-y-5">
                 <div class="space-y-1.5">
                     <label class="text-gray-300 text-sm font-medium">Số Điện Thoại</label>
-                    <input type="text" name="phone" placeholder="Nhập số điện thoại..." value="${phone != null ? phone : ''}" required autocomplete="off" 
+                    <input type="text" name="phone" placeholder="Nhập số điện thoại..." value="<c:out value='${phone}'/>" required autocomplete="off" 
                            class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                 </div>
 

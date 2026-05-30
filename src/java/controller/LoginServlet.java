@@ -33,7 +33,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         if (ValidationUtil.isAnyEmpty(phone, password)) {
-            request.setAttribute("ERROR", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
+            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
             request.setAttribute("phone", phone);
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
@@ -43,18 +43,27 @@ public class LoginServlet extends HttpServlet {
         User user = us.processLogin(phone, password);
 
         if (user != null) {
+            // Thay đổi Session ID để chống Session Fixation attack
+            request.changeSessionId();
+
             HttpSession session = request.getSession();
             session.setAttribute(AppConstants.SESSION_USER_ACCOUNT, user);
 
+            // Kiểm tra xem trước đó user có đang muốn vào URL nào không
+            String redirectUrl = (String) session.getAttribute("redirectUrl");
+            if (redirectUrl != null) {
+                session.removeAttribute("redirectUrl");
+            }
+
             if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(redirectUrl != null ? redirectUrl : request.getContextPath() + "/admin/dashboard");
             } else {
                 dao.UserDAO userDAO = new UserDAO();
                 dto.Customer cus = userDAO.getCustomerByUserId(user.getUserId());
                 if (cus != null) {
                     session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
                 }
-                response.sendRedirect(request.getContextPath() + "/account/dashboard");
+                response.sendRedirect(redirectUrl != null ? redirectUrl : request.getContextPath() + "/account/dashboard");
             }
 
         } else {

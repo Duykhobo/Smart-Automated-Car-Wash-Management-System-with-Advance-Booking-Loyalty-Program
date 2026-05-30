@@ -22,4 +22,9 @@
         <exception-type>java.lang.Exception</exception-type>
         <location>/WEB-INF/views/error/error.jsp</location>
     </error-page>
+    
+    <!-- Session Configuration -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 </web-app>

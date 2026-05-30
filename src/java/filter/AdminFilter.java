@@ -39,6 +39,11 @@ public class AdminFilter implements Filter {
         if (loggedIn) {
             User user = (User) session.getAttribute(AppConstants.SESSION_USER_ACCOUNT);
             if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
+                // Chống back trình duyệt bằng cache
+                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                res.setHeader("Pragma", "no-cache");
+                res.setDateHeader("Expires", 0);
+                
                 // Là Admin -> cho qua
                 chain.doFilter(request, response);
             } else {
@@ -46,9 +51,13 @@ public class AdminFilter implements Filter {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập vào khu vực này!");
             }
         } else {
+            // Lưu lại URL người dùng muốn vào để redirect sau khi login
+            HttpSession newSession = req.getSession(true);
+            newSession.setAttribute("redirectUrl", req.getRequestURI());
+
             // Chưa đăng nhập -> Trả về trang đăng nhập
             req.setAttribute("errorMessage", "Vui lòng đăng nhập bằng tài khoản quản trị!");
-            req.getRequestDispatcher("/login.jsp").forward(request, response);
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 

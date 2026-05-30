@@ -2,8 +2,7 @@ language: "vi-VN"
 tone_instructions: "Review code một cách thân thiện, mang tính xây dựng và đóng vai trò như một Senior Tech Lead. Giải thích rõ ràng nguyên nhân lỗi và đưa ra giải pháp cụ thể."
 early_access: false
 enable_free_tier: true
-inheritance:
-  default: true
+inheritance: true
 chat:
   auto_reply: true
 knowledge_base:

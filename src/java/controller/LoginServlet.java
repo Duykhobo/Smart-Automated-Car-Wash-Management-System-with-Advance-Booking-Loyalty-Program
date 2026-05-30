@@ -1,5 +1,7 @@
 package controller;
 
+import dao.UserDAO;
+import dto.Customer;
 import dto.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -30,36 +32,36 @@ public class LoginServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String password = request.getParameter("password");
 
-        // Edge case: Thiếu thông tin
         if (ValidationUtil.isAnyEmpty(phone, password)) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
+            request.setAttribute("ERROR", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
+            request.setAttribute("phone", phone);
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
-        UserService userService = new UserService();
-        User user = userService.processLogin(phone, password);
+
+        UserService us = new UserService();
+        User user = us.processLogin(phone, password);
 
         if (user != null) {
-            // Đăng nhập thành công, lưu session
             HttpSession session = request.getSession();
             session.setAttribute(AppConstants.SESSION_USER_ACCOUNT, user);
 
-            // Phân quyền (Edge case: Admin vs Customer)
             if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect("admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
-                dao.UserDAO userDAO = new dao.UserDAO();
-                dto.Customer customer = userDAO.getCustomerByUserId(user.getUserId());
-                if (customer != null) {
-                    session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, customer);
+                dao.UserDAO userDAO = new UserDAO();
+                dto.Customer cus = userDAO.getCustomerByUserId(user.getUserId());
+                if (cus != null) {
+                    session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
                 }
                 response.sendRedirect(request.getContextPath() + "/account/dashboard");
             }
+
         } else {
-            // Sai số điện thoại hoặc mật khẩu
-            request.setAttribute("errorMessage", "Số điện thoại hoặc Mật khẩu không chính xác!");
-            request.setAttribute("phone", phone); // Giữ lại SĐT
+            request.setAttribute("errorMessage", "Số điện thoại hoặc mật khẩu không chính xác!");
+            request.setAttribute("phone", phone);
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
+
     }
 }

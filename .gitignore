@@ -34,3 +34,6 @@ out/
 .vscode/settings.json
 .agent
 .github/prompts/
+
+# Ignore sensitive DB properties
+src/java/db.properties

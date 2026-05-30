@@ -24,6 +24,7 @@ public class CustomerDAO {
                     int dbUserID = rs.getInt("UserID");
                     String fullname = rs.getString("FullName");
                     String phone = rs.getString("Phone"); 
+                    String email = rs.getString("Email");
                     String licensePlate = ""; // Không còn dùng trong bảng Customers
                     String tierStatus = rs.getString("TierStatus");
                     int pointBalance = rs.getInt("PointsBalance");
@@ -33,7 +34,7 @@ public class CustomerDAO {
                     Timestamp tierUpgradeDate = rs.getTimestamp("TierUpgradeDate");
                     String avatar = rs.getString("Avatar");
                     
-                    return new Customer(cusID, dbUserID, fullname, phone, licensePlate, 
+                    return new Customer(cusID, dbUserID, fullname, phone, email, licensePlate, 
                                         tierStatus, pointBalance, totalSpend, totalWashes, tierUpgradeDate, avatar);
                 }
             }

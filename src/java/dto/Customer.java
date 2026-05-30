@@ -8,6 +8,7 @@ public class Customer {
     private int userId;
     private String fullName;
     private String phone;
+    private String email;
     private String licensePlate;
     private String tierStatus;
     private int pointsBalance;
@@ -19,11 +20,12 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(int customerId, int userId, String fullName, String phone, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate, String avatar) {
+    public Customer(int customerId, int userId, String fullName, String phone, String email, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate, String avatar) {
         this.customerId = customerId;
         this.userId = userId;
         this.fullName = fullName;
         this.phone = phone;
+        this.email = email;
         this.licensePlate = licensePlate;
         this.tierStatus = tierStatus;
         this.pointsBalance = pointsBalance;
@@ -113,6 +115,14 @@ public class Customer {
         this.tierUpgradeDate = tierUpgradeDate;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getAvatar() {
         return avatar;
     }
@@ -123,6 +133,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" + "customerId=" + customerId + ", userId=" + userId + ", fullName=" + fullName + ", phone=" + phone + ", licensePlate=" + licensePlate + ", tierStatus=" + tierStatus + ", pointsBalance=" + pointsBalance + ", totalSpend=" + totalSpend + ", totalWashes=" + totalWashes + ", tierUpgradeDate=" + tierUpgradeDate + ", avatar=" + avatar + '}';
+        return "Customer{" + "customerId=" + customerId + ", userId=" + userId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", licensePlate=" + licensePlate + ", tierStatus=" + tierStatus + ", pointsBalance=" + pointsBalance + ", totalSpend=" + totalSpend + ", totalWashes=" + totalWashes + ", tierUpgradeDate=" + tierUpgradeDate + ", avatar=" + avatar + '}';
     }
 }

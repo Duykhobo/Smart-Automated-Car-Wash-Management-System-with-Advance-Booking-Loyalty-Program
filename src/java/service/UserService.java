@@ -29,7 +29,7 @@ public class UserService {
             return 0; // Báo trùng SĐT
         }
 
-        String hashedPass = HashUtil.hashPassword(rawPassword);
+        String hashedPass = HashUtil.createHash(rawPassword);
 
         User user = new User();
         user.setUsername(phone);
@@ -54,7 +54,10 @@ public class UserService {
         if (utils.ValidationUtil.isAnyEmpty(phone, rawPassword)) {
             return null;
         }
-        String hashedPass = HashUtil.hashPassword(rawPassword);
-        return userDAO.login(phone, hashedPass);
+        User user = userDAO.getUserByUsername(phone);
+        if (user != null && HashUtil.verifyPassword(rawPassword, user.getPasswordHash())) {
+            return user;
+        }
+        return null;
     }
 }

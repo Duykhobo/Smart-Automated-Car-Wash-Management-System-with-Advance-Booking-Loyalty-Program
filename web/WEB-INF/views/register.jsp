@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -80,22 +81,22 @@ tailwind.config = {
             <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4">
                 
                 <div class="space-y-1">
-                    <label class="text-gray-300 text-sm font-medium">Họ và Tên</label>
-                    <input type="text" id="fullname" name="fullname" placeholder="Nhập họ và tên..." value="${user.fullName}" required 
+                    <label for="fullname" class="block text-gray-300 text-sm font-medium mb-2">Họ và tên *</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="Nhập họ và tên..." value="<c:out value='${user.fullName}'/>" required 
                            class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                     <p class="text-red-400 text-xs mt-1 empty:hidden" id="err-fullname"></p>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-gray-300 text-sm font-medium">Số Điện Thoại</label>
-                    <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại..." value="${user.phone}" required 
+                    <label for="phone" class="block text-gray-300 text-sm font-medium mb-2">Số điện thoại *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại..." value="<c:out value='${user.phone}'/>" required 
                            class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                     <p class="text-red-400 text-xs mt-1 empty:hidden" id="err-phone"></p>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-gray-300 text-sm font-medium">Biển Số Xe</label>
-                    <input type="text" id="plate" name="plate" placeholder="VD: 51H-123.45" value="${user.licensePlate}" required oninput="this.value = this.value.toUpperCase()"
+                    <label for="plate" class="block text-gray-300 text-sm font-medium mb-2">Biển số xe *</label>
+                    <input type="text" id="plate" name="plate" placeholder="VD: 51H-123.45" value="<c:out value='${user.licensePlate}'/>" required oninput="this.value = this.value.toUpperCase()"
                            class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                     <p class="text-red-400 text-xs mt-1 empty:hidden" id="err-plate"></p>
                 </div>

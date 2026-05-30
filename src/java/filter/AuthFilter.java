@@ -11,14 +11,15 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import utils.AppConstants;
 
 /**
- * Filter này chặn mọi request (tùy urlPatterns) để kiểm tra đăng nhập.
- * Ở đây chặn các trang yêu cầu người dùng phải có tài khoản.
+ * Filter này chặn mọi request (tùy urlPatterns) để kiểm tra đăng nhập. Ở đây
+ * chặn các trang yêu cầu người dùng phải có tài khoản.
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/dashboard", "/booking", "/profile", "/manage-cars"})
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/account/*", "/vehicles/*", "/bookings"})
 public class AuthFilter implements Filter {
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // Khởi tạo (nếu cần)
@@ -27,13 +28,13 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
         // Kiểm tra xem session có tồn tại và có chứa 'loggedInUser' không
-        boolean loggedIn = session != null && session.getAttribute("loggedInUser") != null;
+        boolean loggedIn = session != null && session.getAttribute(AppConstants.SESSION_USER_ACCOUNT) != null;
 
         if (loggedIn) {
             // Đã đăng nhập -> cho đi tiếp

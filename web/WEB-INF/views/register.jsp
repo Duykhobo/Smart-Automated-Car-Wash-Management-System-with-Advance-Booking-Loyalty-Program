@@ -55,7 +55,7 @@ tailwind.config = {
 
     <!-- Right Column (Form) -->
     <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 md:px-24 py-12 relative overflow-y-auto">
-        <a href="home" class="absolute top-8 left-6 sm:left-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-medium text-sm group">
+        <a href="${pageContext.request.contextPath}/home" class="absolute top-8 left-6 sm:left-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-medium text-sm group">
             <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             <span class="hidden sm:inline">Quay lại</span>
         </a>
@@ -77,7 +77,7 @@ tailwind.config = {
                 <span id="clientErrorText"></span>
             </div>
 
-            <form action="register" method="POST" id="registerForm" onsubmit="return handleRegister(event)" novalidate class="space-y-4">
+            <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4">
                 
                 <div class="space-y-1">
                     <label class="text-gray-300 text-sm font-medium">Họ và Tên</label>
@@ -147,7 +147,7 @@ tailwind.config = {
             <div class="mt-8 pt-8 border-t border-gray-800 text-center">
                 <p class="text-gray-400 text-sm">
                     Bạn đã có tài khoản? 
-                    <a href="login" class="text-btn-primary font-bold hover:underline ml-1">Đăng nhập</a>
+                    <a href="${pageContext.request.contextPath}/auth/login" class="text-btn-primary font-bold hover:underline ml-1">Đăng nhập</a>
                 </p>
             </div>
         </div>
@@ -168,5 +168,37 @@ tailwind.config = {
     </script>
     <script src="${pageContext.request.contextPath}/js/constants.js" charset="UTF-8"></script>
     <script src="${pageContext.request.contextPath}/js/page-register.js" charset="UTF-8"></script>
+    <script>
+        function handleRegister(event) {
+            const form = event.target;
+            const phone = form.phone.value.trim();
+            const password = form.password.value;
+            const confirmPassword = form.confirmPassword.value;
+            const clientError = document.getElementById('clientError');
+            const clientErrorText = document.getElementById('clientErrorText');
+            
+            let errors = [];
+            
+            if (phone.length !== 10 || !phone.startsWith('0')) {
+                errors.push("Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và gồm 10 số).");
+            }
+            if (password.length < 6) {
+                errors.push("Mật khẩu phải có ít nhất 6 ký tự.");
+            }
+            if (password !== confirmPassword) {
+                errors.push("Xác nhận mật khẩu không khớp.");
+            }
+            
+            if (errors.length > 0) {
+                clientErrorText.innerHTML = errors.join('<br>');
+                clientError.classList.remove('hidden');
+                event.preventDefault();
+                return false;
+            }
+            
+            clientError.classList.add('hidden');
+            return true;
+        }
+    </script>
 </body>
 </html>

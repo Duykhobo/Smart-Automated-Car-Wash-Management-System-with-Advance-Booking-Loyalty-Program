@@ -37,17 +37,17 @@ tailwind.config = {
 
     <!-- Desktop Sidebar (Tự động hiển thị trên máy tính, ẩn trên mobile) -->
     <aside class="hidden md:flex flex-col w-64 border-r border-gray-800 bg-[#121826]">
-        <a href="home" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <a href="${pageContext.request.contextPath}/home" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div class="w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center text-black font-bold text-xl">A</div>
             <span class="font-bold text-xl tracking-wider text-btn-primary">AUTOWASH</span>
         </a>
         
         <nav class="flex-1 px-4 py-4 space-y-2">
-            <a href="dashboard" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span class="font-medium">Trang chủ</span>
             </a>
-            <a href="booking" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
+            <a href="${pageContext.request.contextPath}/bookings" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <span class="font-medium">Đặt lịch</span>
             </a>
@@ -55,7 +55,7 @@ tailwind.config = {
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
                 <span class="font-medium">Ưu đãi</span>
             </a>
-            <a href="profile" class="flex items-center gap-3 px-4 py-3 bg-btn-primary/10 text-btn-primary rounded-xl transition-colors">
+            <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 bg-btn-primary/10 text-btn-primary rounded-xl transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span class="font-medium">Hồ sơ cá nhân</span>
             </a>
@@ -105,7 +105,7 @@ tailwind.config = {
             <!-- Actions List -->
             <section class="flex flex-col gap-3" aria-label="Danh sách chức năng">
                 <nav class="flex flex-col gap-3" aria-label="Điều hướng hồ sơ">
-                    <a href="manage-cars" class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
+                    <a href="${pageContext.request.contextPath}/vehicles" class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-btn-primary/20 transition-colors">
                                 <svg class="w-5 h-5 text-gray-300 group-hover:text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
@@ -146,7 +146,7 @@ tailwind.config = {
                     </a>
                 </nav>
 
-                <form action="logout" method="post" class="mt-4">
+                <form action="${pageContext.request.contextPath}/auth/logout" method="post" class="mt-4">
                     <button type="submit" class="flex items-center justify-center gap-3 w-full p-4 rounded-2xl border-2 border-dashed border-red-500/50 hover:border-red-500 text-red-500 hover:bg-red-500/10 transition-all font-bold text-base shadow-md">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         <span>Đăng xuất</span>
@@ -159,11 +159,11 @@ tailwind.config = {
     <!-- Mobile Bottom Navigation (Chỉ hiện trên điện thoại, ẩn trên máy tính) -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 z-50 px-2 py-2" style="padding-bottom: env(safe-area-inset-bottom);" aria-label="Điều hướng chính Mobile">
         <div class="flex justify-around items-center h-14">
-            <a href="dashboard" class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span class="text-[10px] font-medium">Trang chủ</span>
             </a>
-            <a href="booking" class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
+            <a href="${pageContext.request.contextPath}/bookings" class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <span class="text-[10px] font-medium">Đặt lịch</span>
             </a>
@@ -171,7 +171,7 @@ tailwind.config = {
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
                 <span class="text-[10px] font-medium">Ưu đãi</span>
             </a>
-            <a href="profile" class="flex flex-col items-center gap-1 w-16 text-btn-primary">
+            <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 w-16 text-btn-primary">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                 <span class="text-[10px] font-medium">Hồ sơ</span>
             </a>

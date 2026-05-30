@@ -11,10 +11,8 @@ import utils.DBContext;
 public class CustomerDAO {
     
     public Customer getCustomerByAccountId(int userID) {
-        // Chỉ cần gọi tên bảng "Customers"
-        String sql = "SELECT * FROM Customers WHERE UserID = ?";
+        String sql = "SELECT c.*, t.TierName AS TierStatus FROM Customers c LEFT JOIN MemberTiers t ON c.TierID = t.TierID WHERE c.UserID = ?";
         
-        // Sử dụng Try-with-resources: Tự động đóng Connection, Statement và ResultSet khi chạy xong
         try (Connection cn = DBContext.getConnection();
              PreparedStatement st = cn.prepareStatement(sql)) {
             
@@ -25,18 +23,18 @@ public class CustomerDAO {
                     int cusID = rs.getInt("CustomerID");
                     int dbUserID = rs.getInt("UserID");
                     String fullname = rs.getString("FullName");
-                    String phone = rs.getString("Phone"); // Nên viết hoa chữ P cho đúng chuẩn SQL nếu có
-                    String licensePlate = rs.getString("LicensePlate");
+                    String phone = rs.getString("Phone"); 
+                    String licensePlate = ""; // Không còn dùng trong bảng Customers
                     String tierStatus = rs.getString("TierStatus");
                     int pointBalance = rs.getInt("PointsBalance");
                     
-                    // Sửa lỗi getInt -> getDouble để tránh mất số thập phân
                     double totalSpend = rs.getDouble("TotalSpend"); 
                     int totalWashes = rs.getInt("TotalWashes");
                     Timestamp tierUpgradeDate = rs.getTimestamp("TierUpgradeDate");
+                    String avatar = rs.getString("Avatar");
                     
                     return new Customer(cusID, dbUserID, fullname, phone, licensePlate, 
-                                        tierStatus, pointBalance, totalSpend, totalWashes, tierUpgradeDate);
+                                        tierStatus, pointBalance, totalSpend, totalWashes, tierUpgradeDate, avatar);
                 }
             }
         } catch (SQLException e) {
@@ -44,7 +42,6 @@ public class CustomerDAO {
             e.printStackTrace();
         }
         
-        // Trả về null nếu không tìm thấy user hoặc có lỗi
         return null;
     }
 }

@@ -55,7 +55,7 @@ tailwind.config = {
 
     <!-- Right Column (Form) -->
     <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 md:px-24 py-12 relative">
-        <a href="home" class="absolute top-8 left-6 sm:left-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-medium text-sm group">
+        <a href="${pageContext.request.contextPath}/home" class="absolute top-8 left-6 sm:left-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-medium text-sm group">
             <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             <span class="hidden sm:inline">Quay lại trang chủ</span>
         </a>
@@ -78,7 +78,7 @@ tailwind.config = {
                 </div>
             <% } %>
 
-            <form action="login" method="POST" class="space-y-5">
+            <form action="${pageContext.request.contextPath}/auth/login" method="POST" novalidate class="space-y-5">
                 <div class="space-y-1.5">
                     <label class="text-gray-300 text-sm font-medium">Số Điện Thoại</label>
                     <input type="text" name="phone" placeholder="Nhập số điện thoại..." value="${phone != null ? phone : ''}" required autocomplete="off" 
@@ -102,7 +102,7 @@ tailwind.config = {
             <div class="mt-8 pt-8 border-t border-gray-800 text-center">
                 <p class="text-gray-400 text-sm">
                     Bạn chưa có tài khoản? 
-                    <a href="register" class="text-btn-primary font-bold hover:underline ml-1">Đăng ký ngay</a>
+                    <a href="${pageContext.request.contextPath}/auth/register" class="text-btn-primary font-bold hover:underline ml-1">Đăng ký ngay</a>
                 </p>
             </div>
         </div>

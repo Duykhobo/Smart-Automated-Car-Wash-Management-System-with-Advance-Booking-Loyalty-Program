@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/dashboard", "/booking", "/profile", "/manage-cars"})
+@WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/account/dashboard", "/bookings", "/account/profile"})
 public class PageController extends HttpServlet {
 
     @Override
@@ -24,17 +24,14 @@ public class PageController extends HttpServlet {
             case "/index":
                 view = "/WEB-INF/views/index.jsp";
                 break;
-            case "/dashboard":
+            case "/account/dashboard":
                 view = "/WEB-INF/views/dashboard.jsp";
                 break;
-            case "/booking":
+            case "/bookings":
                 view = "/WEB-INF/views/booking.jsp";
                 break;
-            case "/profile":
+            case "/account/profile":
                 view = "/WEB-INF/views/profile.jsp";
-                break;
-            case "/manage-cars":
-                view = "/WEB-INF/views/manage_cars.jsp";
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);

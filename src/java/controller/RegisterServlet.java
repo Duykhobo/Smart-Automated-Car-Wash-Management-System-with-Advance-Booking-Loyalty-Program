@@ -18,7 +18,7 @@ import utils.ValidationUtil;
  *
  * @author ThanhDuy
  */
-@WebServlet(name = "RegisterServlet", urlPatterns = { "/register" })
+@WebServlet(name = "RegisterServlet", urlPatterns = { "/auth/register" })
 public class RegisterServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
@@ -77,14 +77,27 @@ public class RegisterServlet extends HttpServlet {
 
         // Edge case: Kiểm tra đầu vào trống hoặc null ở phía backend
         if (ValidationUtil.isAnyEmpty(fullName, phone, licensePlate, rawPassword)) {
-
             request.setAttribute("errorMessage", "Vui lòng điền đầy đủ tất cả thông tin đăng ký!");
-            Customer cus = new Customer();
-            cus.setFullName(fullName);
-            cus.setPhone(phone);
-            cus.setLicensePlate(licensePlate);
-            request.setAttribute("user", cus);
-            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+
+        // Validate Format (Tên, SDT, Biển số)
+        if (!ValidationUtil.isValidName(fullName)) {
+            request.setAttribute("errorMessage", "Họ và tên không hợp lệ! (Không được chứa số hoặc ký tự đặc biệt)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+        
+        if (!ValidationUtil.isValidVNPhone(phone)) {
+            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ! (Phải có 10 chữ số và bắt đầu bằng số 0)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+        
+        if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+            request.setAttribute("errorMessage", "Biển số xe không hợp lệ! (VD chuẩn: 59A-12345 hoặc 59A1-1234)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
             return;
         }
 
@@ -93,12 +106,7 @@ public class RegisterServlet extends HttpServlet {
 
         if (result == 0) {
             request.setAttribute("errorMessage", "Số điện thoại này đã được đăng ký!");
-            Customer oldData = new Customer();
-            oldData.setFullName(fullName);
-            oldData.setPhone(phone);
-            oldData.setLicensePlate(licensePlate);
-            request.setAttribute("user", oldData);
-            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
+            forwardWithError(request, response, fullName, phone, licensePlate);
             return;
         }
 
@@ -107,12 +115,18 @@ public class RegisterServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "Hệ thống đang bận, vui lòng thử lại sau!");
-            Customer cus = new Customer();
-            cus.setFullName(fullName);
-            cus.setPhone(phone);
-            cus.setLicensePlate(licensePlate);
-            request.setAttribute("user", cus);
-            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
+            forwardWithError(request, response, fullName, phone, licensePlate);
         }
+    }
+
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, 
+                                  String fullName, String phone, String licensePlate) 
+            throws ServletException, IOException {
+        Customer cus = new Customer();
+        cus.setFullName(fullName);
+        cus.setPhone(phone);
+        cus.setLicensePlate(licensePlate);
+        request.setAttribute("user", cus);
+        request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 }

@@ -3,8 +3,8 @@ package service;
 import dao.UserDAO;
 import dto.Customer;
 import dto.User;
+import utils.AppConstants;
 import utils.HashUtil;
-import utils.ValidationUtil;
 
 public class UserService {
 
@@ -34,7 +34,7 @@ public class UserService {
         User user = new User();
         user.setUsername(phone);
         user.setPasswordHash(hashedPass);
-        user.setRole("CUSTOMER");
+        user.setRole(AppConstants.ROLE_CUSTOMER);
 
         Customer cus = new Customer();
         cus.setFullName(fullName);

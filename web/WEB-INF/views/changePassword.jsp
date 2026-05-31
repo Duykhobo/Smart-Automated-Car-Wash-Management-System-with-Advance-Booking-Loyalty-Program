@@ -15,6 +15,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            /* Ẩn icon con mắt mặc định của trình duyệt Edge/IE */
+            input[type="password"]::-ms-reveal,
+            input[type="password"]::-ms-clear {
+                display: none;
+            }
+        </style>
         <script>
             /** @type {import('tailwindcss').Config} */
             tailwind.config = {

@@ -2,6 +2,7 @@
 <%@page import="dto.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:if test="${empty sessionScope.USER}">
     <c:redirect url="/auth/login" />
 </c:if>
@@ -70,6 +71,17 @@
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
         <div class="max-w-4xl mx-auto p-6 md:p-8 space-y-8">
+            <%
+                String errMsg = (String) session.getAttribute(utils.AppConstants.SESSION_MSG_ERROR);
+                if (errMsg != null) {
+            %>
+            <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-xl">
+                <strong>Lỗi:</strong> <%= errMsg %>
+            </div>
+            <%
+                    session.removeAttribute(utils.AppConstants.SESSION_MSG_ERROR);
+                }
+            %>
             
             <!-- Header -->
             <header class="flex flex-col gap-1 mt-4 md:mt-0">
@@ -77,30 +89,65 @@
                 <h1 class="text-white text-2xl md:text-3xl font-bold">${sessionScope.USER.fullName}</h1>
             </header>
                     <!-- Membership Card -->
-                    <section aria-labelledby="membership-card-title" class="relative w-full max-w-md rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 shadow-xl p-6">
-                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-400 via-transparent to-transparent"></div>
+                    <section aria-labelledby="membership-card-title" class="relative w-full max-w-md rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-gray-700 shadow-2xl p-6 group">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0 z-0">
+                            <img src="${pageContext.request.contextPath}/assets/images/membership_badge.png" class="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-500" alt="Card Background">
+                        </div>
+                        
+                        <!-- Gradient Overlay -->
+                        <div class="absolute inset-0 z-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+                        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-400 via-transparent to-transparent z-0"></div>
 
                         <div class="relative z-10 flex flex-col gap-6">
                             <div class="flex justify-between items-start">
-                                <h2 id="membership-card-title" class="text-gray-300 text-sm font-medium tracking-wide">Auto Wash Pro</h2>
-                                <div class="text-right">
-                                    <span class="text-white text-sm font-normal">Hạng </span>
-                                    <span class="text-amber-400 font-bold text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"><c:out value="${customer.tierStatus}"/></span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+                                        <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    </div>
+                                    <h2 id="membership-card-title" class="text-gray-200 text-sm font-semibold tracking-wider uppercase">Auto Wash Pro</h2>
+                                </div>
+                                
+                                <div class="text-right flex flex-col items-end">
+                                    <span class="text-gray-300 text-xs font-medium uppercase tracking-wider mb-1">Hạng Thành Viên</span>
+                                    <span class="text-amber-400 font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]"><c:out value="${customer.tierStatus}"/></span>
                                 </div>
                             </div>
 
-                            <div class="flex flex-col mt-2">
-                                <p class="text-gray-400 text-sm">Điểm tích lũy hiện tại</p>
-                                <p class="text-white text-4xl font-bold tracking-tight"><c:out value="${customer.totalSpend}"/> <span class="text-lg font-normal text-amber-400">pts</span></p>
+                            <div class="flex flex-col mt-4">
+                                <p class="text-gray-300 text-sm mb-1">Điểm tích lũy hiện tại</p>
+                                <div class="flex items-baseline gap-2">
+                                    <p class="text-white text-5xl font-black tracking-tighter drop-shadow-md"><c:out value="${customer.pointsBalance}"/></p>
+                                    <span class="text-xl font-bold text-amber-400 drop-shadow-sm">pts</span>
+                                </div>
                             </div>
 
-                            <div class="mt-4 flex flex-col gap-3">
-                                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="58">
-                                    <div class="bg-amber-400 h-full rounded-full shadow-[0_0_10px_rgba(251,191,36,0.8)]" style="width: 58%"></div>
+                            <div class="mt-4 pt-4 border-t border-gray-700/50 flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-400 text-xs uppercase tracking-wider mb-1">Tổng chi tiêu</span>
+                                    <span class="text-gray-200 font-bold"><c:out value="${customer.totalSpend}"/> đ</span>
                                 </div>
-                                <p class="text-gray-400 text-xs md:text-sm text-center">Còn 1,550 điểm nữa để lên hạng <span class="text-[#00d4ff] font-semibold">Bạch Kim</span></p>
+                                <div class="w-px h-8 bg-gray-700/50"></div>
+                                <div class="flex flex-col text-right">
+                                    <span class="text-gray-400 text-xs uppercase tracking-wider mb-1">Số lần rửa</span>
+                                    <span class="text-gray-200 font-bold"><c:out value="${customer.totalWashes}"/> lần</span>
+                                </div>
                             </div>
+                            <c:if test="${not empty nextTierName}">
+                                <div class="mt-4 pt-4 border-t border-gray-700/50 flex flex-col items-center justify-center">
+                                    <span class="text-gray-400 text-xs mb-1">Chỉ còn <strong class="text-amber-400"><c:out value="${spendToNextTier}"/> đ</strong> để lên hạng <strong class="text-white"><c:out value="${nextTierName}"/></strong></span>
+                                    <div class="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+                                      <div class="bg-amber-400 h-1.5 rounded-full" style="width: ${tierProgressPercent}%"></div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
+                        <style>
+                            @keyframes shimmer {
+                                0% { transform: translateX(-100%); }
+                                100% { transform: translateX(100%); }
+                            }
+                        </style>
                     </section>
 
                     <!-- Upcoming Appointments -->
@@ -111,37 +158,32 @@
                         </div>
 
                         <div class="flex flex-col gap-4">
-                            <!-- Appointment Card 1 -->
-                            <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <c:choose>
+                                <c:when test="${not empty upcomingBooking}">
+                                    <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                                                <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <h3 class="text-white font-semibold text-base">Biển số: <c:out value="${upcomingBooking.licensePlate}"/></h3>
+                                                <p class="text-gray-400 text-sm">
+                                                    Giờ: <fmt:formatDate value="${upcomingBooking.scheduledTime}" pattern="HH:mm"/>, 
+                                                    Ngày: <fmt:formatDate value="${upcomingBooking.bookingDate}" pattern="dd/MM/yyyy"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0">
+                                            <span class="text-amber-500 text-xs md:text-sm font-medium"><c:out value="${upcomingBooking.status}"/></span>
+                                        </div>
+                                    </article>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 text-gray-400 text-center">
+                                        Bạn chưa có lịch hẹn nào sắp tới. <a href="${pageContext.request.contextPath}/bookings" class="text-btn-primary hover:underline">Đặt lịch ngay</a>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-white font-semibold text-base">Gói Rửa Tiêu Chuẩn</h3>
-                                        <p class="text-gray-400 text-sm">10:00 AM, Ngày 24/05</p>
-                                    </div>
-                                </div>
-                                <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0">
-                                    <span class="text-amber-500 text-xs md:text-sm font-medium">Đang chờ</span>
-                                </div>
-                            </article>
-
-                            <!-- Appointment Card 2 -->
-                            <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-white font-semibold text-base">Gói Rửa Tiêu Chuẩn</h3>
-                                        <p class="text-gray-400 text-sm">10:00 AM, Ngày 24/05</p>
-                                    </div>
-                                </div>
-                                <div class="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full shrink-0">
-                                    <span class="text-green-400 text-xs md:text-sm font-medium">Hoàn Thành</span>
-                                </div>
-                            </article>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </section>
                 </div>

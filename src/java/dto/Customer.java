@@ -1,8 +1,9 @@
 package dto;
 
 import java.sql.Timestamp;
+import java.io.Serializable;
 
-public class Customer {
+public class Customer implements Serializable {
 
     private int customerId;
     private int userId;

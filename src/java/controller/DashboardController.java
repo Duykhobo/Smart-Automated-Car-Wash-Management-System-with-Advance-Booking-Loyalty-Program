@@ -59,7 +59,64 @@ public class DashboardController extends HttpServlet {
         }
         CustomerDAO cusDAO = new CustomerDAO();
         Customer cus = cusDAO.getCustomerByAccountId(user.getUserId());
-        request.setAttribute("customer", cus);
+        if (cus != null) {
+            request.setAttribute("customer", cus);
+            
+            // 1. Fetch upcoming bookings
+            dao.BookingDAO bookingDAO = new dao.BookingDAO();
+            java.util.List<dto.Booking> upcomingBookings = bookingDAO.getUpcomingBookings(cus.getCustomerId());
+            if (!upcomingBookings.isEmpty()) {
+                request.setAttribute("upcomingBooking", upcomingBookings.get(0)); // Show the next immediate booking
+            }
+            
+            // Fetch vehicles
+            dao.CarDao carDao = new dao.CarDao();
+            try {
+                java.util.List<dto.Cars> vehicles = carDao.getAllCars(cus.getCustomerId());
+                request.setAttribute("vehicles", vehicles);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            // 2. Calculate Tier Progress
+            dao.MemberTierDAO tierDAO = new dao.MemberTierDAO();
+            java.util.List<dto.MemberTier> tiers = tierDAO.getAllTiers();
+            
+            dto.MemberTier currentTier = null;
+            dto.MemberTier nextTier = null;
+            
+            // Tiers are sorted by PriorityRank ASC (1: Member, 2: Silver, 3: Gold, 4: Platinum)
+            for (int i = 0; i < tiers.size(); i++) {
+                if (tiers.get(i).getTierName().equalsIgnoreCase(cus.getTierStatus())) {
+                    currentTier = tiers.get(i);
+                    if (i < tiers.size() - 1) {
+                        nextTier = tiers.get(i + 1);
+                    }
+                    break;
+                }
+            }
+            
+            if (nextTier != null) {
+                // Calculate missing points (using min spend for now as an example metric)
+                double spendMissing = nextTier.getMinSpend() - cus.getTotalSpend();
+                if (spendMissing < 0) spendMissing = 0;
+                
+                request.setAttribute("nextTierName", nextTier.getTierName());
+                request.setAttribute("spendToNextTier", spendMissing);
+                
+                // Progress percentage
+                double currentMinSpend = currentTier != null ? currentTier.getMinSpend() : 0;
+                double spendRange = nextTier.getMinSpend() - currentMinSpend;
+                double currentProgress = cus.getTotalSpend() - currentMinSpend;
+                double progressPercent = (currentProgress / spendRange) * 100;
+                if (progressPercent > 100) progressPercent = 100;
+                if (progressPercent < 0) progressPercent = 0;
+                
+                request.setAttribute("tierProgressPercent", progressPercent);
+            } else {
+                request.setAttribute("tierProgressPercent", 100);
+            }
+        }
         request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
     }
 

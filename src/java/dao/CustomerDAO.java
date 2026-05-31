@@ -2,7 +2,6 @@ package dao;
 
 import dto.Customer;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,20 +45,31 @@ public class CustomerDAO {
         return null;
     }
 
-    public int updateProfile(int cusId, String fullname, String email) {
+    public int updateProfile(int cusId, String fullname, String email, String avatarPath) {
         int result = 0;
-        String sql = "Update Customers\n"
-                + "Set FullName = ? , Email = ?\n"
-                + "Where CustomerID = ?";
+        String sql;
+        if (avatarPath != null) {
+            sql = "Update Customers\n"
+                    + "Set FullName = ? , Email = ?, Avatar = ?\n"
+                    + "Where CustomerID = ?";
+        } else {
+            sql = "Update Customers\n"
+                    + "Set FullName = ? , Email = ?\n"
+                    + "Where CustomerID = ?";
+        }
 
-        try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql)) {
-            
+        try ( Connection cn = DBContext.getConnection();  PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, fullname);
             st.setString(2, email);
-            st.setInt(3, cusId);
+            if (avatarPath != null) {
+                st.setString(3, avatarPath);
+                st.setInt(4, cusId);
+            } else {
+                st.setInt(3, cusId);
+            }
             result = st.executeUpdate();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,13 +80,12 @@ public class CustomerDAO {
         String sql = "Select top 1 1\n"
                 + "From Customers\n"
                 + "Where Email = ? AND CustomerID <> ?";
-        
-        try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql)) {
-            
+
+        try ( Connection cn = DBContext.getConnection();  PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, email);
-            st.setString(2, cusId);
-            try (ResultSet found = st.executeQuery()) {
+            st.setInt(2, cusId);
+            try ( ResultSet found = st.executeQuery()) {
                 if (found.next()) {
                     return true;
                 }

@@ -5,8 +5,9 @@
 package dto;
 
 import java.sql.Timestamp;
+import java.io.Serializable;
 
-public class User {
+public class User implements Serializable {
 
     private int userId;
     private String username;

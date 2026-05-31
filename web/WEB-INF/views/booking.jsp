@@ -83,6 +83,7 @@ tailwind.config = {
         </header>
 
         <div class="px-4 md:px-8 py-6 max-w-2xl mx-auto space-y-8">
+            <form id="bookingForm" action="<c:url value='/BookingController'/>" method="POST" class="space-y-8">
             
             <!-- Select Car -->
             <section class="space-y-3">
@@ -143,137 +144,34 @@ tailwind.config = {
                 
                 <!-- Date Horizontal Scroll -->
                 <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 snap-x">
-                    <!-- Selected Date -->
-                    <label class="cursor-pointer shrink-0 snap-start">
-                        <input type="radio" name="date" class="peer sr-only" checked>
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-gray-400 peer-checked:text-black/80 font-medium">T2</span>
-                            <span class="text-lg font-bold">25</span>
-                        </div>
-                    </label>
-                    <!-- Unselected Dates -->
-                    <label class="cursor-pointer shrink-0 snap-start">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-gray-400 peer-checked:text-black/80 font-medium">T3</span>
-                            <span class="text-lg font-bold">26</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer shrink-0 snap-start">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-gray-400 peer-checked:text-black/80 font-medium">T4</span>
-                            <span class="text-lg font-bold">27</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer shrink-0 snap-start">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-gray-400 peer-checked:text-black/80 font-medium">T5</span>
-                            <span class="text-lg font-bold">28</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer shrink-0 snap-start hover:scale-105 active:scale-95 transition-transform">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-gray-400 peer-checked:text-black/80 font-medium">T6</span>
-                            <span class="text-lg font-bold">29</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer shrink-0 snap-start hover:scale-105 active:scale-95 transition-transform">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-red-400/80 peer-checked:text-black/80 font-medium">T7</span>
-                            <span class="text-lg font-bold text-red-400 peer-checked:text-black">30</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer shrink-0 snap-start hover:scale-105 active:scale-95 transition-transform">
-                        <input type="radio" name="date" class="peer sr-only">
-                        <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
-                            <span class="text-xs text-red-400/80 peer-checked:text-black/80 font-medium">CN</span>
-                            <span class="text-lg font-bold text-red-400 peer-checked:text-black">31</span>
-                        </div>
-                    </label>
+                    <c:forEach var="date" items="${next7Days}" varStatus="status">
+                        <c:set var="dayOfWeek" value="${date.dayOfWeek.value}" />
+                        <c:choose>
+                            <c:when test="${dayOfWeek == 7}"><c:set var="dayName" value="CN" /></c:when>
+                            <c:otherwise><c:set var="dayName" value="T${dayOfWeek + 1}" /></c:otherwise>
+                        </c:choose>
+                        <c:set var="isWeekend" value="${dayOfWeek == 6 || dayOfWeek == 7}" />
+                        
+                        <label class="cursor-pointer shrink-0 snap-start hover:scale-105 active:scale-95 transition-transform">
+                            <input type="radio" name="date" value="${date}" class="peer sr-only" ${status.first ? 'checked' : ''}>
+                            <div class="w-16 h-[72px] rounded-xl bg-card-bg border border-transparent peer-checked:bg-btn-primary peer-checked:text-black flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm">
+                                <span class="text-xs ${isWeekend ? 'text-red-400/80' : 'text-gray-400'} peer-checked:text-black/80 font-medium">${dayName}</span>
+                                <span class="text-lg font-bold ${isWeekend ? 'text-red-400' : ''} peer-checked:text-black">${date.dayOfMonth}</span>
+                            </div>
+                        </label>
+                    </c:forEach>
                 </div>
 
                 <!-- Time Slots Grid -->
                 <div class="grid grid-cols-3 gap-3">
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="08:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">08:00</span>
-                        </div>
-                    </label>
-
-                    <!-- Booked Slot 1 -->
-                    <label class="cursor-not-allowed opacity-50 relative group" title="Khung giờ này đã có người đặt">
-                        <input type="radio" name="time" class="peer sr-only" disabled>
-                        <div class="h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-500 flex items-center justify-center transition-all overflow-hidden relative">
-                            <!-- Đường gạch chéo chìm -->
-                            <div class="absolute inset-0 w-full h-full opacity-30">
-                                <svg class="w-full h-full text-red-500" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                    <line x1="0" y1="100" x2="100" y2="0" stroke="currentColor" stroke-width="1.5" />
-                                </svg>
+                    <c:forEach var="time" items="${timeSlots}" varStatus="status">
+                        <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
+                            <input type="radio" name="time" class="peer sr-only" value="${time}" ${status.first ? 'checked' : ''}>
+                            <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
+                                <span class="font-semibold text-sm">${time}</span>
                             </div>
-                            <span class="font-semibold text-sm relative z-10 decoration-red-500/50">09:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="10:00" checked>
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">10:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="11:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">11:00</span>
-                        </div>
-                    </label>
-
-                    <!-- Booked Slot 2 -->
-                    <label class="cursor-not-allowed opacity-50 relative group" title="Khung giờ này đã có người đặt">
-                        <input type="radio" name="time" class="peer sr-only" disabled>
-                        <div class="h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 text-gray-500 flex items-center justify-center transition-all overflow-hidden relative">
-                            <!-- Đường gạch chéo chìm -->
-                            <div class="absolute inset-0 w-full h-full opacity-30">
-                                <svg class="w-full h-full text-red-500" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                    <line x1="0" y1="100" x2="100" y2="0" stroke="currentColor" stroke-width="1.5" />
-                                </svg>
-                            </div>
-                            <span class="font-semibold text-sm relative z-10 decoration-red-500/50">13:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="14:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">14:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="15:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">15:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="16:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">16:00</span>
-                        </div>
-                    </label>
-
-                    <label class="cursor-pointer hover:scale-105 active:scale-95 transition-transform group">
-                        <input type="radio" name="time" class="peer sr-only" value="17:00">
-                        <div class="h-10 rounded-lg bg-card-bg border border-transparent peer-checked:bg-btn-primary/10 peer-checked:border-btn-primary peer-checked:text-btn-primary peer-focus-visible:ring-2 peer-focus-visible:ring-btn-primary flex items-center justify-center transition-all shadow-sm group-hover:border-gray-500">
-                            <span class="font-semibold text-sm">17:00</span>
-                        </div>
-                    </label>
+                        </label>
+                    </c:forEach>
                 </div>
             </section>
 
@@ -284,6 +182,7 @@ tailwind.config = {
                     <button class="px-4 py-2 text-btn-primary font-bold text-sm hover:opacity-80 transition-opacity whitespace-nowrap shrink-0">Áp dụng</button>
                 </div>
             </section>
+            </form>
         </div>
     </main>
 
@@ -294,7 +193,7 @@ tailwind.config = {
                 <span class="text-xs md:text-[14px] text-gray-400">Tổng thanh toán</span>
                 <span class="text-lg md:text-xl font-bold text-white">350.000 đ</span>
             </div>
-            <button class="bg-btn-primary hover:bg-cyan-400 text-black font-bold px-6 h-12 md:h-[52px] min-w-[110px] md:min-w-[120px] rounded-xl shadow-[0_4px_16px_rgba(0,212,255,0.3)] transition-colors text-sm md:text-base flex items-center justify-center hover:scale-105 active:scale-95">
+            <button type="submit" form="bookingForm" class="bg-btn-primary hover:bg-cyan-400 text-black font-bold px-6 h-12 md:h-[52px] min-w-[110px] md:min-w-[120px] rounded-xl shadow-[0_4px_16px_rgba(0,212,255,0.3)] transition-colors text-sm md:text-base flex items-center justify-center hover:scale-105 active:scale-95">
                 XÁC NHẬN
             </button>
         </div>

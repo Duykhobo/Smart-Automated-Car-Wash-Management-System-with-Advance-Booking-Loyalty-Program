@@ -87,27 +87,27 @@ public class ChangePasswordController extends HttpServlet {
         String confirmNewPassword = request.getParameter("txtConfirmNewPassword");
         // kiểm tra xem nó có trống không 
         if (ValidationUtil.isAnyEmpty(currentpassword, newPassword, confirmNewPassword)) {
-            request.setAttribute("errorMessage", "Không được để trống");
-            request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+            request.getSession().setAttribute("ERROR", "Không được để trống");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
         //Kiểm tra độ dài có dưới 6 không
         if (newPassword.length() < 6) {
-            request.setAttribute("errorMessage", "Mật khẩu mới phải từ 6 ký tự trở lên!");
-            request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+            request.getSession().setAttribute("ERROR", "Mật khẩu mới phải từ 6 ký tự trở lên!");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
         //Kiểm tra xem xác nhận mật khẩu mới có khớp với mk mới không 
         if (!confirmNewPassword.equals(newPassword)) {
-            request.setAttribute("errorMessage", "Xác nhận mật khẩu không trùng với mật khẩu mới.Vui lòng kiểm tra lại");
-            request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+            request.getSession().setAttribute("ERROR", "Xác nhận mật khẩu không trùng với mật khẩu mới.Vui lòng kiểm tra lại");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
         // Kiểm tra mật khẩu cũ có giống không
         boolean correct = HashUtil.verifyPassword(currentpassword, user.getPasswordHash());
         if (!correct) {
-            request.setAttribute("errorMessage", "Mật khẩu cũ không chính xác");
-            request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+            request.getSession().setAttribute("ERROR", "Mật khẩu cũ không chính xác");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
         String newHashedPassword = HashUtil.createHash(newPassword);
@@ -116,11 +116,11 @@ public class ChangePasswordController extends HttpServlet {
         if (updateResult == 1) {
             user.setPasswordHash(newHashedPassword);
             request.getSession().setAttribute(AppConstants.SESSION_USER_ACCOUNT, user);
-            request.setAttribute("successMessage", "Đổi mật khẩu thành công!");
+            request.getSession().setAttribute("SUCCESS", "Đổi mật khẩu thành công!");
         } else {
-            request.setAttribute("errorMessage", "Lỗi hệ thống! Không thể cập nhật mật khẩu, vui lòng thử lại sau.");
+            request.getSession().setAttribute("ERROR", "Lỗi hệ thống! Không thể cập nhật mật khẩu, vui lòng thử lại sau.");
         }
-        request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/account/change-password");
         return;
     }
 

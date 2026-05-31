@@ -116,8 +116,10 @@ public class CustomerProfileServlet extends HttpServlet {
         int updateResult = cDAO.updateProfile(customer.getCustomerId(), fullname, email);
         if (updateResult > 0) {
             // Cập nhật thành công: Gửi thông báo xanh và lấy lại thông tin mới nhất từ DB
+
             request.setAttribute("successMessage", "Cập nhật thông tin thành công!");
             Customer updatedCustomer = cDAO.getCustomerByAccountId(user.getUserId());
+            request.getSession().setAttribute(AppConstants.SESSION_CUSTOMER_INFO, updatedCustomer); // cập nhật cho cả những trang nào lấy customer bằng session
             request.setAttribute("customer", updatedCustomer);
         } else {
             // Cập nhật thất bại

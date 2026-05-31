@@ -87,6 +87,9 @@ public class VehicleController extends HttpServlet {
             switch (action) {
                 case "add": {
                     String licensePlate = request.getParameter("licensePlate");
+                    if (licensePlate != null) {
+                        licensePlate = licensePlate.trim().toUpperCase(); // Bổ sung dòng này để chuẩn hóa ghi đè thành chứ in hoa//
+                    }
                     String vehicleType = request.getParameter("vehicleType");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
@@ -109,15 +112,6 @@ public class VehicleController extends HttpServlet {
                         return;
                     }
                     
-                    // Them 1 vai dong trong database để tránh việc bị trùng với xe đã bị xoá ALTER
-                    // TABLE Vehicles
-                    // DROP CONSTRAINT UQ__Vehicles__026BC15C775AACA0;
-                    // -- 2. Tạo một Filtered Unique Index mới thay thế:
-                    // -- Chỉ bắt buộc biển số là DUY NHẤT đối với những xe đang hoạt động (IsActive
-                    // = 1)
-                    // CREATE UNIQUE NONCLUSTERED INDEX UQ_Vehicles_LicensePlate_Active
-                    // ON Vehicles(LicensePlate)
-                    // WHERE IsActive = 1; //
                     Timestamp createdAt = new Timestamp(System.currentTimeMillis());
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
 
@@ -139,6 +133,9 @@ public class VehicleController extends HttpServlet {
                 case "update": {
                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
                     String licensePlate = request.getParameter("licensePlate");
+                    if (licensePlate != null) {
+                        licensePlate = licensePlate.trim().toUpperCase(); // Thêm dòng này để chuẩn hóa biển số in hoa khi sửa
+                    }
                     String vehicleType = request.getParameter("vehicleType");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");

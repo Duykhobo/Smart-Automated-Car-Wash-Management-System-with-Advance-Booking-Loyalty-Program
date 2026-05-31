@@ -122,11 +122,18 @@
                                             <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-500 transition-colors" aria-label="Đặt làm mặc định" title="Đặt làm mặc định">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
                                             </button>
-                                        </form>
-                                    </c:if>
-                                                                       <button onclick="openCarModal('update', '${car.vehicleId}', '${car.licensePlate}', '${car.brand}', '${car.model}', '${car.vehicleType}', '${car.color}')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary" aria-label="Chỉnh sửa">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                    </button>
+                                            </form>
+                                            </c:if>
+                                            <button type="button" data-id="${car.vehicleId}" data-plate="${car.licensePlate}" data-brand="${car.brand}"
+                                                data-model="${car.model}" data-type="${car.vehicleType}" data-color="${car.color}"
+                                                onclick="openCarModalFromButton(this)"
+                                                class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary"
+                                                aria-label="Chỉnh sửa">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                                </svg>
+                                            </button>
                                     <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe ${car.licensePlate} không?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="vehicleId" value="${car.vehicleId}">
@@ -256,6 +263,18 @@
         const modalVehicleId = document.getElementById('modalVehicleId');
         const formError = document.getElementById('formError');
 
+
+    function openCarModalFromButton(button) {
+    const id = button.getAttribute('data-id');
+    const plate = button.getAttribute('data-plate');
+    const brand = button.getAttribute('data-brand');
+    const model = button.getAttribute('data-model');
+    const type = button.getAttribute('data-type');
+    const color = button.getAttribute('data-color');
+    
+    // Gọi lại hàm modal cũ với các dữ liệu đã lấy an toàn
+    openCarModal('update', id, plate, brand, model, type, color);
+}
         // Xử lý khi thay đổi lựa chọn dropdown hãng xe
 function handleBrandChange() {
     const select = document.getElementById('modalBrandSelect');

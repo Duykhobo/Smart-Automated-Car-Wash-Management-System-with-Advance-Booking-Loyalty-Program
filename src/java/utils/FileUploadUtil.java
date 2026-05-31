@@ -32,6 +32,30 @@ public class FileUploadUtil {
                 return null;
             }
 
+            // --- BẢO MẬT: Kiểm tra đuôi file (File Extension Whitelist) ---
+            String fileExtension = "";
+            int dotIndex = fileName.lastIndexOf(".");
+            if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+                fileExtension = fileName.substring(dotIndex + 1).toLowerCase();
+            }
+            
+            // Danh sách các đuôi file an toàn
+            String[] allowedExtensions = {"jpg", "jpeg", "png", "gif", "webp"};
+            boolean isValidExtension = false;
+            for (String ext : allowedExtensions) {
+                if (ext.equals(fileExtension)) {
+                    isValidExtension = true;
+                    break;
+                }
+            }
+            
+            if (!isValidExtension) {
+                // Nếu đuôi file không hợp lệ, chặn ngay lập tức
+                System.err.println("CẢNH BÁO: Phát hiện người dùng cố tình upload file không hợp lệ: " + fileName);
+                return null; 
+            }
+            // -------------------------------------------------------------
+
             // Tạo tên file ngẫu nhiên để không bị đè ảnh khi trùng tên (VD: Hinh.png -> xxxxx-Hinh.png)
             String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
 

@@ -123,6 +123,30 @@ public class UserDAO {
         return null;
     }
 
+    // Lấy thông tin User bằng Username (SĐT) để phục vụ việc xác thực mật khẩu kiểu mới (có Salt)
+    public User getUserByUsername(String username) {
+        String sql = "SELECT * FROM Users WHERE [Username] = ?";
+        try (Connection conn = DBContext.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("UserID"));
+                    user.setUsername(rs.getString("Username"));
+                    user.setPasswordHash(rs.getString("PasswordHash"));
+                    user.setRole(rs.getString("Role"));
+                    user.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public dto.Customer getCustomerByUserId(int userId) {
         String sql = "SELECT * FROM Customers WHERE UserID = ?";
         try (java.sql.Connection conn = DBContext.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -134,6 +158,7 @@ public class UserDAO {
                     cus.setUserId(rs.getInt("UserID"));
                     cus.setFullName(rs.getString("FullName"));
                     cus.setPhone(rs.getString("Phone"));
+                    cus.setEmail(rs.getString("Email"));
                     cus.setPointsBalance(rs.getInt("PointsBalance"));
                     cus.setTotalSpend(rs.getDouble("TotalSpend"));
                     cus.setTotalWashes(rs.getInt("TotalWashes"));

@@ -63,7 +63,21 @@ public class CustomerProfileServlet extends HttpServlet {
                     if (!dir.exists()) dir.mkdirs();
                     
                     String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-                    filePart.write(uploadDir + File.separator + uniqueFileName);
+                    String finalPath = uploadDir + File.separator + uniqueFileName;
+                    filePart.write(finalPath);
+                    
+                    // Trick for NetBeans: Save to source 'web' folder as well to prevent wipe on Clean & Build
+                    if (uploadDir.contains("build" + File.separator + "web")) {
+                        String sourceDir = uploadDir.replace("build" + File.separator + "web", "web");
+                        File sDir = new File(sourceDir);
+                        if (!sDir.exists()) sDir.mkdirs();
+                        java.nio.file.Files.copy(
+                            java.nio.file.Paths.get(finalPath), 
+                            java.nio.file.Paths.get(sourceDir + File.separator + uniqueFileName), 
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                        );
+                    }
+                    
                     avatarPath = "assets/avatars/" + uniqueFileName;
                 }
             }

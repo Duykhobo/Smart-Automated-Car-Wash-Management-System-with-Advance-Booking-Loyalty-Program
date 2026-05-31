@@ -1,14 +1,10 @@
 <%@page import="utils.AppConstants"%>
 <%@page import="dto.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%
-    Customer user = (Customer) session.getAttribute(AppConstants.SESSION_CUSTOMER_INFO);
-    if (user == null) {
-        response.sendRedirect("/auth/login");
-    } else {
-        Customer cus = (Customer) request.getAttribute("customer");
-
-%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<c:if test="${empty sessionScope.USER}">
+    <c:redirect url="/auth/login" />
+</c:if>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -89,13 +85,13 @@
                                 <h2 id="membership-card-title" class="text-gray-300 text-sm font-medium tracking-wide">Auto Wash Pro</h2>
                                 <div class="text-right">
                                     <span class="text-white text-sm font-normal">Hạng </span>
-                                    <span class="text-amber-400 font-bold text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"><%= cus.getTierStatus()%></span>
+                                    <span class="text-amber-400 font-bold text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"><c:out value="${customer.tierStatus}"/></span>
                                 </div>
                             </div>
 
                             <div class="flex flex-col mt-2">
                                 <p class="text-gray-400 text-sm">Điểm tích lũy hiện tại</p>
-                                <p class="text-white text-4xl font-bold tracking-tight"><%=cus.getTotalSpend()%> <span class="text-lg font-normal text-amber-400">pts</span></p>
+                                <p class="text-white text-4xl font-bold tracking-tight"><c:out value="${customer.totalSpend}"/> <span class="text-lg font-normal text-amber-400">pts</span></p>
                             </div>
 
                             <div class="mt-4 flex flex-col gap-3">
@@ -176,6 +172,3 @@
         </div>
     </body>
 </html>
-<%
-    }
-%>

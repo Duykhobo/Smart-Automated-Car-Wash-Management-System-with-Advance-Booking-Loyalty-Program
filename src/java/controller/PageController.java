@@ -13,10 +13,10 @@ public class PageController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String path = request.getServletPath();
         String view = "";
-        
+
         switch (path) {
             case "":
             case "/":
@@ -25,19 +25,26 @@ public class PageController extends HttpServlet {
                 view = "/WEB-INF/views/index.jsp";
                 break;
             case "/account/dashboard":
-                view = "/WEB-INF/views/dashboard.jsp";
+                view = "/DashboardController";
                 break;
             case "/bookings":
                 view = "/WEB-INF/views/booking.jsp";
                 break;
             case "/account/profile":
-                view = "/WEB-INF/views/profile.jsp";
+                view = "/CustomerProfileServlet";
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
         }
-        
+
         request.getRequestDispatcher(view).forward(request, response);
+    }
+
+    // de chuyen cho form dung doPost
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Gọi lại doGet để nó chạy qua khối switch-case và forward sang CustomerProfileServlet
+        doGet(request, response);
     }
 }

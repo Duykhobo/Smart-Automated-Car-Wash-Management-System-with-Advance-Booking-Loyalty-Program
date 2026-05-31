@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import utils.AppConstants;
 import utils.ValidationUtil;
 
 /**
@@ -34,17 +35,7 @@ public class CustomerProfileServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        User user = (User) request.getSession().getAttribute("loggedInUser");
-        if (user == null) {
-            response.sendRedirect("login.jsp");
-        } else {
-            CustomerDAO c = new CustomerDAO();
-            Customer customer = c.getCustomerByAccountId(user.getUserId());
 
-            request.setAttribute("customer", customer);
-            request.getRequestDispatcher("CustomerProfile.jsp").forward(request, response);
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -59,39 +50,79 @@ public class CustomerProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.setContentType("text/html;charset=UTF-8");
+        User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
+        if (user == null) {
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+        } else {
+            CustomerDAO c = new CustomerDAO();
+            Customer customer = c.getCustomerByAccountId(user.getUserId());
+
+            request.setAttribute("customer", customer);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("loggedInUser");
+        User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            response.sendRedirect("login.jsp");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
         String fullname = request.getParameter("txtfullname");
-        String phone = request.getParameter("txtphone");
-        String password = request.getParameter("txtpassword");
-        CustomerDAO c = new CustomerDAO();
+        String email = request.getParameter("email");
+        CustomerDAO cDAO = new CustomerDAO();
         ValidationUtil validate = new ValidationUtil();
-        Customer customer = c.getCustomerByAccountId(user.getUserId());
+        Customer customer = cDAO.getCustomerByAccountId(user.getUserId());
         // nếu mà khách hàng cố tình để trống thì hiển thị lỗi
-        if (validate.isAnyEmpty(fullname, phone)) {
+        if (validate.isAnyEmpty(fullname, email)) {
             request.setAttribute("errorMessage", "Không được để trống");
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("edit_profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
             return;
         }
-        // trường hợp khác hàng để trống password thì ko thay đổi password
-        if (password.isEmpty()) {
-            if (phone.equalsIgnoreCase(user.getUsername())) {
-                if (c.updateProfile(customer.getCustomerId(), fullname, phone) == 1) {
-                    request.setAttribute("customer", customer);
-                    request.getRequestDispatcher("CustomerProfile.jsp").forward(request, response);
-                }
-            }
+        // Kiểm tra xem là người dùng có thay đổi gì không ?
+        if (customer.getFullName().equalsIgnoreCase(fullname) && customer.getEmail().equalsIgnoreCase(email)) {
+            request.setAttribute("customer", customer);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            return;
         }
+        // Kiểm tra định dạng tên
+        if (!ValidationUtil.isValidName(fullname)) {
+            request.setAttribute("errorMessage", "Tên không hợp lệ! Vui lòng nhập lại tên.");
+            request.setAttribute("customer", customer);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            return;
+        }
+
+        if (!ValidationUtil.isValidEmail(email)) {
+            request.setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
+            request.setAttribute("customer", customer);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            return;
+        }
+        if (cDAO.isEmailExists(customer.getCustomerId(), email)) {
+            request.setAttribute("errorMessage", "Email đã tồn tại");
+            request.setAttribute("customer", customer);
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            return;
+        }
+
+        int updateResult = cDAO.updateProfile(customer.getCustomerId(), fullname, email);
+        if (updateResult > 0) {
+            // Cập nhật thành công: Gửi thông báo xanh và lấy lại thông tin mới nhất từ DB
+            request.setAttribute("successMessage", "Cập nhật thông tin thành công!");
+            Customer updatedCustomer = cDAO.getCustomerByAccountId(user.getUserId());
+            request.setAttribute("customer", updatedCustomer);
+        } else {
+            // Cập nhật thất bại
+            request.setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau!");
+            request.setAttribute("customer", customer);
+        }
+        // Forward về lại trang hiển thị profile
+        request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
     }
 
     /**

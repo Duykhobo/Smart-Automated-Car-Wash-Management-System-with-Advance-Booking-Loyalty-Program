@@ -1,4 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -85,16 +87,25 @@ tailwind.config = {
             <!-- Select Car -->
             <section class="space-y-3">
                 <div class="flex items-center justify-between p-4 bg-card-bg rounded-xl border border-btn-primary/50 shadow-[0_4px_20px_rgba(0,212,255,0.05)]">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 flex items-center justify-center text-gray-300">
+                    <div class="flex items-center gap-4 w-full">
+                        <div class="w-10 h-10 flex items-center justify-center text-gray-300 shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8M8 11h8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         </div>
-                        <input type="text" value="51H-123.45" readonly class="bg-transparent text-btn-primary font-bold text-lg border-none outline-none w-28 p-0 cursor-default">
+                        <select name="vehicleId" class="bg-transparent text-btn-primary font-bold text-lg border-none outline-none w-full p-0 cursor-pointer appearance-none">
+                            <c:choose>
+                                <c:when test="${not empty vehicles}">
+                                    <c:forEach var="v" items="${vehicles}">
+                                        <option value="${v.vehicleId}" class="bg-bg-primary text-white" ${v.isDefault ? 'selected' : ''}>
+                                            ${v.licensePlate} <c:if test="${not empty v.brand}">- ${v.brand}</c:if>
+                                        </option>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="" disabled selected class="bg-bg-primary text-gray-400">Chưa có xe nào</option>
+                                </c:otherwise>
+                            </c:choose>
+                        </select>
                     </div>
-                    <button class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors group">
-                        Đổi xe
-                        <svg class="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </button>
                 </div>
             </section>
 
@@ -102,26 +113,27 @@ tailwind.config = {
             <section class="space-y-4">
                 <h2 class="font-semibold text-lg">1. Chọn Gói Dịch Vụ</h2>
                 <div class="space-y-3">
-                    <!-- Standard Service (Unselected) -->
-                    <label class="block relative cursor-pointer group">
-                        <input type="radio" name="service" class="peer sr-only">
-                        <div class="p-4 md:p-5 min-h-[80px] rounded-xl bg-card-bg border-2 border-transparent peer-checked:border-btn-primary peer-checked:bg-card-bg/80 transition-all shadow-md flex items-center justify-between gap-3">
-                            <h3 class="font-medium text-sm md:text-base text-gray-300 peer-checked:text-white leading-snug">Rửa Bọt Tuyết Tiêu Chuẩn</h3>
-                            <div class="font-bold text-sm md:text-[15px] whitespace-nowrap shrink-0">100.000 đ</div>
-                        </div>
-                    </label>
-
-                    <!-- Premium Service (Selected) -->
-                    <label class="block relative cursor-pointer group">
-                        <input type="radio" name="service" class="peer sr-only" checked>
-                        <div class="p-4 md:p-5 min-h-[80px] rounded-xl bg-card-bg border-2 border-transparent peer-checked:border-btn-primary peer-checked:bg-card-bg/80 transition-all shadow-md flex items-center justify-between gap-3">
-                            <div class="flex flex-col gap-1.5">
-                                <h3 class="font-medium text-sm md:text-base text-gray-300 peer-checked:text-white leading-snug">Rửa Ceramic Cấp Cao</h3>
-                                <span class="bg-[#fbbf24] text-bg-primary text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded w-max">Khuyên dùng</span>
-                            </div>
-                            <div class="font-bold text-sm md:text-[15px] whitespace-nowrap shrink-0">350.000 đ</div>
-                        </div>
-                    </label>
+                    <c:choose>
+                        <c:when test="${not empty services}">
+                            <c:forEach var="service" items="${services}" varStatus="status">
+                                <label class="block relative cursor-pointer group">
+                                    <input type="radio" name="service" value="${service.serviceId}" class="peer sr-only" ${status.first ? 'checked' : ''}>
+                                    <div class="p-4 md:p-5 min-h-[80px] rounded-xl bg-card-bg border-2 border-transparent peer-checked:border-btn-primary peer-checked:bg-card-bg/80 transition-all shadow-md flex items-center justify-between gap-3">
+                                        <div class="flex flex-col gap-1.5">
+                                            <h3 class="font-medium text-sm md:text-base text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>
+                                            <!-- Optional: You can add logic to highlight premium services if needed -->
+                                        </div>
+                                        <div class="font-bold text-sm md:text-[15px] whitespace-nowrap shrink-0">
+                                            <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/> đ
+                                        </div>
+                                    </div>
+                                </label>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="text-gray-400">Không có dịch vụ nào đang hoạt động.</p>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </section>
 

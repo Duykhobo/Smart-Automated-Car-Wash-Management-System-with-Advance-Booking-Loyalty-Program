@@ -32,7 +32,7 @@ public class PageController extends HttpServlet {
                 view = "/DashboardController";
                 break;
             case "/bookings":
-                view = "/WEB-INF/views/booking.jsp";
+                view = "/BookingController";
                 break;
             case "/account/profile":
                 view = "/CustomerProfileServlet";

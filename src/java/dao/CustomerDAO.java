@@ -45,17 +45,29 @@ public class CustomerDAO {
         return null;
     }
 
-    public int updateProfile(int cusId, String fullname, String email) {
+    public int updateProfile(int cusId, String fullname, String email, String avatarPath) {
         int result = 0;
-        String sql = "Update Customers\n"
-                + "Set FullName = ? , Email = ?\n"
-                + "Where CustomerID = ?";
+        String sql;
+        if (avatarPath != null) {
+            sql = "Update Customers\n"
+                    + "Set FullName = ? , Email = ?, Avatar = ?\n"
+                    + "Where CustomerID = ?";
+        } else {
+            sql = "Update Customers\n"
+                    + "Set FullName = ? , Email = ?\n"
+                    + "Where CustomerID = ?";
+        }
 
         try ( Connection cn = DBContext.getConnection();  PreparedStatement st = cn.prepareStatement(sql)) {
 
             st.setString(1, fullname);
             st.setString(2, email);
-            st.setInt(3, cusId);
+            if (avatarPath != null) {
+                st.setString(3, avatarPath);
+                st.setInt(4, cusId);
+            } else {
+                st.setInt(3, cusId);
+            }
             result = st.executeUpdate();
 
         } catch (Exception e) {

@@ -20,7 +20,7 @@ public class CustomerService {
      * @return Customer đã được cập nhật thành công, hoặc null nếu không có sự thay đổi.
      * @throws Exception chứa câu báo lỗi (errorMessage) nếu validation thất bại.
      */
-    public Customer updateProfile(int accountId, String fullname, String email) throws Exception {
+    public Customer updateProfile(int accountId, String fullname, String email, String avatarPath) throws Exception {
         Customer customer = customerDAO.getCustomerByAccountId(accountId);
         if (customer == null) {
             throw new Exception("Không tìm thấy thông tin khách hàng.");
@@ -33,7 +33,7 @@ public class CustomerService {
         }
         
         if (customer.getFullName().equalsIgnoreCase(fullname) && 
-            (customer.getEmail() == null ? email == null : customer.getEmail().equalsIgnoreCase(email))) {
+            (customer.getEmail() == null ? email == null : customer.getEmail().equalsIgnoreCase(email)) && avatarPath == null) {
             // Không có sự thay đổi
             return customer;
         }
@@ -52,7 +52,7 @@ public class CustomerService {
             throw new Exception("Email đã tồn tại");
         }
         
-        int updateResult = customerDAO.updateProfile(customerId, fullname, email);
+        int updateResult = customerDAO.updateProfile(customerId, fullname, email, avatarPath);
         if (updateResult > 0) {
             return customerDAO.getCustomerByAccountId(accountId);
         } else {

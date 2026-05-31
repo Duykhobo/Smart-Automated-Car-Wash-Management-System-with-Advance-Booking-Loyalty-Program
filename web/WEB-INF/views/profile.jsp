@@ -1,4 +1,5 @@
 <%@page import="dto.Customer"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -71,11 +72,18 @@
                     <section class="flex flex-col items-center gap-4 text-center">
                         <div class="relative group cursor-pointer">
                             <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gray-800 bg-gray-700 flex items-center justify-center transition-transform group-hover:scale-105 shadow-[0_0_20px_rgba(0,212,255,0.15)]">
-                                <!-- Default Avatar Icon -->
-                                <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                                <c:choose>
+                                    <c:when test="${not empty customer.avatar}">
+                                        <img src="${pageContext.request.contextPath}/${customer.avatar}" alt="Avatar" class="w-full h-full object-cover">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Default Avatar Icon -->
+                                        <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                             <!-- Nút thay đổi ảnh đại diện (ẩn, hiện khi di chuột) -->
-                            <div class="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <div class="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity" onclick="openProfileModal()">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             </div>
                         </div>
@@ -100,11 +108,11 @@
                     <section class="grid grid-cols-2 gap-4" aria-label="Thống kê tài khoản">
                         <article class="flex flex-col items-center justify-center p-5 bg-[#1a222c] border border-gray-800 rounded-2xl shadow-lg">
                             <p class="text-gray-400 text-xs md:text-sm mb-1">Tổng chi tiêu</p>
-                            <p class="text-white text-xl md:text-2xl font-bold">3.500.000đ</p>
+                            <p class="text-white text-xl md:text-2xl font-bold"><c:out value="${customer.totalSpend}"/> đ</p>
                         </article>
                         <article class="flex flex-col items-center justify-center p-5 bg-[#1a222c] border border-gray-800 rounded-2xl shadow-lg">
                             <p class="text-gray-400 text-xs md:text-sm mb-1">Số lần rửa</p>
-                            <p class="text-white text-xl md:text-2xl font-bold">15 <span class="text-base font-normal">lần</span></p>
+                            <p class="text-white text-xl md:text-2xl font-bold"><c:out value="${customer.totalWashes}"/> <span class="text-base font-normal">lần</span></p>
                         </article>
                     </section>
 
@@ -201,7 +209,7 @@
                 </div>
 
                 <!-- Body Form -->
-                <form action="${pageContext.request.contextPath}/account/profile" method="POST" class="p-5 space-y-4">
+                <form action="${pageContext.request.contextPath}/account/profile" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
                     <%
                         String error = (String) request.getAttribute("errorMessage");
                         String success = (String) request.getAttribute("successMessage");
@@ -219,11 +227,20 @@
                     </div>
                     <% }%>
 
-                    <!-- Avatar Upload (Mock) -->
+                    <!-- Avatar Upload -->
                     <div class="flex flex-col items-center gap-3 mb-6">
-                        <div class="w-20 h-20 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800 hover:border-btn-primary hover:text-btn-primary transition-colors cursor-pointer group focus-within:ring-2 focus-within:ring-btn-primary" tabindex="0">
-                            <svg class="w-8 h-8 text-gray-500 group-hover:text-btn-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        </div>
+                        <label for="avatarUpload" class="w-20 h-20 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800 hover:border-btn-primary hover:text-btn-primary transition-colors cursor-pointer group focus-within:ring-2 focus-within:ring-btn-primary overflow-hidden relative">
+                            <c:choose>
+                                <c:when test="${not empty customer.avatar}">
+                                    <img id="avatarPreview" src="${pageContext.request.contextPath}/${customer.avatar}" alt="Avatar" class="w-full h-full object-cover">
+                                </c:when>
+                                <c:otherwise>
+                                    <img id="avatarPreview" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                                    <svg id="avatarPlaceholder" class="w-8 h-8 text-gray-500 group-hover:text-btn-primary transition-colors absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </c:otherwise>
+                            </c:choose>
+                            <input type="file" id="avatarUpload" name="avatarUpload" accept="image/*" class="hidden" onchange="previewAvatar(event)">
+                        </label>
                         <span class="text-xs text-gray-400">Nhấn để thay đổi ảnh</span>
                     </div>
 
@@ -280,6 +297,20 @@
                     profileModal.classList.remove('flex');
                     profileModal.classList.add('hidden');
                 }, 300);
+            }
+
+            function previewAvatar(event) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const preview = document.getElementById('avatarPreview');
+                    const placeholder = document.getElementById('avatarPlaceholder');
+                    preview.src = reader.result;
+                    preview.classList.remove('hidden');
+                    if(placeholder) placeholder.classList.add('hidden');
+                }
+                if (event.target.files[0]) {
+                    reader.readAsDataURL(event.target.files[0]);
+                }
             }
 
             // Nếu trang load lên mà phát hiện có lỗi (do submit thất bại từ Servlet), tự động mở lại modal chỉnh sửa

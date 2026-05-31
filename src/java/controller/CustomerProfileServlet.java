@@ -15,7 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import service.CustomerService;
 import utils.AppConstants;
 
+import javax.servlet.annotation.MultipartConfig;
+import java.io.File;
+import java.nio.file.Paths;
+
 @WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet"})
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
 public class CustomerProfileServlet extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
@@ -47,9 +52,28 @@ public class CustomerProfileServlet extends HttpServlet {
         String fullname = request.getParameter("txtfullname");
         String email = request.getParameter("email");
         
+        String avatarPath = null;
+        try {
+            javax.servlet.http.Part filePart = request.getPart("avatarUpload");
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                if (fileName != null && !fileName.isEmpty()) {
+                    String uploadDir = request.getServletContext().getRealPath("/assets/avatars");
+                    File dir = new File(uploadDir);
+                    if (!dir.exists()) dir.mkdirs();
+                    
+                    String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                    filePart.write(uploadDir + File.separator + uniqueFileName);
+                    avatarPath = "assets/avatars/" + uniqueFileName;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error uploading avatar: " + e.getMessage());
+        }
+        
         try {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
-            Customer updatedCustomer = customerService.updateProfile(user.getUserId(), fullname, email);
+            Customer updatedCustomer = customerService.updateProfile(user.getUserId(), fullname, email, avatarPath);
             
             if (updatedCustomer != customer) { // If there were changes
                 request.getSession().setAttribute("successMessage", "Cập nhật thông tin thành công!");

@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="flex items-center gap-1 md:gap-3 z-10 shrink-0">
                                     <c:if test="${not car.isDefault}">
-                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe <c:out value="${car.licensePlate}" /> làm mặc định?');">
+                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe ${car.licensePlate} làm mặc định?');">
                                             <input type="hidden" name="action" value="setDefault">
                                             <input type="hidden" name="vehicleId" value="${car.vehicleId}">
                                             <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-500 transition-colors" aria-label="Đặt làm mặc định" title="Đặt làm mặc định">
@@ -124,10 +124,10 @@
                                             </button>
                                         </form>
                                     </c:if>
-                                    <button onclick="openCarModal('update', '${car.vehicleId}', '<c:out value="${car.licensePlate}" />', '<c:out value="${car.brand}" />', '<c:out value="${car.model}" />', '<c:out value="${car.vehicleType}" />', '<c:out value="${car.color}" />')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary" aria-label="Chỉnh sửa">
+                                                                       <button onclick="openCarModal('update', '${car.vehicleId}', '${car.licensePlate}', '${car.brand}', '${car.model}', '${car.vehicleType}', '${car.color}')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary" aria-label="Chỉnh sửa">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
-                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe <c:out value="${car.licensePlate}" /> không?');">
+                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe ${car.licensePlate} không?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="vehicleId" value="${car.vehicleId}">
                                         <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors" aria-label="Xóa">

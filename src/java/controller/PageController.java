@@ -21,6 +21,7 @@ public class PageController extends HttpServlet {
             case "":
             case "/":
             case "/home":
+
             case "/index":
                 view = "/WEB-INF/views/index.jsp";
                 break;

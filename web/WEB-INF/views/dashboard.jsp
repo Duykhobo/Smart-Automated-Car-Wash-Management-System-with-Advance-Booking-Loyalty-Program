@@ -69,7 +69,7 @@ tailwind.config = {
             <!-- Header -->
             <header class="flex flex-col gap-1 mt-4 md:mt-0">
                 <p class="text-gray-400 text-sm md:text-base font-normal">Chào buổi sáng,</p>
-                <h1 class="text-white text-2xl md:text-3xl font-bold">Thanh Duy</h1>
+                <h1 class="text-white text-2xl md:text-3xl font-bold">${sessionScope.USER.fullName}</h1>
             </header>
 
             <!-- Membership Card -->

@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="flex items-center gap-1 md:gap-3 z-10 shrink-0">
                                     <c:if test="${not car.isDefault}">
-                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe <c:out value=\"${car.licensePlate}\" /> làm mặc định?');">
+                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe <c:out value="${car.licensePlate}" /> làm mặc định?');">
                                             <input type="hidden" name="action" value="setDefault">
                                             <input type="hidden" name="vehicleId" value="${car.vehicleId}">
                                             <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-500 transition-colors" aria-label="Đặt làm mặc định" title="Đặt làm mặc định">
@@ -124,10 +124,10 @@
                                             </button>
                                         </form>
                                     </c:if>
-                                    <button onclick="openCarModal('update', '${car.vehicleId}', '<c:out value=\"${car.licensePlate}\" />', '<c:out value=\"${car.brand}\" />', '<c:out value=\"${car.model}\" />', '<c:out value=\"${car.vehicleType}\" />', '<c:out value=\"${car.color}\" />')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary" aria-label="Chỉnh sửa">
+                                    <button onclick="openCarModal('update', '${car.vehicleId}', '<c:out value="${car.licensePlate}" />', '<c:out value="${car.brand}" />', '<c:out value="${car.model}" />', '<c:out value="${car.vehicleType}" />', '<c:out value="${car.color}" />')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary" aria-label="Chỉnh sửa">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
-                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe <c:out value=\"${car.licensePlate}\" /> không?');">
+                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe <c:out value="${car.licensePlate}" /> không?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="vehicleId" value="${car.vehicleId}">
                                         <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors" aria-label="Xóa">
@@ -174,10 +174,33 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
-                        <label class="text-gray-300 text-sm font-medium">Hãng xe *</label>
-                        <input type="text" id="modalBrand" name="brand" placeholder="VD: Honda" required 
-                               class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
-                    </div>
+    <label class="text-gray-300 text-sm font-medium">Hãng xe *</label>
+    <!-- Dropdown chọn hãng xe -->
+    <select id="modalBrandSelect" onchange="handleBrandChange()" required
+            class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all cursor-pointer">
+        <option value="">Chọn hãng xe</option>
+        <option value="Toyota">Toyota</option>
+        <option value="Honda">Honda</option>
+        <option value="Hyundai">Hyundai</option>
+        <option value="Kia">Kia</option>
+        <option value="Mazda">Mazda</option>
+        <option value="Ford">Ford</option>
+        <option value="Mitsubishi">Mitsubishi</option>
+        <option value="VinFast">VinFast</option>
+        <option value="Suzuki">Suzuki</option>
+        <option value="Mercedes-Benz">Mercedes-Benz</option>
+        <option value="BMW">BMW</option>
+        <option value="Audi">Audi</option>
+        <option value="Khác">Hãng khác...</option>
+    </select>
+    
+    <!-- Input ẩn (hidden) để chứa giá trị thực gửi lên Server (đảm bảo giữ nguyên name="brand") -->
+    <input type="hidden" id="modalBrand" name="brand" value="">
+    
+    <!-- Input phụ tự động hiển thị nếu chọn "Hãng khác..." -->
+    <input type="text" id="modalBrandOther" placeholder="Nhập tên hãng xe khác..." oninput="updateBrandHiddenValue()"
+           class="hidden mt-2 w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
+</div>
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium">Dòng xe *</label>
                         <input type="text" id="modalModel" name="model" placeholder="VD: Civic" required 
@@ -233,36 +256,89 @@
         const modalVehicleId = document.getElementById('modalVehicleId');
         const formError = document.getElementById('formError');
 
+        // Xử lý khi thay đổi lựa chọn dropdown hãng xe
+function handleBrandChange() {
+    const select = document.getElementById('modalBrandSelect');
+    const inputOther = document.getElementById('modalBrandOther');
+    const hiddenInput = document.getElementById('modalBrand');
+    
+    if (select.value === 'Khác') {
+        inputOther.classList.remove('hidden');
+        inputOther.required = true;
+        hiddenInput.value = inputOther.value.trim();
+    } else {
+        inputOther.classList.add('hidden');
+        inputOther.required = false;
+        hiddenInput.value = select.value;
+    }
+}
+
+// Đồng bộ dữ liệu khi gõ vào ô nhập hãng khác
+function updateBrandHiddenValue() {
+    const inputOther = document.getElementById('modalBrandOther');
+    const hiddenInput = document.getElementById('modalBrand');
+    hiddenInput.value = inputOther.value.trim();
+}
         function openCarModal(action, id = '', plate = '', brand = '', model = '', type = 'sedan', color = '') {
-            modalAction.value = action;
-            formError.classList.add('hidden');
-            
-            if (action === 'update') {
-                carModalTitle.textContent = 'Cập nhật xe';
-                modalVehicleId.value = id;
-                modalPlate.value = plate;
-                modalBrand.value = brand;
-                modalModel.value = model;
-                modalType.value = type;
-                modalColor.value = color;
-            } else {
-                carModalTitle.textContent = 'Thêm xe mới';
-                modalVehicleId.value = '';
-                modalPlate.value = '';
-                modalBrand.value = '';
-                modalModel.value = '';
-                modalType.value = 'sedan';
-                modalColor.value = '';
+    modalAction.value = action;
+    formError.classList.add('hidden');
+    
+    const select = document.getElementById('modalBrandSelect');
+    const inputOther = document.getElementById('modalBrandOther');
+    const hiddenInput = document.getElementById('modalBrand');
+    
+    if (action === 'update') {
+        carModalTitle.textContent = 'Cập nhật xe';
+        modalVehicleId.value = id;
+        modalPlate.value = plate;
+        modalModel.value = model;
+        modalType.value = type;
+        modalColor.value = color;
+        
+        // Điền giá trị hãng xe
+        hiddenInput.value = brand;
+        
+        // Kiểm tra xem brand cũ có sẵn trong danh sách dropdown không
+        let isKnownBrand = false;
+        for (let option of select.options) {
+            if (option.value === brand) {
+                isKnownBrand = true;
+                break;
             }
-            
-            carModal.classList.remove('hidden');
-            carModal.classList.add('flex');
-            
-            setTimeout(() => {
-                carModalContent.classList.remove('scale-95', 'opacity-0');
-                carModalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
         }
+        
+        if (isKnownBrand) {
+            select.value = brand;
+            inputOther.classList.add('hidden');
+            inputOther.value = '';
+        } else {
+            select.value = 'Khác';
+            inputOther.classList.remove('hidden');
+            inputOther.value = brand;
+        }
+    } else {
+        carModalTitle.textContent = 'Thêm xe mới';
+        modalVehicleId.value = '';
+        modalPlate.value = '';
+        modalModel.value = '';
+        modalType.value = 'sedan';
+        modalColor.value = '';
+        
+        // Reset hãng xe về mặc định
+        select.value = '';
+        inputOther.classList.add('hidden');
+        inputOther.value = '';
+        hiddenInput.value = '';
+    }
+    
+    carModal.classList.remove('hidden');
+    carModal.classList.add('flex');
+    
+    setTimeout(() => {
+        carModalContent.classList.remove('scale-95', 'opacity-0');
+        carModalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
 
         function closeCarModal() {
             carModalContent.classList.remove('scale-100', 'opacity-100');
@@ -275,14 +351,24 @@
         }
 
         function validateCarForm() {
-            if (!modalPlate.value.trim() || !modalBrand.value.trim() || !modalModel.value.trim() || !modalColor.value.trim()) {
-                formError.textContent = "Vui lòng nhập đầy đủ các trường bắt buộc (*).";
-                formError.classList.remove('hidden');
-                return false;
-            }
-            formError.classList.add('hidden');
-            return true;
-        }
+    // 1. Kiểm tra các trường bắt buộc không được để trống
+    if (!modalPlate.value.trim() || !modalBrand.value.trim() || !modalModel.value.trim() || !modalColor.value.trim()) {
+        formError.textContent = "Vui lòng nhập đầy đủ các trường bắt buộc (*).";
+        formError.classList.remove('hidden');
+        return false;
+    }
+    
+    // 2. BỔ SUNG: Kiểm tra định dạng biển số xe bằng Regular Expression (giống hệt backend)
+    const plateRegex = /^[0-9]{2}[A-Z][0-9A-Z]?-[0-9]{4,5}$/;
+    if (!plateRegex.test(modalPlate.value.trim().toUpperCase())) {
+        formError.textContent = "Biển số xe không đúng định dạng! (Ví dụ đúng: 59A-12345 hoặc 59A1-12345)";
+        formError.classList.remove('hidden');
+        return false;
+    }
+    
+    formError.classList.add('hidden');
+    return true;
+}
 
         carModal.addEventListener('click', function(e) {
             if (e.target === carModal) {

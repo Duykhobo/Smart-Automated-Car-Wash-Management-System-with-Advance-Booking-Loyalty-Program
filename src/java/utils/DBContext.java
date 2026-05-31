@@ -8,13 +8,12 @@ import java.util.ResourceBundle;
 
 public class DBContext {
 
-    private static final ResourceBundle rb = ResourceBundle.getBundle("db");
     
-    private static final String SERVER_NAME = rb.getString("db.server");
-    private static final String PORT_NUMBER = rb.getString("db.port");
-    private static final String DB_NAME = rb.getString("db.name");
-    private static final String USER_ID = rb.getString("db.user");
-    private static final String PASSWORD = rb.getString("db.password");
+    private static final String SERVER_NAME ="localhost";
+    private static final String PORT_NUMBER = "1433";
+    private static final String DB_NAME = "SmartCarWash";
+    private static final String USER_ID ="sa";
+    private static final String PASSWORD = "12345";
     
     // Khai báo DataSource dùng chung (Singleton Pattern ngầm)
     private static HikariDataSource dataSource;

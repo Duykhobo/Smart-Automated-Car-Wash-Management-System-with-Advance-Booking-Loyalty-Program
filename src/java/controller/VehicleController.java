@@ -18,12 +18,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-@WebServlet(name = "VehicleController", urlPatterns = {"/vehicles", "/vehicles/action"})
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
-    maxFileSize = 1024 * 1024 * 10,       // 10MB
-    maxRequestSize = 1024 * 1024 * 50     // 50MB
+import utils.ValidationUtil;
+@WebServlet(name = "VehicleController", urlPatterns = { "/vehicles", "/vehicles/action" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class VehicleController extends HttpServlet {
 
@@ -36,7 +35,7 @@ public class VehicleController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+
         try {
             Object obj = request.getSession().getAttribute(AppConstants.SESSION_CUSTOMER_INFO);
             if (obj == null || !(obj instanceof Customer)) {
@@ -66,7 +65,7 @@ public class VehicleController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
-        
+
         String action = request.getParameter("action");
         if (action == null) {
             response.sendRedirect(request.getContextPath() + "/vehicles");
@@ -92,33 +91,51 @@ public class VehicleController extends HttpServlet {
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
-                    
                     if (licensePlate == null || licensePlate.trim().isEmpty() ||
-                        brand == null || brand.trim().isEmpty() ||
-                        model == null || model.trim().isEmpty() ||
-                        vehicleType == null || vehicleType.trim().isEmpty() ||
-                        color == null || color.trim().isEmpty()) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Vui lòng nhập đầy đủ các trường bắt buộc!");
+                            brand == null || brand.trim().isEmpty() ||
+                            model == null || model.trim().isEmpty() ||
+                            vehicleType == null || vehicleType.trim().isEmpty() ||
+                            color == null || color.trim().isEmpty()) {
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Vui lòng nhập đầy đủ các trường bắt buộc!");
+                        response.sendRedirect(request.getContextPath() + "/vehicles");
+                        return;
+                    }
+                    // BỔ SUNG: Kiểm tra định dạng biển số xe khi thêm mới
+                    if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Định dạng biển số xe không hợp lệ! (Ví dụ: 59A-12345 hoặc 59A1-12345)");
                         response.sendRedirect(request.getContextPath() + "/vehicles");
                         return;
                     }
                     
+                    // Them 1 vai dong trong database để tránh việc bị trùng với xe đã bị xoá ALTER
+                    // TABLE Vehicles
+                    // DROP CONSTRAINT UQ__Vehicles__026BC15C775AACA0;
+                    // -- 2. Tạo một Filtered Unique Index mới thay thế:
+                    // -- Chỉ bắt buộc biển số là DUY NHẤT đối với những xe đang hoạt động (IsActive
+                    // = 1)
+                    // CREATE UNIQUE NONCLUSTERED INDEX UQ_Vehicles_LicensePlate_Active
+                    // ON Vehicles(LicensePlate)
+                    // WHERE IsActive = 1; //
                     Timestamp createdAt = new Timestamp(System.currentTimeMillis());
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
-                    
+
                     String imageUrl = FileUploadUtil.saveFile(request, "carImage", getServletContext().getRealPath(""));
-                    Cars car = new Cars(customerId, licensePlate, brand, model, vehicleType, color, imageUrl, false, createdAt, updatedAt, true);
-                    
+                    Cars car = new Cars(customerId, licensePlate, brand, model, vehicleType, color, imageUrl, false,
+                            createdAt, updatedAt, true);
+
                     boolean success = carDAO.insertCar(car);
                     if (success) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS, "Thêm xe mới thành công!");
                     } else {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Thêm xe thất bại! Biển số có thể đã đăng ký.");
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Thêm xe thất bại! Biển số có thể đã đăng ký.");
                     }
                     response.sendRedirect(request.getContextPath() + "/vehicles");
                     break;
                 }
-                
+
                 case "update": {
                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
                     String licensePlate = request.getParameter("licensePlate");
@@ -126,31 +143,40 @@ public class VehicleController extends HttpServlet {
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
-                    
+
                     if (licensePlate == null || licensePlate.trim().isEmpty() ||
-                        brand == null || brand.trim().isEmpty() ||
-                        model == null || model.trim().isEmpty() ||
-                        vehicleType == null || vehicleType.trim().isEmpty() ||
-                        color == null || color.trim().isEmpty()) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Vui lòng nhập đầy đủ các trường bắt buộc!");
+                            brand == null || brand.trim().isEmpty() ||
+                            model == null || model.trim().isEmpty() ||
+                            vehicleType == null || vehicleType.trim().isEmpty() ||
+                            color == null || color.trim().isEmpty()) {
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Vui lòng nhập đầy đủ các trường bắt buộc!");
                         response.sendRedirect(request.getContextPath() + "/vehicles");
                         return;
                     }
-                    
+                    // BỔ SUNG: Kiểm tra định dạng biển số xe khi cập nhật
+                    if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Định dạng biển số xe không hợp lệ! (Ví dụ: 59A-12345 hoặc 59A1-12345)");
+                        response.sendRedirect(request.getContextPath() + "/vehicles");
+                        return;
+                    }
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
                     String imageUrl = FileUploadUtil.saveFile(request, "carImage", getServletContext().getRealPath(""));
-                    Cars car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleType, color, imageUrl, false, null, updatedAt, true);
-                    
+                    Cars car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleType, color, imageUrl,
+                            false, null, updatedAt, true);
+
                     boolean success = carDAO.updateCar(car);
                     if (success) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS, "Cập nhật thông tin xe thành công!");
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS,
+                                "Cập nhật thông tin xe thành công!");
                     } else {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Cập nhật thất bại!");
                     }
                     response.sendRedirect(request.getContextPath() + "/vehicles");
                     break;
                 }
-                
+
                 case "delete": {
                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
                     boolean success = carDAO.softDeleteCar(vehicleId, customerId);
@@ -162,19 +188,21 @@ public class VehicleController extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/vehicles");
                     break;
                 }
-                
+
                 case "setDefault": {
                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
                     boolean success = carDAO.setDefaultCar(vehicleId, customerId);
                     if (success) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS, "Đã thiết lập xe mặc định thành công!");
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS,
+                                "Đã thiết lập xe mặc định thành công!");
                     } else {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Thiết lập thất bại! Không tìm thấy xe.");
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
+                                "Thiết lập thất bại! Không tìm thấy xe.");
                     }
                     response.sendRedirect(request.getContextPath() + "/vehicles");
                     break;
                 }
-                
+
                 default:
                     response.sendRedirect(request.getContextPath() + "/vehicles");
                     break;

@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/account/dashboard", "/bookings", "/account/profile"})
+@WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/account/dashboard", "/bookings", "/account/profile", "/account/change-password"})
 public class PageController extends HttpServlet {
 
     @Override
@@ -33,6 +33,10 @@ public class PageController extends HttpServlet {
             case "/account/profile":
                 view = "/CustomerProfileServlet";
                 break;
+            case "/account/change-password":
+                view = "/ChangePasswordController";
+                break;
+
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;

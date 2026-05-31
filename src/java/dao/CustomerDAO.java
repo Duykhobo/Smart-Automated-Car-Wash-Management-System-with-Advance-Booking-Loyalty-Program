@@ -68,27 +68,6 @@ public class CustomerDAO {
         return result;
     }
 
-    public int updatePassword(int userID, String hashPass) {
-        int result = 0;
-        Connection cn = null;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "Update Users\n"
-                        + "Set PasswordHash = ?\n"
-                        + "Where UserID = ?";
-                PreparedStatement st = cn.prepareStatement(sql);
-                st.setString(1, hashPass);
-                st.setInt(2, userID);
-                result = st.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-        }
-        return result;
-    }
-
     public boolean isEmailExists(int cusId, String email) {
         Connection cn = null;
         try {

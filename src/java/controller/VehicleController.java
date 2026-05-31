@@ -94,11 +94,7 @@ public class VehicleController extends HttpServlet {
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
-                    if (licensePlate == null || licensePlate.trim().isEmpty() ||
-                            brand == null || brand.trim().isEmpty() ||
-                            model == null || model.trim().isEmpty() ||
-                            vehicleType == null || vehicleType.trim().isEmpty() ||
-                            color == null || color.trim().isEmpty()) {
+                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleType, color)) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
                                 "Vui lòng nhập đầy đủ các trường bắt buộc!");
                         response.sendRedirect(request.getContextPath() + "/vehicles");
@@ -141,11 +137,7 @@ public class VehicleController extends HttpServlet {
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
 
-                    if (licensePlate == null || licensePlate.trim().isEmpty() ||
-                            brand == null || brand.trim().isEmpty() ||
-                            model == null || model.trim().isEmpty() ||
-                            vehicleType == null || vehicleType.trim().isEmpty() ||
-                            color == null || color.trim().isEmpty()) {
+                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleType, color)) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
                                 "Vui lòng nhập đầy đủ các trường bắt buộc!");
                         response.sendRedirect(request.getContextPath() + "/vehicles");

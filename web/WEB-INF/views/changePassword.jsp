@@ -124,17 +124,17 @@
                             // Supports request attributes or session attributes (flexible depending on servlet design)
                             String error = (String) request.getAttribute("errorMessage");
                             if (error == null) {
-                                error = (String) session.getAttribute("ERROR");
+                                error = (String) session.getAttribute("errorMessage");
                                 if (error != null) {
-                                    session.removeAttribute("ERROR");
+                                    session.removeAttribute("errorMessage");
                                 }
                             }
 
                             String success = (String) request.getAttribute("successMessage");
                             if (success == null) {
-                                success = (String) session.getAttribute("SUCCESS");
+                                success = (String) session.getAttribute("successMessage");
                                 if (success != null) {
-                                    session.removeAttribute("SUCCESS");
+                                    session.removeAttribute("successMessage");
                                 }
                             }
                         %>

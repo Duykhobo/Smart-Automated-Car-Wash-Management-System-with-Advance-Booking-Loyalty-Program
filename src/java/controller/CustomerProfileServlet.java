@@ -59,7 +59,7 @@ public class CustomerProfileServlet extends HttpServlet {
             Customer customer = c.getCustomerByAccountId(user.getUserId());
 
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/account/profile");
         }
     }
 
@@ -81,20 +81,20 @@ public class CustomerProfileServlet extends HttpServlet {
         if (validate.isAnyEmpty(fullname)) {
             request.setAttribute("errorMessage", "Không được để trống");
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
         // Kiểm tra xem là người dùng có thay đổi gì không ?
         if (customer.getFullName().equalsIgnoreCase(fullname) && customer.getEmail().equalsIgnoreCase(email)) {
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
         // Kiểm tra định dạng tên
         if (!ValidationUtil.isValidName(fullname)) {
             request.setAttribute("errorMessage", "Tên không hợp lệ! Vui lòng nhập lại tên.");
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
 
@@ -102,14 +102,14 @@ public class CustomerProfileServlet extends HttpServlet {
             if (!ValidationUtil.isValidEmail(email)) {
                 request.setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
                 request.setAttribute("customer", customer);
-                request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/account/profile");
                 return;
             }
         }
         if (cDAO.isEmailExists(customer.getCustomerId(), email)) {
             request.setAttribute("errorMessage", "Email đã tồn tại");
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
 
@@ -127,7 +127,7 @@ public class CustomerProfileServlet extends HttpServlet {
             request.setAttribute("customer", customer);
         }
         // Forward về lại trang hiển thị profile
-        request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/account/profile");
     }
 
     /**

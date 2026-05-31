@@ -114,7 +114,7 @@ public class CarDao {
             Timestamp now = new Timestamp(System.currentTimeMillis());
             st.setTimestamp(10, now);
             st.setTimestamp(11, now);
-
+                
             int rows = st.executeUpdate();
             if (rows > 0) {
                 success = true;

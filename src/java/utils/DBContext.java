@@ -8,7 +8,8 @@ import java.util.ResourceBundle;
 
 public class DBContext {
 
-    private static final ResourceBundle rb = ResourceBundle.getBundle("db");
+    
+        private static final ResourceBundle rb = ResourceBundle.getBundle("db");
     
     private static final String SERVER_NAME = rb.getString("db.server");
     private static final String PORT_NUMBER = rb.getString("db.port");

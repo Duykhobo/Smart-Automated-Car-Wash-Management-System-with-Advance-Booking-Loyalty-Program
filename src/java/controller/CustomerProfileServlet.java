@@ -66,6 +66,7 @@ public class CustomerProfileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
@@ -77,7 +78,7 @@ public class CustomerProfileServlet extends HttpServlet {
         ValidationUtil validate = new ValidationUtil();
         Customer customer = cDAO.getCustomerByAccountId(user.getUserId());
         // nếu mà khách hàng cố tình để trống thì hiển thị lỗi
-        if (validate.isAnyEmpty(fullname, email)) {
+        if (validate.isAnyEmpty(fullname)) {
             request.setAttribute("errorMessage", "Không được để trống");
             request.setAttribute("customer", customer);
             request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
@@ -97,11 +98,13 @@ public class CustomerProfileServlet extends HttpServlet {
             return;
         }
 
-        if (!ValidationUtil.isValidEmail(email)) {
-            request.setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
-            request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
-            return;
+        if (email != null && !email.trim().isEmpty()) {
+            if (!ValidationUtil.isValidEmail(email)) {
+                request.setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
+                request.setAttribute("customer", customer);
+                request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+                return;
+            }
         }
         if (cDAO.isEmailExists(customer.getCustomerId(), email)) {
             request.setAttribute("errorMessage", "Email đã tồn tại");

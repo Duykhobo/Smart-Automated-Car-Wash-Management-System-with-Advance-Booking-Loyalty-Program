@@ -71,17 +71,15 @@
                     </a>
                 </nav>
             </aside>
-
-            <!-- Main Content Area -->
-            <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
-                <div class="max-w-4xl mx-auto p-6 md:p-8 space-y-8">
-
-                    <!-- Header -->
-                    <header class="flex flex-col gap-1 mt-4 md:mt-0">
-                        <p class="text-gray-400 text-sm md:text-base font-normal">Chào Mừng,</p>
-                        <h1 class="text-white text-2xl md:text-3xl font-bold"><%=cus.getFullName()%></h1>
-                    </header>
-
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
+        <div class="max-w-4xl mx-auto p-6 md:p-8 space-y-8">
+            
+            <!-- Header -->
+            <header class="flex flex-col gap-1 mt-4 md:mt-0">
+                <p class="text-gray-400 text-sm md:text-base font-normal">Chào buổi sáng,</p>
+                <h1 class="text-white text-2xl md:text-3xl font-bold">${sessionScope.USER.fullName}</h1>
+            </header>
                     <!-- Membership Card -->
                     <section aria-labelledby="membership-card-title" class="relative w-full max-w-md rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 shadow-xl p-6">
                         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-400 via-transparent to-transparent"></div>

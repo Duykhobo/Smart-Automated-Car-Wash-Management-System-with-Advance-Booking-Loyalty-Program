@@ -32,7 +32,6 @@ GO
 -- =======================================================================
 -- 2. TẠO CÁC BẢNG DỮ LIỆU
 -- =======================================================================
-
 -- 0. BẢNG MEMBER_TIERS (Bảng từ điển hạng thành viên để khử hard-code)
 CREATE TABLE MemberTiers (
     TierID INT IDENTITY(1,1) PRIMARY KEY,

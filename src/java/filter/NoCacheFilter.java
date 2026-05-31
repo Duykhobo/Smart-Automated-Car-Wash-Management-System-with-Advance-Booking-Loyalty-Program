@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  * Filter ngăn chặn trình duyệt cache lại các trang nhạy cảm (như dashboard, profile)
  * Khi user logout và ấn nút Back, họ sẽ không thấy được thông tin cũ nữa.
  */
-@WebFilter(filterName = "NoCacheFilter", urlPatterns = {"/dashboard", "/manage-cars", "/booking", "/profile", "/admin/*"})
+@WebFilter(filterName = "NoCacheFilter", urlPatterns = {"/account/dashboard", "/vehicles", "/bookings", "/account/profile", "/admin/*"})
 public class NoCacheFilter implements Filter {
 
     @Override

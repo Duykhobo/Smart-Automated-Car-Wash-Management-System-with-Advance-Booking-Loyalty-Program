@@ -12,10 +12,11 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import utils.AppConstants;
 
 /**
- * Filter này chặn toàn bộ các request vào thư mục /admin/*
- * Chỉ có user mang Role là "Admin" mới được phép truy cập.
+ * Filter này chặn toàn bộ các request vào thư mục /admin/* Chỉ có user mang
+ * Role là "Admin" mới được phép truy cập.
  */
 @WebFilter(filterName = "AdminFilter", urlPatterns = {"/admin/*"})
 public class AdminFilter implements Filter {
@@ -27,16 +28,22 @@ public class AdminFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        boolean loggedIn = session != null && session.getAttribute("loggedInUser") != null;
+        // Kiểm tra xem session có tồn tại và có chứa 'loggedInUser' không
+        boolean loggedIn = session != null && session.getAttribute(AppConstants.SESSION_USER_ACCOUNT) != null;
 
         if (loggedIn) {
-            User user = (User) session.getAttribute("loggedInUser");
-            if ("Admin".equalsIgnoreCase(user.getRole())) {
+            User user = (User) session.getAttribute(AppConstants.SESSION_USER_ACCOUNT);
+            if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
+                // Chống back trình duyệt bằng cache
+                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                res.setHeader("Pragma", "no-cache");
+                res.setDateHeader("Expires", 0);
+                
                 // Là Admin -> cho qua
                 chain.doFilter(request, response);
             } else {
@@ -44,9 +51,13 @@ public class AdminFilter implements Filter {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập vào khu vực này!");
             }
         } else {
+            // Lưu lại URL người dùng muốn vào để redirect sau khi login
+            HttpSession newSession = req.getSession(true);
+            newSession.setAttribute("redirectUrl", req.getRequestURI());
+
             // Chưa đăng nhập -> Trả về trang đăng nhập
             req.setAttribute("errorMessage", "Vui lòng đăng nhập bằng tài khoản quản trị!");
-            req.getRequestDispatcher("/login.jsp").forward(request, response);
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 

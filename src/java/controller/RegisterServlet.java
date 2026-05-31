@@ -4,9 +4,7 @@
  */
 package controller;
 
-import dao.UserDAO;
 import dto.Customer;
-import dto.User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,31 +18,50 @@ import utils.ValidationUtil;
  *
  * @author ThanhDuy
  */
-@WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
+@WebServlet(name = "RegisterServlet", urlPatterns = { "/auth/register" })
 public class RegisterServlet extends HttpServlet {
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Processes user registration submissions and forwards to the appropriate view.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Reads form parameters (fullname, phone, plate, password), enforces UTF-8
+     * encoding,
+     * and validates that all required fields are present. If any field is missing
+     * or blank,
+     * sets "errorMessage", attaches a partially populated Customer as "user", and
+     * forwards to "register.jsp".
+     * Otherwise calls UserService.processRegistration(fullname, phone, plate,
+     * password) and:
+     * - when the result is 0: sets "errorMessage" indicating the phone is already
+     * registered,
+     * attaches the submitted Customer as "user", and forwards to "register.jsp";
+     * - when the result is 1: sets "successMessage" indicating registration success
+     * and forwards to "login.jsp";
+     * - for any other result: sets a system-busy "errorMessage", attaches the
+     * submitted Customer as "user",
+     * and forwards to "register.jsp".
+     *
+     * @param request  the HTTP request carrying form data
+     * @param response the HTTP response used for forwarding
+     * @throws ServletException if a servlet-specific error occurs during request
+     *                          forwarding
+     * @throws IOException      if an I/O error occurs during request forwarding
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -57,43 +74,59 @@ public class RegisterServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String licensePlate = request.getParameter("plate");
         String rawPassword = request.getParameter("password");
-        
+
+        // Edge case: Kiểm tra đầu vào trống hoặc null ở phía backend
         if (ValidationUtil.isAnyEmpty(fullName, phone, licensePlate, rawPassword)) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ tất cả thông tin!");
-            Customer oldData = new Customer();
-            oldData.setFullName(fullName);
-            oldData.setPhone(phone);
-            oldData.setLicensePlate(licensePlate);
-            request.setAttribute("user", oldData);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.setAttribute("errorMessage", "Vui lòng điền đầy đủ tất cả thông tin đăng ký!");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+
+        // Validate Format (Tên, SDT, Biển số)
+        if (!ValidationUtil.isValidName(fullName)) {
+            request.setAttribute("errorMessage", "Họ và tên không hợp lệ! (Không được chứa số hoặc ký tự đặc biệt)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
             return;
         }
         
+        if (!ValidationUtil.isValidVNPhone(phone)) {
+            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ! (Phải có 10 chữ số và bắt đầu bằng số 0)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+        
+        if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+            request.setAttribute("errorMessage", "Biển số xe không hợp lệ! (VD chuẩn: 59A-12345 hoặc 59A1-1234)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+
         UserService userService = new UserService();
         int result = userService.processRegistration(fullName, phone, licensePlate, rawPassword);
 
         if (result == 0) {
             request.setAttribute("errorMessage", "Số điện thoại này đã được đăng ký!");
-            Customer oldData = new Customer();
-            oldData.setFullName(fullName);
-            oldData.setPhone(phone);
-            oldData.setLicensePlate(licensePlate);
-            request.setAttribute("user", oldData);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            forwardWithError(request, response, fullName, phone, licensePlate);
             return;
         }
 
         if (result == 1) {
-            request.getSession().setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
-            response.sendRedirect("login.jsp");
+            request.setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "Hệ thống đang bận, vui lòng thử lại sau!");
-            Customer cus = new Customer();
-            cus.setFullName(fullName);
-            cus.setPhone(phone);
-            cus.setLicensePlate(licensePlate);
-            request.setAttribute("user", cus);
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            forwardWithError(request, response, fullName, phone, licensePlate);
         }
+    }
+
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, 
+                                  String fullName, String phone, String licensePlate) 
+            throws ServletException, IOException {
+        Customer cus = new Customer();
+        cus.setFullName(fullName);
+        cus.setPhone(phone);
+        cus.setLicensePlate(licensePlate);
+        request.setAttribute("user", cus);
+        request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 }

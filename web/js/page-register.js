@@ -1,3 +1,9 @@
+/**
+ * Validate the registration form and prepare the submit button before form submission.
+ * If validation fails, the submission is prevented and the function returns `false`. If validation succeeds, the submit button text is changed to "Đang xử lý..." and the button is disabled shortly after to help prevent double submission.
+ * @param {Event} event - The form submit event.
+ * @returns {boolean} `true` if validation passed and submission may proceed, `false` if validation failed and submission was prevented.
+ */
 function handleRegister(event) {
     // 1. Chạy Validation Front-end
     if (!validateForm()) {
@@ -7,8 +13,13 @@ function handleRegister(event) {
 
     // Form hợp lệ -> Để cho HTML tự submit lên Servlet!
     const submitBtn = document.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
     submitBtn.innerText = "Đang xử lý...";
+    
+    // Dùng setTimeout để tránh vô hiệu hóa nút ngay lập tức trong luồng đồng bộ, 
+    // tránh làm trình duyệt dừng hoặc từ chối gửi form đi.
+    setTimeout(() => {
+        submitBtn.disabled = true;
+    }, 10);
 
     return true;
 }

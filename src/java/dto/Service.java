@@ -13,6 +13,7 @@ public class Service {
     private int serviceId;
     private String name;
     private Double basePrice;
+    private boolean isActive;
 
     public Service() {
     }
@@ -21,6 +22,14 @@ public class Service {
         this.serviceId = serviceId;
         this.name = name;
         this.basePrice = basePrice;
+        this.isActive = true; // default
+    }
+
+    public Service(int serviceId, String name, Double basePrice, boolean isActive) {
+        this.serviceId = serviceId;
+        this.name = name;
+        this.basePrice = basePrice;
+        this.isActive = isActive;
     }
 
     public void setServiceId(int serviceId) {
@@ -45,6 +54,14 @@ public class Service {
 
     public Double getBasePrice() {
         return basePrice;
+    }
+
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
 }

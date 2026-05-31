@@ -3,9 +3,11 @@ package service;
 import dao.UserDAO;
 import dto.Customer;
 import dto.User;
+import utils.AppConstants;
 import utils.HashUtil;
 
 public class UserService {
+
     private UserDAO userDAO;
 
     public UserService() {
@@ -19,6 +21,7 @@ public class UserService {
 
     /**
      * Xử lý nghiệp vụ Đăng ký tài khoản
+     *
      * @return 1 nếu thành công, 0 nếu bị trùng SĐT, -1 nếu lỗi hệ thống
      */
     public int processRegistration(String fullName, String phone, String licensePlate, String rawPassword) {
@@ -26,12 +29,12 @@ public class UserService {
             return 0; // Báo trùng SĐT
         }
 
-        String hashedPass = HashUtil.hashPassword(rawPassword);
+        String hashedPass = HashUtil.createHash(rawPassword);
 
         User user = new User();
         user.setUsername(phone);
         user.setPasswordHash(hashedPass);
-        user.setRole("Customer");
+        user.setRole(AppConstants.ROLE_CUSTOMER);
 
         Customer cus = new Customer();
         cus.setFullName(fullName);
@@ -44,14 +47,17 @@ public class UserService {
 
     /**
      * Xử lý nghiệp vụ Đăng nhập
+     *
      * @return User object nếu đúng thông tin, null nếu sai.
      */
     public User processLogin(String phone, String rawPassword) {
-        if (phone == null || phone.trim().isEmpty() || rawPassword == null || rawPassword.trim().isEmpty()) {
+        if (utils.ValidationUtil.isAnyEmpty(phone, rawPassword)) {
             return null;
         }
-        
-        String hashedPass = HashUtil.hashPassword(rawPassword);
-        return userDAO.login(phone, hashedPass);
+        User user = userDAO.getUserByUsername(phone);
+        if (user != null && HashUtil.verifyPassword(rawPassword, user.getPasswordHash())) {
+            return user;
+        }
+        return null;
     }
 }

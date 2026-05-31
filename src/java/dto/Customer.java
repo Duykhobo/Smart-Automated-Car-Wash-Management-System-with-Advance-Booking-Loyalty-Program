@@ -1,34 +1,39 @@
 package dto;
 
 import java.sql.Timestamp;
+import java.io.Serializable;
 
-public class Customer {
+public class Customer implements Serializable {
 
     private int customerId;
     private int userId;
     private String fullName;
     private String phone;
+    private String email;
     private String licensePlate;
     private String tierStatus;
     private int pointsBalance;
     private Double totalSpend;
     private int totalWashes;
     private Timestamp tierUpgradeDate;
+    private String avatar; // Thêm trường lưu đường dẫn ảnh đại diện
 
     public Customer() {
     }
 
-    public Customer(int customerId, int userId, String fullName, String phone, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate) {
+    public Customer(int customerId, int userId, String fullName, String phone, String email, String licensePlate, String tierStatus, int pointsBalance, Double totalSpend, int totalWashes, Timestamp tierUpgradeDate, String avatar) {
         this.customerId = customerId;
         this.userId = userId;
         this.fullName = fullName;
         this.phone = phone;
+        this.email = email;
         this.licensePlate = licensePlate;
         this.tierStatus = tierStatus;
         this.pointsBalance = pointsBalance;
         this.totalSpend = totalSpend;
         this.totalWashes = totalWashes;
         this.tierUpgradeDate = tierUpgradeDate;
+        this.avatar = avatar;
     }
 
     public int getCustomerId() {
@@ -109,5 +114,26 @@ public class Customer {
 
     public void setTierUpgradeDate(Timestamp tierUpgradeDate) {
         this.tierUpgradeDate = tierUpgradeDate;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" + "customerId=" + customerId + ", userId=" + userId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", licensePlate=" + licensePlate + ", tierStatus=" + tierStatus + ", pointsBalance=" + pointsBalance + ", totalSpend=" + totalSpend + ", totalWashes=" + totalWashes + ", tierUpgradeDate=" + tierUpgradeDate + ", avatar=" + avatar + '}';
     }
 }

@@ -3,7 +3,6 @@
 *.log
 *.ctxt
 .mtj.tmp/
-*.jar
 *.war
 *.nar
 *.ear
@@ -33,3 +32,8 @@ local.properties
 *.ipr
 out/
 .vscode/settings.json
+.agent
+.github/prompts/
+
+# Ignore sensitive DB properties
+src/java/db.properties

@@ -114,14 +114,17 @@ public class ChangePasswordController extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         int updateResult = userDAO.updatePassword(user.getUserId(), newHashedPassword);
         if (updateResult == 1) {
-            user.setPasswordHash(newHashedPassword);
-            request.getSession().setAttribute(AppConstants.SESSION_USER_ACCOUNT, user);
-            request.getSession().setAttribute("successMessage", "Đổi mật khẩu thành công!");
+            // Đổi mật khẩu thành công, xóa session cũ bắt đăng nhập lại
+            request.getSession().invalidate();
+            // Tạo session mới để lưu thông báo thành công
+            request.getSession(true).setAttribute("successMessage", "Đổi mật khẩu thành công! Vui lòng đăng nhập lại với mật khẩu mới.");
+            response.sendRedirect(request.getContextPath() + "/auth/login");
+            return;
         } else {
             request.getSession().setAttribute("errorMessage", "Lỗi hệ thống! Không thể cập nhật mật khẩu, vui lòng thử lại sau.");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
+            return;
         }
-        response.sendRedirect(request.getContextPath() + "/account/change-password");
-        return;
     }
 
     /**

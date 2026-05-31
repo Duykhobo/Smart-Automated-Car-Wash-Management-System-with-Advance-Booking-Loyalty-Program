@@ -48,45 +48,41 @@ public class CustomerDAO {
 
     public int updateProfile(int cusId, String fullname, String email) {
         int result = 0;
-        Connection cn = null;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "Update Customers\n"
-                        + "Set FullName = ? , Email = ?\n"
-                        + "Where CustomerID = ?";
-                PreparedStatement st = cn.prepareStatement(sql);
-                st.setString(1, fullname);
-                st.setString(2, email);
-                st.setInt(3, cusId);
-                result = st.executeUpdate();
-            }
+        String sql = "Update Customers\n"
+                + "Set FullName = ? , Email = ?\n"
+                + "Where CustomerID = ?";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, fullname);
+            st.setString(2, email);
+            st.setInt(3, cusId);
+            result = st.executeUpdate();
+            
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
         return result;
     }
 
     public boolean isEmailExists(int cusId, String email) {
-        Connection cn = null;
-        try {
-            cn = DBContext.getConnection();
-            if (cn != null) {
-                String sql = "Select top 1 1\n"
-                        + "From Customers\n"
-                        + "Where Email = ? AND CustomerID <> ?";
-                PreparedStatement st = cn.prepareStatement(sql);
-                st.setString(1, email);
-                st.setInt(2, cusId);
-                ResultSet found = st.executeQuery();
+        String sql = "Select top 1 1\n"
+                + "From Customers\n"
+                + "Where Email = ? AND CustomerID <> ?";
+        
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, email);
+            st.setString(2, cusId);
+            try (ResultSet found = st.executeQuery()) {
                 if (found.next()) {
                     return true;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
         return false;
     }

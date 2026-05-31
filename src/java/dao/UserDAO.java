@@ -53,12 +53,12 @@ public class UserDAO {
                             psCustomer.setString(2, cus.getFullName());
                             psCustomer.setString(3, cus.getPhone());
                             psCustomer.executeUpdate();
-                            
+
                             // Lấy ID tự tăng của Customer vừa tạo
-                            try (ResultSet rsCustomer = psCustomer.getGeneratedKeys()) {
+                            try ( ResultSet rsCustomer = psCustomer.getGeneratedKeys()) {
                                 if (rsCustomer.next()) {
                                     int generatedCustomerId = rsCustomer.getInt(1);
-                                    
+
                                     // 4. Có CustomerID rồi thì Insert Biển số vào bảng Vehicles
                                     try ( PreparedStatement psVehicle = conn.prepareStatement(sqlInsertVehicle)) {
                                         psVehicle.setInt(1, generatedCustomerId);
@@ -126,11 +126,10 @@ public class UserDAO {
     // Lấy thông tin User bằng Username (SĐT) để phục vụ việc xác thực mật khẩu kiểu mới (có Salt)
     public User getUserByUsername(String username) {
         String sql = "SELECT * FROM Users WHERE [Username] = ?";
-        try (Connection conn = DBContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-             
+        try ( Connection conn = DBContext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     User user = new User();
                     user.setUserId(rs.getInt("UserID"));
@@ -149,9 +148,9 @@ public class UserDAO {
 
     public dto.Customer getCustomerByUserId(int userId) {
         String sql = "SELECT * FROM Customers WHERE UserID = ?";
-        try (java.sql.Connection conn = DBContext.getConnection(); java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( java.sql.Connection conn = DBContext.getConnection();  java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            try (java.sql.ResultSet rs = ps.executeQuery()) {
+            try ( java.sql.ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     dto.Customer cus = new dto.Customer();
                     cus.setCustomerId(rs.getInt("CustomerID"));
@@ -171,5 +170,26 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public int updatePassword(int userID, String hashPass) {
+        int result = 0;
+        Connection cn = null;
+        try {
+            cn = DBContext.getConnection();
+            if (cn != null) {
+                String sql = "Update Users\n"
+                        + "Set PasswordHash = ?\n"
+                        + "Where UserID = ?";
+                PreparedStatement st = cn.prepareStatement(sql);
+                st.setString(1, hashPass);
+                st.setInt(2, userID);
+                result = st.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
+        return result;
     }
 }

@@ -59,7 +59,7 @@ public class CustomerProfileServlet extends HttpServlet {
             Customer customer = c.getCustomerByAccountId(user.getUserId());
 
             request.setAttribute("customer", customer);
-            response.sendRedirect(request.getContextPath() + "/account/profile");
+            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
         }
     }
 
@@ -79,36 +79,31 @@ public class CustomerProfileServlet extends HttpServlet {
         Customer customer = cDAO.getCustomerByAccountId(user.getUserId());
         // nếu mà khách hàng cố tình để trống thì hiển thị lỗi
         if (validate.isAnyEmpty(fullname)) {
-            request.setAttribute("errorMessage", "Không được để trống");
-            request.setAttribute("customer", customer);
+            request.getSession().setAttribute("errorMessage", "Không được để trống");
             response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
         // Kiểm tra xem là người dùng có thay đổi gì không ?
         if (customer.getFullName().equalsIgnoreCase(fullname) && customer.getEmail().equalsIgnoreCase(email)) {
-            request.setAttribute("customer", customer);
             response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
         // Kiểm tra định dạng tên
         if (!ValidationUtil.isValidName(fullname)) {
-            request.setAttribute("errorMessage", "Tên không hợp lệ! Vui lòng nhập lại tên.");
-            request.setAttribute("customer", customer);
+            request.getSession().setAttribute("errorMessage", "Tên không hợp lệ! Vui lòng nhập lại tên.");
             response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
 
         if (email != null && !email.trim().isEmpty()) {
             if (!ValidationUtil.isValidEmail(email)) {
-                request.setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
-                request.setAttribute("customer", customer);
+                request.getSession().setAttribute("errorMessage", "Email không hợp lệ!!Vui lòng nhập lại");
                 response.sendRedirect(request.getContextPath() + "/account/profile");
                 return;
             }
         }
         if (cDAO.isEmailExists(customer.getCustomerId(), email)) {
-            request.setAttribute("errorMessage", "Email đã tồn tại");
-            request.setAttribute("customer", customer);
+            request.getSession().setAttribute("errorMessage", "Email đã tồn tại");
             response.sendRedirect(request.getContextPath() + "/account/profile");
             return;
         }
@@ -116,15 +111,12 @@ public class CustomerProfileServlet extends HttpServlet {
         int updateResult = cDAO.updateProfile(customer.getCustomerId(), fullname, email);
         if (updateResult > 0) {
             // Cập nhật thành công: Gửi thông báo xanh và lấy lại thông tin mới nhất từ DB
-
-            request.setAttribute("successMessage", "Cập nhật thông tin thành công!");
+            request.getSession().setAttribute("successMessage", "Cập nhật thông tin thành công!");
             Customer updatedCustomer = cDAO.getCustomerByAccountId(user.getUserId());
             request.getSession().setAttribute(AppConstants.SESSION_CUSTOMER_INFO, updatedCustomer); // cập nhật cho cả những trang nào lấy customer bằng session
-            request.setAttribute("customer", updatedCustomer);
         } else {
             // Cập nhật thất bại
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau!");
-            request.setAttribute("customer", customer);
+            request.getSession().setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau!");
         }
         // Forward về lại trang hiển thị profile
         response.sendRedirect(request.getContextPath() + "/account/profile");

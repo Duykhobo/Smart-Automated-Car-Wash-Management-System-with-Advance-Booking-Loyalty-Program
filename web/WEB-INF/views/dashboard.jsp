@@ -2,6 +2,7 @@
 <%@page import="dto.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <c:if test="${empty sessionScope.USER}">
     <c:redirect url="/auth/login" />
 </c:if>
@@ -70,6 +71,17 @@
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
         <div class="max-w-4xl mx-auto p-6 md:p-8 space-y-8">
+            <%
+                String errMsg = (String) session.getAttribute(utils.AppConstants.SESSION_MSG_ERROR);
+                if (errMsg != null) {
+            %>
+            <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-xl">
+                <strong>Lỗi:</strong> <%= errMsg %>
+            </div>
+            <%
+                    session.removeAttribute(utils.AppConstants.SESSION_MSG_ERROR);
+                }
+            %>
             
             <!-- Header -->
             <header class="flex flex-col gap-1 mt-4 md:mt-0">
@@ -121,6 +133,14 @@
                                     <span class="text-gray-200 font-bold"><c:out value="${customer.totalWashes}"/> lần</span>
                                 </div>
                             </div>
+                            <c:if test="${not empty nextTierName}">
+                                <div class="mt-4 pt-4 border-t border-gray-700/50 flex flex-col items-center justify-center">
+                                    <span class="text-gray-400 text-xs mb-1">Chỉ còn <strong class="text-amber-400"><c:out value="${spendToNextTier}"/> đ</strong> để lên hạng <strong class="text-white"><c:out value="${nextTierName}"/></strong></span>
+                                    <div class="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+                                      <div class="bg-amber-400 h-1.5 rounded-full" style="width: ${tierProgressPercent}%"></div>
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
                         <style>
                             @keyframes shimmer {
@@ -138,37 +158,32 @@
                         </div>
 
                         <div class="flex flex-col gap-4">
-                            <!-- Appointment Card 1 -->
-                            <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <c:choose>
+                                <c:when test="${not empty upcomingBooking}">
+                                    <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                                                <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <h3 class="text-white font-semibold text-base">Biển số: <c:out value="${upcomingBooking.licensePlate}"/></h3>
+                                                <p class="text-gray-400 text-sm">
+                                                    Giờ: <fmt:formatDate value="${upcomingBooking.scheduledTime}" pattern="HH:mm"/>, 
+                                                    Ngày: <fmt:formatDate value="${upcomingBooking.bookingDate}" pattern="dd/MM/yyyy"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0">
+                                            <span class="text-amber-500 text-xs md:text-sm font-medium"><c:out value="${upcomingBooking.status}"/></span>
+                                        </div>
+                                    </article>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="p-4 bg-gray-800 rounded-xl border border-gray-700 text-gray-400 text-center">
+                                        Bạn chưa có lịch hẹn nào sắp tới. <a href="${pageContext.request.contextPath}/bookings" class="text-btn-primary hover:underline">Đặt lịch ngay</a>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-white font-semibold text-base">Gói Rửa Tiêu Chuẩn</h3>
-                                        <p class="text-gray-400 text-sm">10:00 AM, Ngày 24/05</p>
-                                    </div>
-                                </div>
-                                <div class="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0">
-                                    <span class="text-amber-500 text-xs md:text-sm font-medium">Đang chờ</span>
-                                </div>
-                            </article>
-
-                            <!-- Appointment Card 2 -->
-                            <article class="flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-btn-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg class="w-6 h-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-white font-semibold text-base">Gói Rửa Tiêu Chuẩn</h3>
-                                        <p class="text-gray-400 text-sm">10:00 AM, Ngày 24/05</p>
-                                    </div>
-                                </div>
-                                <div class="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full shrink-0">
-                                    <span class="text-green-400 text-xs md:text-sm font-medium">Hoàn Thành</span>
-                                </div>
-                            </article>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </section>
                 </div>

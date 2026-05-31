@@ -117,26 +117,9 @@
                                             <p class="text-gray-400 text-sm"><c:out value="${car.brand}" /> <c:out value="${car.model}" /> • <c:out value="${car.color}" /> • <span class="capitalize"><c:out value="${car.vehicleType}" /></span></p>
                                         </div>
                                     </div>
-                                </c:if>
-                                <div class="flex items-center gap-4 z-10">
-                                    <div class="w-16 h-16 bg-gray-700 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                                        <c:choose>
-                                            <c:when test="${not empty car.imageUrl}">
-                                                <img src="${pageContext.request.contextPath}/assets/uploads/${car.imageUrl}" alt="${car.brand}" class="w-full h-full object-cover">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8M8 11h8m-9 4h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l-2 2v2a1 1 0 001 1h16a1 1 0 001-1v-2l-2-2"></path></svg>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                    <div class="flex flex-col items-start gap-1">
-                                        <h2 class="text-gray-300 font-bold text-lg md:text-xl leading-none"><c:out value="${car.licensePlate}" /></h2>
-                                        <p class="text-gray-400 text-sm"><c:out value="${car.brand}" /> <c:out value="${car.model}" /> • <c:out value="${car.color}" /> • <span class="capitalize"><c:out value="${car.vehicleType}" /></span></p>
-                                    </div>
-                                </div>
                                 <div class="flex items-center gap-1 md:gap-3 z-10 shrink-0">
                                     <c:if test="${not car.isDefault}">
-                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe <c:out value=\'${car.licensePlate}\'/> làm mặc định?');">
+                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Đặt xe ${car.licensePlate} làm mặc định?');">
                                             <input type="hidden" name="action" value="setDefault">
                                             <input type="hidden" name="vehicleId" value="<c:out value='${car.vehicleId}'/>">
                                             <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-500/20 text-gray-400 hover:text-yellow-500 transition-colors" aria-label="Đặt làm mặc định" title="Đặt làm mặc định">
@@ -154,7 +137,7 @@
                                                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                                 </svg>
                                             </button>
-                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe <c:out value=\'${car.licensePlate}\'/> không?');">
+                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa xe ${car.licensePlate} không?');">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="vehicleId" value="<c:out value='${car.vehicleId}'/>">
                                         <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors" aria-label="Xóa">
@@ -176,59 +159,8 @@
             </div>
         </main>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-    <label class="text-gray-300 text-sm font-medium">Hãng xe *</label>
-    <!-- Dropdown chọn hãng xe -->
-    <select id="modalBrandSelect" onchange="handleBrandChange()" required
-            class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all cursor-pointer">
-        <option value="">Chọn hãng xe</option>
-        <option value="Toyota">Toyota</option>
-        <option value="Honda">Honda</option>
-        <option value="Hyundai">Hyundai</option>
-        <option value="Kia">Kia</option>
-        <option value="Mazda">Mazda</option>
-        <option value="Ford">Ford</option>
-        <option value="Mitsubishi">Mitsubishi</option>
-        <option value="VinFast">VinFast</option>
-        <option value="Suzuki">Suzuki</option>
-        <option value="Mercedes-Benz">Mercedes-Benz</option>
-        <option value="BMW">BMW</option>
-        <option value="Audi">Audi</option>
-        <option value="Khác">Hãng khác...</option>
-    </select>
-    
-    <!-- Input ẩn (hidden) để chứa giá trị thực gửi lên Server (đảm bảo giữ nguyên name="brand") -->
-    <input type="hidden" id="modalBrand" name="brand" value="">
-    
-    <!-- Input phụ tự động hiển thị nếu chọn "Hãng khác..." -->
-    <input type="text" id="modalBrandOther" placeholder="Nhập tên hãng xe khác..." oninput="updateBrandHiddenValue()"
-           class="hidden mt-2 w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
-</div>
-                    <div class="space-y-1.5">
-                        <label class="text-gray-300 text-sm font-medium">Dòng xe *</label>
-                        <input type="text" id="modalModel" name="model" placeholder="VD: Civic" required 
-                               class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="text-gray-300 text-sm font-medium">Loại xe *</label>
-                        <select id="modalType" name="vehicleType" class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all appearance-none cursor-pointer">
-                            <option value="sedan">Sedan (4 chỗ)</option>
-                            <option value="suv">SUV (7 chỗ)</option>
-                            <option value="hatchback">Hatchback</option>
-                            <option value="pickup">Bán tải</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-gray-300 text-sm font-medium">Màu sắc *</label>
-                        <input type="text" id="modalColor" name="color" placeholder="VD: Trắng" required 
-                               class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
-                    </div>
-                </div>
-
+        <!-- Car Modal Wrapper -->
+        <div id="carModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
             <div class="relative bg-[#1f2937] w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden transform scale-95 opacity-0 transition-all duration-300 max-h-[90vh] flex flex-col" id="carModalContent">
                 <div class="flex items-center justify-between p-5 border-b border-gray-800 shrink-0">
                     <h3 class="text-xl font-bold text-white" id="carModalTitle">Thêm xe mới</h3>
@@ -251,8 +183,26 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="text-gray-300 text-sm font-medium">Hãng xe *</label>
-                            <input type="text" id="modalBrand" name="brand" placeholder="VD: Honda" required 
-                                   class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
+                            <select id="modalBrandSelect" onchange="handleBrandChange()" required
+                                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all cursor-pointer">
+                                <option value="">Chọn hãng</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Honda">Honda</option>
+                                <option value="Hyundai">Hyundai</option>
+                                <option value="Kia">Kia</option>
+                                <option value="Mazda">Mazda</option>
+                                <option value="Ford">Ford</option>
+                                <option value="Mitsubishi">Mitsubishi</option>
+                                <option value="VinFast">VinFast</option>
+                                <option value="Suzuki">Suzuki</option>
+                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                <option value="BMW">BMW</option>
+                                <option value="Audi">Audi</option>
+                                <option value="Khác">Khác...</option>
+                            </select>
+                            <input type="hidden" id="modalBrand" name="brand" value="">
+                            <input type="text" id="modalBrandOther" placeholder="Hãng khác..." oninput="updateBrandHiddenValue()"
+                                   class="hidden mt-2 w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-gray-300 text-sm font-medium">Dòng xe *</label>
@@ -408,33 +358,28 @@ function updateBrandHiddenValue() {
             function closeCarModal() {
                 carModalContent.classList.remove('scale-100', 'opacity-100');
                 carModalContent.classList.add('scale-95', 'opacity-0');
-
-        function validateCarForm() {
-    // 1. Kiểm tra các trường bắt buộc không được để trống
-    if (!modalPlate.value.trim() || !modalBrand.value.trim() || !modalModel.value.trim() || !modalColor.value.trim()) {
-        formError.textContent = "Vui lòng nhập đầy đủ các trường bắt buộc (*).";
-        formError.classList.remove('hidden');
-        return false;
-    }
-    
-    // 2. BỔ SUNG: Kiểm tra định dạng biển số xe bằng Regular Expression (giống hệt backend)
-    const plateRegex = /^[0-9]{2}[A-Z][0-9A-Z]?-[0-9]{4,5}$/;
-    if (!plateRegex.test(modalPlate.value.trim().toUpperCase())) {
-        formError.textContent = "Biển số xe không đúng định dạng! (Ví dụ đúng: 59A-12345 hoặc 59A1-12345)";
-        formError.classList.remove('hidden');
-        return false;
-    }
-    
-    formError.classList.add('hidden');
-    return true;
-}
+                setTimeout(() => {
+                    carModal.classList.remove('flex');
+                    carModal.classList.add('hidden');
+                }, 300);
+            }
 
             function validateCarForm() {
+                // 1. Kiểm tra các trường bắt buộc không được để trống
                 if (!modalPlate.value.trim() || !modalBrand.value.trim() || !modalModel.value.trim() || !modalColor.value.trim()) {
                     formError.textContent = "Vui lòng nhập đầy đủ các trường bắt buộc (*).";
                     formError.classList.remove('hidden');
                     return false;
                 }
+                
+                // 2. Kiểm tra định dạng biển số xe bằng Regular Expression (giống hệt backend)
+                const plateRegex = /^[0-9]{2}[A-Z][0-9A-Z]?-[0-9]{4,5}$/;
+                if (!plateRegex.test(modalPlate.value.trim().toUpperCase())) {
+                    formError.textContent = "Biển số xe không đúng định dạng! (Ví dụ đúng: 59A-12345 hoặc 59A1-12345)";
+                    formError.classList.remove('hidden');
+                    return false;
+                }
+                
                 formError.classList.add('hidden');
                 return true;
             }

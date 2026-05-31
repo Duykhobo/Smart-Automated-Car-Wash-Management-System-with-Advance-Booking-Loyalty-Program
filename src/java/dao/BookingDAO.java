@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.List;
 import utils.DBContext;
 
 public class BookingDAO {
@@ -49,5 +50,35 @@ public class BookingDAO {
             throw new Exception("Lỗi hệ thống khi đặt lịch.");
         }
         return success;
+    }
+
+    public List<dto.Booking> getUpcomingBookings(int customerId) {
+        List<dto.Booking> list = new java.util.ArrayList<>();
+        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed') ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        try (Connection cn = DBContext.getConnection();
+             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, customerId);
+            try (java.sql.ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new dto.Booking(
+                        rs.getInt("BookingID"),
+                        rs.getInt("CustomerID"),
+                        rs.getInt("ServiceID"),
+                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                        rs.getString("LicensePlate"),
+                        rs.getTimestamp("BookingDate"),
+                        rs.getTimestamp("ScheduledTime"),
+                        rs.getDouble("OriginalPrice"),
+                        rs.getDouble("DiscountAmount"),
+                        rs.getDouble("FinalPrice"),
+                        rs.getString("Status"),
+                        rs.getInt("PriorityScore")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

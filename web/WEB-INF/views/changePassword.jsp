@@ -41,10 +41,21 @@
                 plugins: []
             }
         </script>
+        <%
+            // Safe session and customer resolution
+            Customer cus = (Customer) request.getAttribute("customer");
+            if (cus == null) {
+                User uAccount = (User) session.getAttribute(AppConstants.SESSION_USER_ACCOUNT);
+                if (uAccount != null) {
+                    CustomerDAO cDao = new CustomerDAO();
+                    cus = cDao.getCustomerByAccountId(uAccount.getUserId());
+                }
+            }
+        %>
     </head>
     <body class="bg-bg-primary text-white font-sans antialiased selection:bg-btn-primary selection:text-black">
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+        <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
         <div class="flex h-screen overflow-hidden bg-bg-primary">
 
@@ -97,14 +108,11 @@
 
                         <div class="flex flex-col gap-1">
                             <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Đổi Mật Khẩu</h1>
-                            <c:choose>
-                                <c:when test="${not empty customer}">
-                                    <p class="text-gray-400 text-sm">Tài khoản: <span class="text-gray-300 font-semibold"><c:out value="${customer.fullName}"/></span> (<c:out value="${customer.phone}"/>)</p>
-                                </c:when>
-                                <c:otherwise>
-                                    <p class="text-gray-400 text-sm">Cập nhật mật khẩu bảo mật cho tài khoản của bạn</p>
-                                </c:otherwise>
-                            </c:choose>
+                            <% if (cus != null) {%>
+                            <p class="text-gray-400 text-sm">Tài khoản: <span class="text-gray-300 font-semibold"><%= cus.getFullName()%></span> (<%= cus.getPhone()%>)</p>
+                            <% } else {%>
+                            <p class="text-gray-400 text-sm">Cập nhật mật khẩu bảo mật cho tài khoản của bạn</p>
+                            <% }%>
                         </div>
                     </section>
 
@@ -121,32 +129,45 @@
 
                         <!-- Backend response status notifications -->
                         <!-- Backend response status notifications -->
-                        <c:set var="error" value="${not empty requestScope.errorMessage ? requestScope.errorMessage : sessionScope.errorMessage}" />
-                        <c:set var="success" value="${not empty requestScope.successMessage ? requestScope.successMessage : sessionScope.successMessage}" />
-                        <c:remove var="errorMessage" scope="session" />
-                        <c:remove var="successMessage" scope="session" />
+                        <%
+                            // Supports request attributes or session attributes (flexible depending on servlet design)
+                            String error = (String) request.getAttribute("errorMessage");
+                            if (error == null) {
+                                error = (String) session.getAttribute("errorMessage");
+                                if (error != null) {
+                                    session.removeAttribute("errorMessage");
+                                }
+                            }
 
-                        <c:if test="${not empty error}">
+                            String success = (String) request.getAttribute("successMessage");
+                            if (success == null) {
+                                success = (String) session.getAttribute("successMessage");
+                                if (success != null) {
+                                    session.removeAttribute("successMessage");
+                                }
+                            }
+                        %>
+
+                        <% if (error != null) {%>
                         <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span><c:out value="${error}" /></span>
+                            <span><%= error%></span>
                         </div>
-                        </c:if>
+                        <% }%>
 
-                        <c:if test="${not empty success}">
+                        <% if (success != null) {%>
                         <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span><c:out value="${success}" /></span>
+                            <span><%= success%></span>
                         </div>
-                        </c:if>
-
+                        <% }%>
                         <!-- Form action triggers POST to change-password servlet. 
                              Developers can map a servlet/controller to "/account/change-password" or adjust this action url. -->
-                        <form action="${pageContext.request.contextPath}/account/change-password" method="POST" class="space-y-6" onsubmit="return validateForm();">
+                        <form action="${pageContext.request.contextPath}/account/change-password" method="POST" class="space-y-6" >
 
                             <!-- Nhập mật khẩu cũ -->
                             <div class="space-y-1.5">
@@ -279,56 +300,7 @@
                 }
             }
 
-            // High-quality client-side form validation before submitting to server
-            function validateForm() {
-                const oldPassword = document.getElementById('oldPassword').value.trim();
-                const newPassword = document.getElementById('newPassword').value.trim();
-                const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-                const clientErrorAlert = document.getElementById('clientErrorAlert');
-                const clientErrorText = document.getElementById('clientErrorText');
-
-                // Clear previous client error messages
-                clientErrorAlert.classList.add('hidden');
-                clientErrorText.textContent = '';
-
-                // 1. Check for empty fields
-                if (oldPassword === '' || newPassword === '' || confirmPassword === '') {
-                    showClientError("Vui lòng điền đầy đủ tất cả các trường thông tin.");
-                    return false;
-                }
-
-                // 2. Enforce minimum length of 6 characters
-                if (newPassword.length < 6) {
-                    showClientError("Mật khẩu mới phải có ít nhất 6 ký tự.");
-                    return false;
-                }
-
-                // 3. Prevent using the old password as the new password
-                if (newPassword === oldPassword) {
-                    showClientError("Mật khẩu mới không được giống với mật khẩu cũ hiện tại.");
-                    return false;
-                }
-
-                // 4. Ensure new passwords match
-                if (newPassword !== confirmPassword) {
-                    showClientError("Nhập lại mật khẩu mới không khớp. Vui lòng nhập chính xác.");
-                    return false;
-                }
-
-                return true;
-            }
-
-            function showClientError(message) {
-                const clientErrorAlert = document.getElementById('clientErrorAlert');
-                const clientErrorText = document.getElementById('clientErrorText');
-
-                clientErrorText.textContent = message;
-                clientErrorAlert.classList.remove('hidden');
-
-                // Smoothly focus the user's attention on the error
-                clientErrorAlert.scrollIntoView({behavior: 'smooth', block: 'center'});
-            }
         </script>
     </body>
 </html>

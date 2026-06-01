@@ -211,8 +211,15 @@
                 <!-- Body Form -->
                 <form action="${pageContext.request.contextPath}/account/profile" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
                     <%
-                        String error = (String) request.getAttribute("errorMessage");
-                        String success = (String) request.getAttribute("successMessage");
+                        String error = (String) session.getAttribute("errorMessage");
+                        String success = (String) session.getAttribute("successMessage");
+
+                        if (error != null) {
+                            session.removeAttribute("errorMessage");
+                        }
+                        if (success != null) {
+                            session.removeAttribute("successMessage");
+                        }
                     %>
                     <!--Neu co loi thi hien thi loi mau do-->
                     <% if (error != null) {%>
@@ -301,12 +308,13 @@
 
             function previewAvatar(event) {
                 const reader = new FileReader();
-                reader.onload = function() {
+                reader.onload = function () {
                     const preview = document.getElementById('avatarPreview');
                     const placeholder = document.getElementById('avatarPlaceholder');
                     preview.src = reader.result;
                     preview.classList.remove('hidden');
-                    if(placeholder) placeholder.classList.add('hidden');
+                    if (placeholder)
+                        placeholder.classList.add('hidden');
                 }
                 if (event.target.files[0]) {
                     reader.readAsDataURL(event.target.files[0]);

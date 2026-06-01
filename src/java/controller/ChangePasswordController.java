@@ -110,6 +110,12 @@ public class ChangePasswordController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
+        // kiểm trả xem mật khẩu mới có giống mật khẩu cũ không 
+        if (currentpassword.equals(newPassword)) {
+            request.getSession().setAttribute("errorMessage", "Mật khẩu mới không được trùng với mật khẩu đang dùng");
+            response.sendRedirect(request.getContextPath() + "/account/change-password");
+            return;
+        }
         String newHashedPassword = HashUtil.createHash(newPassword);
         UserDAO userDAO = new UserDAO();
         int updateResult = userDAO.updatePassword(user.getUserId(), newHashedPassword);

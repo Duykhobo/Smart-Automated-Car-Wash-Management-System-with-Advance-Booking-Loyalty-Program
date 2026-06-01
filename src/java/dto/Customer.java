@@ -2,6 +2,7 @@ package dto;
 
 import java.sql.Timestamp;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Customer implements Serializable {
 

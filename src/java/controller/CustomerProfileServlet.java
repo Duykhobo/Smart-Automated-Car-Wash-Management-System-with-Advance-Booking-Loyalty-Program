@@ -48,48 +48,59 @@ public class CustomerProfileServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
-        
+
         String fullname = request.getParameter("txtfullname");
         String email = request.getParameter("email");
-        
+
         String avatarPath = null;
         try {
             javax.servlet.http.Part filePart = request.getPart("avatarUpload");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 if (fileName != null && !fileName.isEmpty()) {
+                    String lowerFileName = fileName.toLowerCase();
+                    if (!lowerFileName.endsWith(".jpg") && !lowerFileName.endsWith(".jpeg") 
+                            && !lowerFileName.endsWith(".png") && !lowerFileName.endsWith(".gif") 
+                            && !lowerFileName.endsWith(".webp")) {
+                        throw new Exception("Chỉ cho phép tải lên file ảnh (jpg, jpeg, png, gif, webp).");
+                    }
+                    
                     String uploadDir = request.getServletContext().getRealPath("/assets/avatars");
                     File dir = new File(uploadDir);
-                    if (!dir.exists()) dir.mkdirs();
-                    
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+
                     String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
                     String finalPath = uploadDir + File.separator + uniqueFileName;
                     filePart.write(finalPath);
-                    
+
                     // Trick for NetBeans: Save to source 'web' folder as well to prevent wipe on Clean & Build
                     if (uploadDir.contains("build" + File.separator + "web")) {
                         String sourceDir = uploadDir.replace("build" + File.separator + "web", "web");
                         File sDir = new File(sourceDir);
-                        if (!sDir.exists()) sDir.mkdirs();
+                        if (!sDir.exists()) {
+                            sDir.mkdirs();
+                        }
                         java.nio.file.Files.copy(
-                            java.nio.file.Paths.get(finalPath), 
-                            java.nio.file.Paths.get(sourceDir + File.separator + uniqueFileName), 
-                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                                java.nio.file.Paths.get(finalPath),
+                                java.nio.file.Paths.get(sourceDir + File.separator + uniqueFileName),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
                         );
                     }
-                    
+
                     avatarPath = "assets/avatars/" + uniqueFileName;
                 }
             }
         } catch (Exception e) {
             System.err.println("Error uploading avatar: " + e.getMessage());
         }
-        
+
         try {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
             Customer updatedCustomer = customerService.updateProfile(user.getUserId(), fullname, email, avatarPath);
-            
-            if (updatedCustomer != customer) { // If there were changes
+
+            if (updatedCustomer != null) { // Nếu người dùng có thay đôi thông tin
                 request.getSession().setAttribute("successMessage", "Cập nhật thông tin thành công!");
                 request.getSession().setAttribute(AppConstants.SESSION_CUSTOMER_INFO, updatedCustomer);
             }

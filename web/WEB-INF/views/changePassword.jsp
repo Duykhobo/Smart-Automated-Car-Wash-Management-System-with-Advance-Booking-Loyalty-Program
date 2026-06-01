@@ -41,17 +41,7 @@
                 plugins: []
             }
         </script>
-        <%
-            // Safe session and customer resolution
-            Customer cus = (Customer) request.getAttribute("customer");
-            if (cus == null) {
-                User uAccount = (User) session.getAttribute(AppConstants.SESSION_USER_ACCOUNT);
-                if (uAccount != null) {
-                    CustomerDAO cDao = new CustomerDAO();
-                    cus = cDao.getCustomerByAccountId(uAccount.getUserId());
-                }
-            }
-        %>
+
     </head>
     <body class="bg-bg-primary text-white font-sans antialiased selection:bg-btn-primary selection:text-black">
 
@@ -108,11 +98,14 @@
 
                         <div class="flex flex-col gap-1">
                             <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Đổi Mật Khẩu</h1>
-                            <% if (cus != null) {%>
-                            <p class="text-gray-400 text-sm">Tài khoản: <span class="text-gray-300 font-semibold"><%= cus.getFullName()%></span> (<%= cus.getPhone()%>)</p>
-                            <% } else {%>
-                            <p class="text-gray-400 text-sm">Cập nhật mật khẩu bảo mật cho tài khoản của bạn</p>
-                            <% }%>
+                            <c:choose>
+                                <c:when test="${not empty customer}">
+                                    <p class="text-gray-400 text-sm">Tài khoản: <span class="text-gray-300 font-semibold"><c:out value="${customer.fullName}"/></span> (<c:out value="${customer.phone}"/>)</p>
+                                </c:when>
+                                <c:otherwise>
+                                    <p class="text-gray-400 text-sm">Cập nhật mật khẩu bảo mật cho tài khoản của bạn</p>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </section>
 
@@ -128,43 +121,23 @@
                         </div>
 
                         <!-- Backend response status notifications -->
-                        <!-- Backend response status notifications -->
-                        <%
-                            // Supports request attributes or session attributes (flexible depending on servlet design)
-                            String error = (String) request.getAttribute("errorMessage");
-                            if (error == null) {
-                                error = (String) session.getAttribute("errorMessage");
-                                if (error != null) {
-                                    session.removeAttribute("errorMessage");
-                                }
-                            }
+                        <c:if test="${not empty errorMessage}">
+                            <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><c:out value="${errorMessage}"/></span>
+                            </div>
+                        </c:if>
 
-                            String success = (String) request.getAttribute("successMessage");
-                            if (success == null) {
-                                success = (String) session.getAttribute("successMessage");
-                                if (success != null) {
-                                    session.removeAttribute("successMessage");
-                                }
-                            }
-                        %>
-
-                        <% if (error != null) {%>
-                        <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span><%= error%></span>
-                        </div>
-                        <% }%>
-
-                        <% if (success != null) {%>
-                        <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span><%= success%></span>
-                        </div>
-                        <% }%>
+                        <c:if test="${not empty successMessage}">
+                            <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><c:out value="${successMessage}"/></span>
+                            </div>
+                        </c:if>
                         <!-- Form action triggers POST to change-password servlet. 
                              Developers can map a servlet/controller to "/account/change-password" or adjust this action url. -->
                         <form action="${pageContext.request.contextPath}/account/change-password" method="POST" class="space-y-6" >
@@ -302,5 +275,9 @@
 
 
         </script>
+
+        <!-- xoá session của thông báo lỗi để ko bị lưu cho những cái sau -->
+        <c:remove var="errorMessage" scope="session"/>
+        <c:remove var="successMessage" scope="session"/>
     </body>
 </html>

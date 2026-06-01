@@ -134,36 +134,6 @@ public class Customer implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 5;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Customer other = (Customer) obj;
-        if (!Objects.equals(this.fullName, other.fullName)) {
-            return false;
-        }
-        if (!Objects.equals(this.phone, other.phone)) {
-            return false;
-        }
-        if (!Objects.equals(this.email, other.email)) {
-            return false;
-        }
-        return Objects.equals(this.avatar, other.avatar);
-    }
-
-    @Override
     public String toString() {
         return "Customer{" + "customerId=" + customerId + ", userId=" + userId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", licensePlate=" + licensePlate + ", tierStatus=" + tierStatus + ", pointsBalance=" + pointsBalance + ", totalSpend=" + totalSpend + ", totalWashes=" + totalWashes + ", tierUpgradeDate=" + tierUpgradeDate + ", avatar=" + avatar + '}';
     }

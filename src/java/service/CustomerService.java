@@ -39,10 +39,19 @@ public class CustomerService {
             throw new Exception("Không được để trống");
         }
 
-        if (customer.getFullName().equalsIgnoreCase(fullname)
-                && (customer.getEmail() == null ? email == null : customer.getEmail().equalsIgnoreCase(email)) && avatarPath == null) {
-            // Không có sự thay đổi
-            return customer;
+        // kiểm tra xem tên có thay đổi ko
+        boolean isNameUnchanged = customer.getFullName().equalsIgnoreCase(fullname);
+        // kiểm tra xem email có thay đổi ko
+        boolean isEmailUnchanged;
+        if (customer.getEmail() == null) {
+            isEmailUnchanged = (email == null);
+        } else {
+            isEmailUnchanged = customer.getEmail().equalsIgnoreCase(email);
+        }
+        // kiểm tra xem avatar có thay đổi ko
+        boolean isAvatarUnchanged = (avatarPath == null);
+        if (isNameUnchanged && isEmailUnchanged && isAvatarUnchanged) {
+            return null;
         }
 
         if (!ValidationUtil.isValidName(fullname)) {

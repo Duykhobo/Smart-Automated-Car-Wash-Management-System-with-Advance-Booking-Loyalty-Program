@@ -12,7 +12,7 @@ public class AppConstants {
     // Session Keys
     public static final String SESSION_USER_ACCOUNT = "loggedInUser"; // Lưu object User
     public static final String SESSION_CUSTOMER_INFO = "USER";        // Lưu object Customer
-    public static final String SESSION_MSG_SUCCESS = "MESSAGE";
+    public static final String SESSION_MSG_SUCCESS = "SUCCESS";
     public static final String SESSION_MSG_ERROR = "ERROR";
     
     // Booking Statuses (Dự kiến)

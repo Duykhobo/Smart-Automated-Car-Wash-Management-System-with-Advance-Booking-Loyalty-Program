@@ -58,6 +58,13 @@ public class CustomerProfileServlet extends HttpServlet {
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 if (fileName != null && !fileName.isEmpty()) {
+                    String lowerFileName = fileName.toLowerCase();
+                    if (!lowerFileName.endsWith(".jpg") && !lowerFileName.endsWith(".jpeg") 
+                            && !lowerFileName.endsWith(".png") && !lowerFileName.endsWith(".gif") 
+                            && !lowerFileName.endsWith(".webp")) {
+                        throw new Exception("Chỉ cho phép tải lên file ảnh (jpg, jpeg, png, gif, webp).");
+                    }
+                    
                     String uploadDir = request.getServletContext().getRealPath("/assets/avatars");
                     File dir = new File(uploadDir);
                     if (!dir.exists()) {

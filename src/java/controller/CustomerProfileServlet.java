@@ -93,7 +93,7 @@ public class CustomerProfileServlet extends HttpServlet {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
             Customer updatedCustomer = customerService.updateProfile(user.getUserId(), fullname, email, avatarPath);
 
-            if (!updatedCustomer.equals(customer)) { // Nếu người dùng có thay đôi thông tin
+            if (updatedCustomer != null) { // Nếu người dùng có thay đôi thông tin
                 request.getSession().setAttribute("successMessage", "Cập nhật thông tin thành công!");
                 request.getSession().setAttribute(AppConstants.SESSION_CUSTOMER_INFO, updatedCustomer);
             }

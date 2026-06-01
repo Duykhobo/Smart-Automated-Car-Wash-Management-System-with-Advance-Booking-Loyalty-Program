@@ -88,14 +88,9 @@
                             </div>
                         </div>
 
-                        <%
-                            // lay customer
-                            Customer cus = (Customer) request.getAttribute("customer");
-                        %>
-
                         <div class="flex flex-col gap-1">
-                            <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight"><%=cus.getFullName()%></h1>
-                            <p class="text-gray-400 font-medium"><%=cus.getPhone()%></p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight"><c:out value="${customer.fullName}"/></h1>
+                            <p class="text-gray-400 font-medium"><c:out value="${customer.phone}"/></p>
                         </div>
 
                         <button onclick="openProfileModal()" class="flex items-center gap-2 px-5 py-2 mt-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full transition-colors text-btn-primary font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-btn-primary">
@@ -210,22 +205,18 @@
 
                 <!-- Body Form -->
                 <form action="${pageContext.request.contextPath}/account/profile" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
-                    <%
-                        String error = (String) request.getAttribute("errorMessage");
-                        String success = (String) request.getAttribute("successMessage");
-                    %>
                     <!--Neu co loi thi hien thi loi mau do-->
-                    <% if (error != null) {%>
-                    <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-4">
-                        <%= error%>
-                    </div>
-                    <% }%>
+                    <c:if test="${not empty sessionScope.errorMessage}">
+                        <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-4">
+                            <c:out value="${sessionScope.errorMessage}"/>
+                        </div>
+                    </c:if>
                     <!-- Neu thanh cong thi hien thi mau xanh -->
-                    <% if (success != null) {%>
-                    <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-4">
-                        <%= success%>
-                    </div>
-                    <% }%>
+                    <c:if test="${not empty sessionScope.successMessage}">
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-4">
+                            <c:out value="${sessionScope.successMessage}"/>
+                        </div>
+                    </c:if>
 
                     <!-- Avatar Upload -->
                     <div class="flex flex-col items-center gap-3 mb-6">
@@ -246,19 +237,19 @@
 
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium">Họ và Tên</label>
-                        <input type="text" name="txtfullname" value="<%= cus.getFullName()%>" required 
+                        <input type="text" name="txtfullname" value="<c:out value='${customer.fullName}'/>" required 
                                class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium">Số điện thoại</label>
-                        <input type="tel" name="phone" value="<%= cus.getPhone()%>" required readonly
+                        <input type="tel" name="phone" value="<c:out value='${customer.phone}'/>" required readonly
                                class="w-full bg-gray-800 border border-gray-700 text-gray-400 rounded-xl px-4 py-3 focus:outline-none cursor-not-allowed opacity-70" title="Không thể thay đổi số điện thoại">
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium">Email (Tùy chọn)</label>
-                        <input type="email" name="email" value="<%= cus.getEmail() != null ? cus.getEmail() : ""%>" placeholder="Nhập email..." 
+                        <input type="email" name="email" value="<c:out value='${customer.email}'/>" placeholder="Nhập email..." 
                                class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-500">
                     </div>
 
@@ -301,12 +292,13 @@
 
             function previewAvatar(event) {
                 const reader = new FileReader();
-                reader.onload = function() {
+                reader.onload = function () {
                     const preview = document.getElementById('avatarPreview');
                     const placeholder = document.getElementById('avatarPlaceholder');
                     preview.src = reader.result;
                     preview.classList.remove('hidden');
-                    if(placeholder) placeholder.classList.add('hidden');
+                    if (placeholder)
+                        placeholder.classList.add('hidden');
                 }
                 if (event.target.files[0]) {
                     reader.readAsDataURL(event.target.files[0]);
@@ -314,9 +306,13 @@
             }
 
             // Nếu trang load lên mà phát hiện có lỗi (do submit thất bại từ Servlet), tự động mở lại modal chỉnh sửa
-            <% if (error != null || success != null) { %>
+            <c:if test="${not empty sessionScope.errorMessage or not empty sessionScope.successMessage}">
             openProfileModal();
-            <% }%>
+            </c:if>
         </script>
+
+        <!-- xoá session của thông báo lỗi để ko bị lưu cho những cái sau -->
+        <c:remove var="errorMessage" scope="session"/>
+        <c:remove var="successMessage" scope="session"/>
     </body>
 </html>

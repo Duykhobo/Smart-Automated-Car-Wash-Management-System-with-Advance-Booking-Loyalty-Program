@@ -47,9 +47,9 @@ tailwind.config = {
 
     <!-- Desktop Sidebar -->
     <aside class="hidden md:flex flex-col w-64 border-r border-gray-800 bg-[#121826] fixed h-full z-10">
-        <a href="${pageContext.request.contextPath}/home" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <div class="w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center text-black font-bold text-xl">A</div>
-            <span class="font-bold text-xl tracking-wider text-btn-primary">AUTOWASH</span>
+        <a href="${pageContext.request.contextPath}/account/dashboard" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="AutoWash Logo" class="h-10 w-10 object-cover rounded-xl shadow-md" onerror="this.onerror=null; this.outerHTML='<div class=\'w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center text-black font-bold text-xl\'>A</div>';">
+            <span class="text-xl font-bold tracking-tight text-white">AutoWash<span class="text-btn-primary">Pro</span></span>
         </a>
         
         <nav class="flex-1 px-4 py-4 space-y-2">

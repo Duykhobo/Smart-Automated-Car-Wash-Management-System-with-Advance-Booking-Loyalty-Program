@@ -192,7 +192,7 @@
                                             <!-- Form action triggers POST to change-password servlet. 
                              Developers can map a servlet/controller to "/account/change-password" or adjust this action url. -->
                                             <form action="${pageContext.request.contextPath}/account/change-password"
-                                                method="POST" class="space-y-6">
+                                                method="POST" novalidate class="space-y-6">
 
                                                 <!-- Nhập mật khẩu cũ -->
                                                 <div class="space-y-1.5">

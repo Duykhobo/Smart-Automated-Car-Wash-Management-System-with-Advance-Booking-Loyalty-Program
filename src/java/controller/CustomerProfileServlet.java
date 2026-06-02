@@ -71,7 +71,12 @@ public class CustomerProfileServlet extends HttpServlet {
                         dir.mkdirs();
                     }
 
-                    String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                    String extension = "";
+                    int dotIndex = fileName.lastIndexOf(".");
+                    if (dotIndex > 0) {
+                        extension = fileName.substring(dotIndex);
+                    }
+                    String uniqueFileName = java.util.UUID.randomUUID().toString() + extension;
                     String finalPath = uploadDir + File.separator + uniqueFileName;
                     filePart.write(finalPath);
 

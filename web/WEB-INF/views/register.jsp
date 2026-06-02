@@ -73,22 +73,17 @@ tailwind.config = {
             <p class="text-gray-400 text-sm mb-8">Bắt đầu trải nghiệm dịch vụ chuẩn Pro</p>
 
             <!-- Alerts -->
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <% if (request.getAttribute("errorMessage") != null) { %>
-                <script>
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'error',
-                        title: '<%= request.getAttribute("errorMessage") %>',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        background: '#1f2937',
-                        color: '#fff'
-                    });
-                </script>
+                <div id="serverAlert" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <%= request.getAttribute("errorMessage") %>
+                </div>
             <% } %>
+
+            <div id="clientError" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm items-center gap-2 hidden">
+                <svg class="w-5 h-5 shrink-0 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="clientErrorText"></span>
+            </div>
 
             <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4">
                 
@@ -118,8 +113,6 @@ tailwind.config = {
                         <label class="text-gray-300 text-sm font-medium">Mật Khẩu</label>
                         <div class="relative">
                             <input type="password" id="password" name="password" placeholder="Mật khẩu..." required 
-                                   pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}"
-                                   title="Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
                                    class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                             <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -197,30 +190,21 @@ tailwind.config = {
             if (phone.length !== 10 || !phone.startsWith('0')) {
                 errors.push("Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và gồm 10 số).");
             }
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-            if (!passwordRegex.test(password)) {
-                errors.push("Mật khẩu phải từ 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
+            if (password.length < 6) {
+                errors.push("Mật khẩu phải có ít nhất 6 ký tự.");
             }
             if (password !== confirmPassword) {
                 errors.push("Xác nhận mật khẩu không khớp.");
             }
             
             if (errors.length > 0) {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    title: errors.join('<br>'),
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    background: '#1f2937',
-                    color: '#fff'
-                });
+                clientErrorText.innerHTML = errors.join('<br>');
+                clientError.classList.remove('hidden');
                 event.preventDefault();
                 return false;
             }
             
+            clientError.classList.add('hidden');
             return true;
         }
     </script>

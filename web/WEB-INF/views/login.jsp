@@ -72,38 +72,20 @@
                 <h2 class="text-3xl font-bold text-white mb-2">Đăng Nhập</h2>
                 <p class="text-gray-400 text-sm mb-8">Chào mừng bạn quay trở lại hệ thống</p>
 
-                <!-- Alerts Optimized with SweetAlert2 -->
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <!-- Alerts -->
+
                 <c:if test="${not empty sessionScope.successMessage}">
-                    <script>
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: '<c:out value="${sessionScope.successMessage}" />',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            background: '#1f2937',
-                            color: '#fff'
-                        });
-                    </script>
-                    <c:remove var="successMessage" scope="session" />
+                    <div class="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <c:out value="${sessionScope.successMessage}" />
+                        <c:remove var="successMessage" scope="session" />
+                    </div>
                 </c:if>
                 <c:if test="${not empty errorMessage}">
-                    <script>
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'error',
-                            title: '<c:out value="${errorMessage}" />',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            background: '#1f2937',
-                            color: '#fff'
-                        });
-                    </script>
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <c:out value="${errorMessage}" />
+                    </div>
                 </c:if>
 
                 <form action="${pageContext.request.contextPath}/auth/login" method="POST" novalidate class="space-y-5">
@@ -116,7 +98,7 @@
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <label class="text-gray-300 text-sm font-medium">Mật Khẩu</label>
-                            <a href="#" tabindex="-1" class="text-btn-primary text-xs font-semibold hover:underline">Quên mật khẩu?</a>
+                            <a href="#" class="text-btn-primary text-xs font-semibold hover:underline">Quên mật khẩu?</a>
                         </div>
                         <input type="password" name="password" placeholder="Nhập mật khẩu..." required 
                                class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">

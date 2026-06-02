@@ -82,13 +82,6 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // Kiểm tra mật khẩu mạnh
-        if (!ValidationUtil.isStrongPassword(rawPassword)) {
-            request.setAttribute("errorMessage", "Mật khẩu phải từ 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!");
-            forwardWithError(request, response, fullName, phone, licensePlate);
-            return;
-        }
-
         // Validate Format (Tên, SDT, Biển số)
         if (!ValidationUtil.isValidName(fullName)) {
             request.setAttribute("errorMessage", "Họ và tên không hợp lệ! (Không được chứa số hoặc ký tự đặc biệt)");

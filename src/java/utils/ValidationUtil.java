@@ -16,9 +16,6 @@ public class ValidationUtil {
     // Regex cho email
     private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
-    // Regex cho mật khẩu mạnh (Ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt)
-    private static final String STRONG_PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
-
     /**
      * Hàm kiểm tra xem CÓ BẤT KỲ chuỗi nào bị Null hoặc Rỗng hay không. Trả về
      * true nếu có
@@ -71,16 +68,6 @@ public class ValidationUtil {
             return false;
         }
         return Pattern.matches(EMAIL_PATTERN, email.trim());
-    }
-
-    /**
-     * Kiểm tra mật khẩu mạnh
-     */
-    public static boolean isStrongPassword(String password) {
-        if (password == null || password.trim().isEmpty()) {
-            return false;
-        }
-        return Pattern.matches(STRONG_PASSWORD_PATTERN, password); // Không dùng trim() cho password để tránh vô tình bỏ khoảng trắng nếu người dùng cố ý nhập
     }
 
 }

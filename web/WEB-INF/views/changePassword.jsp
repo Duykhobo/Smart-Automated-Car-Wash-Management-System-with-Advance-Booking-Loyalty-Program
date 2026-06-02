@@ -188,8 +188,25 @@
                                                 </script>
                                             </c:if>
 
+                        <!-- Backend response status notifications -->
+                        <c:if test="${not empty errorMessage}">
+                            <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><c:out value="${errorMessage}"/></span>
+                            </div>
+                        </c:if>
 
-                                            <!-- Form action triggers POST to change-password servlet. 
+                        <c:if test="${not empty successMessage}">
+                            <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><c:out value="${successMessage}"/></span>
+                            </div>
+                        </c:if>
+                        <!-- Form action triggers POST to change-password servlet. 
                              Developers can map a servlet/controller to "/account/change-password" or adjust this action url. -->
                                             <form action="${pageContext.request.contextPath}/account/change-password"
                                                 method="POST" novalidate class="space-y-6">
@@ -414,6 +431,18 @@
                 }
             }
 
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eyeOpen.classList.add('hidden');
+                    eyeClosed.classList.remove('hidden');
+                    button.setAttribute('aria-label', 'Ẩn mật khẩu');
+                } else {
+                    input.type = 'password';
+                    eyeOpen.classList.remove('hidden');
+                    eyeClosed.classList.add('hidden');
+                    button.setAttribute('aria-label', 'Hiện mật khẩu');
+                }
+            }
 
         </script>
 

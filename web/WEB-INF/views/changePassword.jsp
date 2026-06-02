@@ -166,7 +166,7 @@
 
                                             <!-- Backend response status notifications -->
                                             <c:if test="${not empty errorMessage}">
-                                                <div
+                                                <div id="serverErrorAlert"
                                                     class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
                                                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">

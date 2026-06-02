@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let errorMessages = [];
 
     function showError(message) {
+        // Ẩn lỗi server nếu có để tránh hiện 2 bảng lỗi cùng lúc
+        const serverAlert = document.getElementById('serverErrorAlert');
+        if (serverAlert) serverAlert.classList.add('hidden');
+
         // Chỉ thêm lỗi nếu chưa có trong mảng (tránh trùng lặp)
         if (!errorMessages.includes(message)) {
             errorMessages.push(message);

@@ -56,8 +56,12 @@ public class FileUploadUtil {
             }
             // -------------------------------------------------------------
 
-            // Tạo tên file ngẫu nhiên để không bị đè ảnh khi trùng tên (VD: Hinh.png -> xxxxx-Hinh.png)
-            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+            String extension2 = "";
+            int dotIndex2 = fileName.lastIndexOf(".");
+            if (dotIndex2 > 0) {
+                extension2 = fileName.substring(dotIndex2);
+            }
+            String uniqueFileName = UUID.randomUUID().toString() + extension2;
 
             // Đảm bảo thư mục tồn tại
             String applicationPath = request.getServletContext().getRealPath("");

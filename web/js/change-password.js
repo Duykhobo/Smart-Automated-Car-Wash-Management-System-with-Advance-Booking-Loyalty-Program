@@ -25,14 +25,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorAlert = document.getElementById('clientErrorAlert');
     const errorText = document.getElementById('clientErrorText');
 
+    let errorMessages = [];
+
     function showError(message) {
-        errorText.textContent = message;
+        // Chỉ thêm lỗi nếu chưa có trong mảng (tránh trùng lặp)
+        if (!errorMessages.includes(message)) {
+            errorMessages.push(message);
+        }
+        errorText.innerHTML = errorMessages.join('<br>');
         errorAlert.classList.remove('hidden');
     }
 
     function hideError() {
         errorAlert.classList.add('hidden');
-        errorText.textContent = '';
+        errorMessages = [];
+        errorText.innerHTML = '';
     }
 
     function validateStrongPassword(input, fieldName) {

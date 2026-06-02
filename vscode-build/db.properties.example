@@ -1,7 +1,0 @@
-# Database Configuration Example
-# Copy file này, đổi tên thành db.properties và điền mật khẩu thực tế của máy bạn
-db.server=localhost
-db.port=1433
-db.name=SmartCarWash
-db.user=sa
-db.password=YOUR_PASSWORD_HERE

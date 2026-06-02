@@ -91,9 +91,9 @@ public class ChangePasswordController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
-        // Kiểm tra mật khẩu mạnh
-        if (!ValidationUtil.isStrongPassword(newPassword)) {
-            request.getSession().setAttribute("errorMessage", "Mật khẩu mới phải từ 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!");
+        //Kiểm tra độ dài có dưới 6 không
+        if (newPassword.length() < 6) {
+            request.getSession().setAttribute("errorMessage", "Mật khẩu mới phải từ 6 ký tự trở lên!");
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }

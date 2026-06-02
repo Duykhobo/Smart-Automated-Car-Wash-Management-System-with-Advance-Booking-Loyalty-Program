@@ -73,17 +73,22 @@ tailwind.config = {
             <p class="text-gray-400 text-sm mb-8">Bắt đầu trải nghiệm dịch vụ chuẩn Pro</p>
 
             <!-- Alerts -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <% if (request.getAttribute("errorMessage") != null) { %>
-                <div id="serverAlert" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <%= request.getAttribute("errorMessage") %>
-                </div>
+                <script>
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: '<%= request.getAttribute("errorMessage") %>',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: '#1f2937',
+                        color: '#fff'
+                    });
+                </script>
             <% } %>
-
-            <div id="clientError" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm items-center gap-2 hidden">
-                <svg class="w-5 h-5 shrink-0 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span id="clientErrorText"></span>
-            </div>
 
             <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4">
                 
@@ -201,13 +206,21 @@ tailwind.config = {
             }
             
             if (errors.length > 0) {
-                clientErrorText.innerHTML = errors.join('<br>');
-                clientError.classList.remove('hidden');
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errors.join('<br>'),
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#1f2937',
+                    color: '#fff'
+                });
                 event.preventDefault();
                 return false;
             }
             
-            clientError.classList.add('hidden');
             return true;
         }
     </script>

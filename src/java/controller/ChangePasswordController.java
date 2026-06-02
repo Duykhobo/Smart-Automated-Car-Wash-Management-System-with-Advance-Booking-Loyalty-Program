@@ -91,9 +91,10 @@ public class ChangePasswordController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }
-        //Kiểm tra độ dài có dưới 6 không
-        if (newPassword.length() < 6) {
-            request.getSession().setAttribute("errorMessage", "Mật khẩu mới phải từ 6 ký tự trở lên!");
+        //Kiểm tra độ mạnh của mật khẩu mới (ít nhất 8 ký tự, chứa chữ viết hoa và ký tự đặc biệt)
+        String passwordPattern = "^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
+        if (!newPassword.matches(passwordPattern)) {
+            request.getSession().setAttribute("errorMessage", "Mật khẩu mới phải có ít nhất 8 ký tự, chứa chữ viết hoa và ký tự đặc biệt!");
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }

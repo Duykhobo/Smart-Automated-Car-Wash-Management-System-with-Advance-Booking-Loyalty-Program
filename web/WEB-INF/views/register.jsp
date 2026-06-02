@@ -113,6 +113,8 @@ tailwind.config = {
                         <label class="text-gray-300 text-sm font-medium">Mật Khẩu</label>
                         <div class="relative">
                             <input type="password" id="password" name="password" placeholder="Mật khẩu..." required 
+                                   pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}"
+                                   title="Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
                                    class="w-full bg-gray-800/50 border border-gray-700 text-white rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-600">
                             <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -190,8 +192,9 @@ tailwind.config = {
             if (phone.length !== 10 || !phone.startsWith('0')) {
                 errors.push("Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và gồm 10 số).");
             }
-            if (password.length < 6) {
-                errors.push("Mật khẩu phải có ít nhất 6 ký tự.");
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                errors.push("Mật khẩu phải từ 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
             }
             if (password !== confirmPassword) {
                 errors.push("Xác nhận mật khẩu không khớp.");

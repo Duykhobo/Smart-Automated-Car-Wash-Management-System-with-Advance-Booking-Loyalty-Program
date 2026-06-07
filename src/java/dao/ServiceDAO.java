@@ -1,6 +1,5 @@
 package dao;
 
-import dto.Service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import dto.Service;
 import utils.DBContext;
 
 public class ServiceDAO {
@@ -19,8 +20,8 @@ public class ServiceDAO {
         String sql = "SELECT [ServiceID], [Name], [BasePrice] FROM [Services] WHERE [IsActive] = 1 ORDER BY [BasePrice] ASC";
 
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
+                PreparedStatement st = cn.prepareStatement(sql);
+                ResultSet rs = st.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("ServiceID");
@@ -41,8 +42,8 @@ public class ServiceDAO {
     public Service getServiceById(int id) throws SQLException {
         String sql = "SELECT [ServiceID], [Name], [BasePrice] FROM [Services] WHERE [ServiceID] = ?";
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql)) {
-            
+                PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setInt(1, id);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -65,11 +66,11 @@ public class ServiceDAO {
         boolean success = false;
         String sql = "INSERT INTO [Services] ([Name], [BasePrice], [IsActive]) VALUES (?, ?, 1)";
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql)) {
-            
+                PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, service.getName());
-            st.setDouble(2, service.getPrice());
-            
+            st.setDouble(2, service.getBasePrice());
+
             int rows = st.executeUpdate();
             if (rows > 0) {
                 success = true;
@@ -88,12 +89,12 @@ public class ServiceDAO {
         boolean success = false;
         String sql = "UPDATE [Services] SET [Name] = ?, [BasePrice] = ?, [UpdatedAt] = GETDATE() WHERE [ServiceID] = ?";
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql)) {
-            
+                PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, service.getName());
-            st.setDouble(2, service.getPrice());
+            st.setDouble(2, service.getBasePrice());
             st.setInt(3, service.getServiceId());
-            
+
             int rows = st.executeUpdate();
             if (rows > 0) {
                 success = true;

@@ -37,4 +37,74 @@ public class ServiceDAO {
         }
         return services;
     }
+
+    public Service getServiceById(int id) throws SQLException {
+        String sql = "SELECT [ServiceID], [Name], [BasePrice] FROM [Services] WHERE [ServiceID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("Name");
+                    double price = rs.getDouble("BasePrice");
+                    return new Service(id, name, price);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching service by ID", e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in getServiceById", e);
+            throw new SQLException(e);
+        }
+        return null;
+    }
+
+    public boolean insertService(Service service) throws SQLException {
+        boolean success = false;
+        String sql = "INSERT INTO [Services] ([Name], [BasePrice], [IsActive]) VALUES (?, ?, 1)";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, service.getName());
+            st.setDouble(2, service.getPrice());
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error inserting service", e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in insertService", e);
+            throw new SQLException(e);
+        }
+        return success;
+    }
+
+    public boolean updateService(Service service) throws SQLException {
+        boolean success = false;
+        String sql = "UPDATE [Services] SET [Name] = ?, [BasePrice] = ?, [UpdatedAt] = GETDATE() WHERE [ServiceID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, service.getName());
+            st.setDouble(2, service.getPrice());
+            st.setInt(3, service.getServiceId());
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating service", e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in updateService", e);
+            throw new SQLException(e);
+        }
+        return success;
+    }
 }

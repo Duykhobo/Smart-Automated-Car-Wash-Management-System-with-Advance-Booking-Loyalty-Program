@@ -81,4 +81,61 @@ public class BookingDAO {
         }
         return list;
     }
+
+    public boolean updateBookingStatus(int bookingId, String newStatus) throws SQLException {
+        boolean success = false;
+        String sql = "UPDATE [Bookings] SET [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, newStatus);
+            st.setInt(2, bookingId);
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating booking status", e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in updateBookingStatus", e);
+            throw new SQLException(e);
+        }
+        return success;
+    }
+
+    public dto.Booking getBookingById(int bookingId) throws SQLException {
+        dto.Booking booking = null;
+        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
+        try (Connection cn = DBContext.getConnection();
+             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, bookingId);
+            try (java.sql.ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    booking = new dto.Booking(
+                        rs.getInt("BookingID"),
+                        rs.getInt("CustomerID"),
+                        rs.getInt("ServiceID"),
+                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                        rs.getString("LicensePlate"),
+                        rs.getTimestamp("BookingDate"),
+                        rs.getTimestamp("ScheduledTime"),
+                        rs.getDouble("OriginalPrice"),
+                        rs.getDouble("DiscountAmount"),
+                        rs.getDouble("FinalPrice"),
+                        rs.getString("Status"),
+                        rs.getInt("PriorityScore")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching booking by ID", e);
+            throw e;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in getBookingById", e);
+            throw new SQLException(e);
+        }
+        return booking;
+    }
 }

@@ -49,13 +49,9 @@ public class CustomerDAO {
         int result = 0;
         String sql;
         if (avatarPath != null) {
-            sql = "Update Customers\n"
-                    + "Set FullName = ? , Email = ?, Avatar = ?\n"
-                    + "Where CustomerID = ?";
+            sql = "UPDATE [Customers] SET [FullName] = ?, [Email] = ?, [Avatar] = ?, [UpdatedAt] = GETDATE() WHERE [CustomerID] = ?";
         } else {
-            sql = "Update Customers\n"
-                    + "Set FullName = ? , Email = ?\n"
-                    + "Where CustomerID = ?";
+            sql = "UPDATE [Customers] SET [FullName] = ?, [Email] = ?, [UpdatedAt] = GETDATE() WHERE [CustomerID] = ?";
         }
 
         try ( Connection cn = DBContext.getConnection();  PreparedStatement st = cn.prepareStatement(sql)) {
@@ -96,4 +92,24 @@ public class CustomerDAO {
         return false;
     }
 
+    public boolean updateTier(int customerId, int tierId) {
+        boolean success = false;
+        String sql = "UPDATE [Customers] SET [TierID] = ?, [TierUpgradeDate] = ?, [UpdatedAt] = GETDATE() WHERE [CustomerID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setInt(1, tierId);
+            st.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            st.setInt(3, customerId);
+            
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error updating customer tier");
+            e.printStackTrace();
+        }
+        return success;
+    }
 }

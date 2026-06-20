@@ -1,8 +1,9 @@
-﻿<%@page import="utils.AppConstants" %>
+<%@page import="utils.AppConstants" %>
     <%@page import="dto.Customer" %>
         <%@page contentType="text/html" pageEncoding="UTF-8" %>
             <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+                <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
                     <c:if test="${empty sessionScope.USER}">
                         <c:redirect url="/auth/login" />
                     </c:if>
@@ -68,6 +69,11 @@
                                         class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                                         <i data-lucide="history" class="w-5 h-5"></i>
                                         <span class="font-medium text-sm">Lịch sử rửa xe</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/vehicles"
+                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                                        <i data-lucide="car" class="w-5 h-5"></i>
+                                        <span class="font-medium text-sm">Quản lý xe</span>
                                     </a>
                                     <a href="${pageContext.request.contextPath}/customer/loyalty"
                                         class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
@@ -172,7 +178,7 @@
                                                                 class="text-text-muted text-xs uppercase tracking-wider mb-1">Tổng
                                                                 chi tiêu</span>
                                                             <span class="text-white font-bold">
-                                                                <c:out value="${customer.totalSpend}" /> Ä'
+                                                                <c:out value="${customer.totalSpend}" /> VND
                                                             </span>
                                                         </div>
                                                         <div class="w-px h-8 bg-border-glass"></div>
@@ -223,41 +229,59 @@
                                                 <div class="flex flex-col gap-4">
                                                     <c:choose>
                                                         <c:when test="${not empty upcomingBooking}">
-                                                            <article
-                                                                class="glass-panel flex items-center justify-between p-5 rounded-2xl border-l-4 border-l-accent-cyan hover:-translate-y-1 transition-transform">
-                                                                <div class="flex items-center gap-4">
-                                                                    <div
-                                                                        class="w-12 h-12 bg-[#00d4ff]/10 rounded-xl flex items-center justify-center shrink-0">
-                                                                        <i data-lucide="calendar"
-                                                                            class="w-6 h-6 text-[#00d4ff]"></i>
-                                                                    </div>
-                                                                    <div class="flex flex-col">
-                                                                        <h3
-                                                                            class="text-white font-semibold text-base font-display">
-                                                                            Biển số:
-                                                                            <c:out
-                                                                                value="${upcomingBooking.licensePlate}" />
-                                                                        </h3>
-                                                                        <p
-                                                                            class="text-text-muted text-sm mt-1 flex items-center gap-3">
-                                                                            <span><i data-lucide="clock"
-                                                                                    class="w-3.5 h-3.5 inline mr-1"></i>
-                                                                                <fmt:formatDate
-                                                                                    value="${upcomingBooking.scheduledTime}"
-                                                                                    pattern="HH:mm" />
-                                                                            </span>
-                                                                            <span><i data-lucide="calendar-days"
-                                                                                    class="w-3.5 h-3.5 inline mr-1"></i>
-                                                                                <fmt:formatDate
-                                                                                    value="${upcomingBooking.bookingDate}"
-                                                                                    pattern="dd/MM/yyyy" />
-                                                                            </span>
-                                                                        </p>
-                                                                    </div>
+                                                            <article class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'border-l-amber-500' : 'border-l-[#00d4ff]'} shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden">
+                                                                <div class="absolute -right-10 -top-10 w-32 h-32 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/10' : 'bg-[#00d4ff]/10'} rounded-full blur-2xl">
                                                                 </div>
-                                                                <div
-                                                                    class="px-3 py-1 bg-[#00d4ff]/20 border border-[#00d4ff]/30 rounded text-[#00d4ff] text-xs font-bold uppercase shrink-0">
-                                                                    <c:out value="${upcomingBooking.status}" />
+                                                                <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                                                    <div class="space-y-3 flex-1">
+                                                                        <div class="flex flex-wrap items-center gap-2">
+                                                                            <span class="px-2.5 py-1 rounded ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/20 text-amber-500' : 'bg-[#00d4ff]/20 text-[#00d4ff]'} text-xs font-bold uppercase ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'in progress' ? 'animate-pulse' : ''}">
+                                                                                <c:out value="${upcomingBooking.status}" />
+                                                                            </span>
+                                                                            <span class="text-text-muted text-sm font-medium">Mã Đặt: #<c:out value="${upcomingBooking.bookingId}" /></span>
+
+                                                                            <c:if test="${customer.tierStatus != 'Member'}">
+                                                                                <div class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-300/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                                                                                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                                                                                    ✨ Đặc quyền <c:out value="${customer.tierStatus}" />
+                                                                                </div>
+                                                                            </c:if>
+                                                                        </div>
+
+                                                                        <h3 class="font-display font-bold text-xl text-white">Lịch Chăm Sóc Xe
+                                                                        </h3>
+
+                                                                        <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mt-2">
+                                                                            <div class="flex items-center gap-2 text-gray-300">
+                                                                                <i data-lucide="calendar" class="w-4 h-4 text-text-muted"></i>
+                                                                                <fmt:formatDate value="${upcomingBooking.bookingDate}" pattern="dd/MM/yyyy" />
+                                                                            </div>
+                                                                            <div class="flex items-center gap-2 text-gray-300">
+                                                                                <i data-lucide="clock" class="w-4 h-4 text-text-muted"></i>
+                                                                                <fmt:formatDate value="${upcomingBooking.scheduledTime}" pattern="HH:mm" />
+                                                                            </div>
+                                                                            <div class="flex items-center gap-2 text-gray-300 col-span-2">
+                                                                                <i data-lucide="car" class="w-4 h-4 text-text-muted"></i>
+                                                                                Biển số: <span class="font-semibold"><c:out value="${upcomingBooking.licensePlate}" /></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="flex flex-col items-start sm:items-end justify-between border-t sm:border-t-0 sm:border-l border-border-glass pt-4 sm:pt-0 sm:pl-6 mt-2 sm:mt-0 min-w-[140px]">
+                                                                        <div class="text-xl font-display font-bold text-[#00d4ff]"><fmt:formatNumber value="${upcomingBooking.finalPrice}" pattern="#,###" /><span class="text-sm font-sans font-normal text-text-muted">VND</span></div>
+                                                                        
+                                                                        <!-- QR Code for Automated Check-in -->
+                                                                        <div class="flex flex-col items-center justify-center mt-3 mb-2 p-2 bg-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${upcomingBooking.bookingId}" alt="QR Code" class="w-16 h-16" />
+                                                                            <span class="text-[10px] text-gray-800 font-bold mt-1 uppercase">Quét tại trạm</span>
+                                                                        </div>
+
+                                                                        <div class="flex gap-2 mt-auto w-full justify-between sm:justify-end">
+                                                                            <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-bg-surface-hover text-white border border-border-glass text-sm font-semibold transition-colors text-center">
+                                                                                Chi Tiết
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </article>
                                                         </c:when>

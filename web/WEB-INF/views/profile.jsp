@@ -1,481 +1,340 @@
-﻿<%@page import="dto.Customer" %>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-        <%@page contentType="text/html" pageEncoding="UTF-8" %>
-            <!DOCTYPE html>
-            <html lang="vi">
+<%@page import="dto.Customer" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="vi">
 
-            <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <meta charset="utf-8" />
-                <title>Auto Wash Pro - Hồ sơ cá nhân</title>
-                <!-- Google Fonts -->
-                <link rel="preconnect" href="https://fonts.googleapis.com">
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-                    rel="stylesheet">
-                <!-- Tailwind CDN -->
-                <script src="https://cdn.tailwindcss.com"></script>
-                <script>
-                    /** @type {import('tailwindcss').Config} */
-                    tailwind.config = {
-                        theme: {
-                            extend: {
-                                fontFamily: {
-                                    sans: ['Inter', 'sans-serif']
-                                },
-                                colors: {
-                                    "bg-primary": "#0b0f1a",
-                                    "btn-primary": "#00d4ff",
-                                    "colors-accents-green": "#10b981",
-                                    "error": "#ef4444"
-                                }
-                            }
-                        },
-                        plugins: []
-                    }
-                </script>
-            </head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta charset="utf-8" />
+    <title>Hồ Sơ Cá Nhân - Auto Wash Pro</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body, .font-sans { font-family: 'Inter', sans-serif !important; }
+      .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
+    </style>
+    
+    <!-- Global CSS & Tailwind -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=5" />
+    <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=5"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
 
-            <body class="bg-bg-primary text-white font-sans antialiased selection:bg-btn-primary selection:text-black">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
 
-                <div class="flex h-screen overflow-hidden bg-bg-primary">
+    <!-- Desktop Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
+        <a href="${pageContext.request.contextPath}/account/dashboard" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
+            <span class="text-xl font-display font-bold tracking-tight text-white">AUTOWASH<span class="text-[#00d4ff]">PRO</span></span>
+        </a>
+        
+        <nav class="flex-1 px-4 py-4 space-y-2 mt-4">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Tổng quan</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/bookings" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Đặt lịch dịch vụ</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Lịch sử rửa xe</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/vehicles" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                <i data-lucide="car" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Quản lý xe</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+                <i data-lucide="award" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Loyalty Program</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="font-medium text-sm">Hồ sơ cá nhân</span>
+            </a>
+        </nav>
+    </aside>
 
-                    <!-- Desktop Sidebar (Tự động hiển thị trên máy tính, ẩn trên mobile) -->
-                    <aside class="hidden md:flex flex-col w-64 border-r border-gray-800 bg-[#121826]">
-                        <a href="${pageContext.request.contextPath}/account/dashboard"
-                            class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-                            <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="AutoWash Logo"
-                                class="h-10 w-10 object-cover rounded-xl shadow-md"
-                                onerror="this.onerror=null; this.outerHTML='<div class=\'w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center text-black font-bold text-xl\'>A</div>';">
-                            <span class="text-xl font-bold tracking-tight text-white">AutoWash<span
-                                    class="text-btn-primary">Pro</span></span>
-                        </a>
+    <main class="flex-1 md:ml-64 relative min-h-screen pb-[120px] md:pb-32 bg-bg-primary">
+        <header class="sticky top-0 z-20 glass-panel border-b border-border-glass px-4 md:px-8 py-4 flex items-center gap-3">
+            <h1 class="text-lg md:text-2xl font-display font-bold truncate text-white ml-2 md:ml-0">Hồ Sơ Của Bạn</h1>
+        </header>
 
-                        <nav class="flex-1 px-4 py-4 space-y-2">
-                            <a href="${pageContext.request.contextPath}/account/dashboard"
-                                class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                    </path>
-                                </svg>
-                                <span class="font-medium">Trang chá»§</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/bookings"
-                                class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                <span class="font-medium">Đặt lịch</span>
-                            </a>
-                            <a href="#"
-                                class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
-                                    </path>
-                                </svg>
-                                <span class="font-medium">Ưu đãi</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/account/profile"
-                                class="flex items-center gap-3 px-4 py-3 bg-btn-primary/10 text-btn-primary rounded-xl transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                <span class="font-medium">Hồ sơ cá nhân</span>
-                            </a>
-                        </nav>
-                    </aside>
+        <div class="px-4 md:px-8 py-8 max-w-3xl mx-auto space-y-6">
 
-                    <!-- Main Content Area -->
-                    <main class="flex-1 overflow-y-auto pb-24 md:pb-8">
-                        <div class="max-w-2xl mx-auto p-6 md:p-8 space-y-8 mt-4 md:mt-0">
-
-                            <!-- Profile Header -->
-                            <section class="flex flex-col items-center gap-4 text-center">
-                                <div class="relative group cursor-pointer">
-                                    <div
-                                        class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gray-800 bg-gray-700 flex items-center justify-center transition-transform group-hover:scale-105 shadow-[0_0_20px_rgba(0,212,255,0.15)]">
-                                        <c:choose>
-                                            <c:when test="${not empty customer.avatar}">
-                                                <img src="${pageContext.request.contextPath}/${customer.avatar}"
-                                                    alt="Avatar" class="w-full h-full object-cover">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <!-- Default Avatar Icon -->
-                                                <svg class="w-12 h-12 md:w-16 md:h-16 text-gray-400" fill="currentColor"
-                                                    viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                    <!-- Nút thay đổi ảnh đại diện (ẩn, hiện khi di chuột) -->
-                                    <div class="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                        onclick="openProfileModal()">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                            </path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col gap-1">
-                                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                                        <c:out value="${customer.fullName}" />
-                                    </h1>
-                                    <p class="text-gray-400 font-medium">
-                                        <c:out value="${customer.phone}" />
-                                    </p>
-                                </div>
-
-                                <button onclick="openProfileModal()"
-                                    class="flex items-center gap-2 px-5 py-2 mt-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full transition-colors text-btn-primary font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-btn-primary">
-                                    <span>Chỉnh sửa hồ sơ</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </section>
-
-                            <!-- Stats -->
-                            <section class="grid grid-cols-2 gap-4" aria-label="Thống kê tài khoản">
-                                <article
-                                    class="flex flex-col items-center justify-center p-5 bg-[#1a222c] border border-gray-800 rounded-2xl shadow-lg">
-                                    <p class="text-gray-400 text-xs md:text-sm mb-1">Tổng chi tiêu</p>
-                                    <p class="text-white text-xl md:text-2xl font-bold">
-                                        <c:out value="${customer.totalSpend}" /> VND
-                                    </p>
-                                </article>
-                                <article
-                                    class="flex flex-col items-center justify-center p-5 bg-[#1a222c] border border-gray-800 rounded-2xl shadow-lg">
-                                    <p class="text-gray-400 text-xs md:text-sm mb-1">Số lần rửa</p>
-                                    <p class="text-white text-xl md:text-2xl font-bold">
-                                        <c:out value="${customer.totalWashes}" /> <span
-                                            class="text-base font-normal">lần</span>
-                                    </p>
-                                </article>
-                            </section>
-
-                            <!-- Actions List -->
-                            <section class="flex flex-col gap-3" aria-label="Danh sách chức năng">
-                                <nav class="flex flex-col gap-3" aria-label="Điều hướng hồ sơ">
-                                    <a href="${pageContext.request.contextPath}/vehicles"
-                                        class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
-                                        <div class="flex items-center gap-4">
-                                            <div
-                                                class="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-btn-primary/20 transition-colors">
-                                                <svg class="w-5 h-5 text-gray-300 group-hover:text-btn-primary"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-semibold text-white text-base">Quản lý xe</span>
-                                        </div>
-                                        <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
-
-                                    <a href="#"
-                                        class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
-                                        <div class="flex items-center gap-4">
-                                            <div
-                                                class="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-btn-primary/20 transition-colors">
-                                                <svg class="w-5 h-5 text-gray-300 group-hover:text-btn-primary"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-semibold text-white text-base">Lịch sử giao dịch</span>
-                                        </div>
-                                        <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
-
-                                    <a href="#"
-                                        class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
-                                        <div class="flex items-center gap-4">
-                                            <div
-                                                class="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-btn-primary/20 transition-colors">
-                                                <svg class="w-5 h-5 text-gray-300 group-hover:text-btn-primary"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-semibold text-white text-base">Phương thức thanh
-                                                toán</span>
-                                        </div>
-                                        <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
-
-                                    <a href="${pageContext.request.contextPath}/account/change-password"
-                                        class="flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 border border-transparent hover:border-gray-600 rounded-2xl transition-all group shadow-md">
-                                        <div class="flex items-center gap-4">
-                                            <div
-                                                class="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:bg-btn-primary/20 transition-colors">
-                                                <svg class="w-5 h-5 text-gray-300 group-hover:text-btn-primary"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                                    </path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="font-semibold text-white text-base">Đổi mật khẩu</span>
-                                        </div>
-                                        <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
-                                </nav>
-
-                                <form action="${pageContext.request.contextPath}/auth/logout" method="post"
-                                    class="mt-4">
-                                    <button type="submit"
-                                        class="flex items-center justify-center gap-3 w-full p-4 rounded-2xl border-2 border-dashed border-red-500/50 hover:border-red-500 text-red-500 hover:bg-red-500/10 transition-all font-bold text-base shadow-md">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                            </path>
-                                        </svg>
-                                        <span>Đăng xuất</span>
-                                    </button>
-                                </form>
-                            </section>
-                        </div>
-                    </main>
-
-                    <!-- Mobile Bottom Navigation (Chỉ hiện trên điện thoại, ẩn trên máy tính) -->
-                    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-800 z-50 px-2 py-2"
-                        style="padding-bottom: env(safe-area-inset-bottom);" aria-label="Điều hướng chính Mobile">
-                        <div class="flex justify-around items-center h-14">
-                            <a href="${pageContext.request.contextPath}/account/dashboard"
-                                class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                    </path>
-                                </svg>
-                                <span class="text-[10px] font-medium">Trang chá»§</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/bookings"
-                                class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                <span class="text-[10px] font-medium">Đặt lịch</span>
-                            </a>
-                            <a href="#"
-                                class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
-                                    </path>
-                                </svg>
-                                <span class="text-[10px] font-medium">Ưu đãi</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/account/profile"
-                                class="flex flex-col items-center gap-1 w-16 text-btn-primary">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="text-[10px] font-medium">Hồ sơ</span>
-                            </a>
-                        </div>
-                    </nav>
-
-                </div>
-                <!-- Profile Edit Modal -->
-                <div id="profileModal" class="fixed inset-0 z-[60] hidden items-center justify-center">
-                    <!-- Backdrop -->
-                    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                        onclick="closeProfileModal()"></div>
-
-                    <!-- Modal Content -->
-                    <div class="relative bg-[#1f2937] w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden transform scale-95 opacity-0 transition-all duration-300"
-                        id="profileModalContent">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between p-5 border-b border-gray-800">
-                            <h3 class="text-xl font-bold text-white">Cập nhật hồ sơ cá nhân</h3>
-                            <button type="button" onclick="closeProfileModal()"
-                                class="text-gray-400 hover:text-white hover:bg-gray-700 p-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-btn-primary">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Body Form -->
-                        <form action="${pageContext.request.contextPath}/account/profile" method="POST"
-                            enctype="multipart/form-data" class="p-5 space-y-4">
-                            <!--Neu co loi thi hien thi loi mau do-->
-                            <c:if test="${not empty sessionScope.errorMessage}">
-                                <div
-                                    class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-4">
-                                    <c:out value="${sessionScope.errorMessage}" />
-                                </div>
-                            </c:if>
-                            <!-- Neu thanh cong thi hien thi mau xanh -->
-                            <c:if test="${not empty sessionScope.successMessage}">
-                                <div
-                                    class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-4">
-                                    <c:out value="${sessionScope.successMessage}" />
-                                </div>
-                            </c:if>
-
-                            <!-- Avatar Upload -->
-                            <div class="flex flex-col items-center gap-3 mb-6">
-                                <label for="avatarUpload"
-                                    class="w-20 h-20 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800 hover:border-btn-primary hover:text-btn-primary transition-colors cursor-pointer group focus-within:ring-2 focus-within:ring-btn-primary overflow-hidden relative">
-                                    <c:choose>
-                                        <c:when test="${not empty customer.avatar}">
-                                            <img id="avatarPreview"
-                                                src="${pageContext.request.contextPath}/${customer.avatar}" alt="Avatar"
-                                                class="w-full h-full object-cover">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <img id="avatarPreview" src="" alt="Avatar"
-                                                class="w-full h-full object-cover hidden">
-                                            <svg id="avatarPlaceholder"
-                                                class="w-8 h-8 text-gray-500 group-hover:text-btn-primary transition-colors absolute"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                                </path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            </svg>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <input type="file" id="avatarUpload" name="avatarUpload" accept="image/*"
-                                        class="hidden" onchange="previewAvatar(event)">
-                                </label>
-                                <span class="text-xs text-gray-400">Nhấn để thay đổi ảnh</span>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label class="text-gray-300 text-sm font-medium">Họ và Tên</label>
-                                <input type="text" name="txtfullname" value="<c:out value='${customer.fullName}'/>"
-                                    required
-                                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all">
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label class="text-gray-300 text-sm font-medium">Số điện thoại</label>
-                                <input type="tel" name="phone" value="<c:out value='${customer.phone}'/>" required
-                                    readonly
-                                    class="w-full bg-gray-800 border border-gray-700 text-gray-400 rounded-xl px-4 py-3 focus:outline-none cursor-not-allowed opacity-70"
-                                    title="Không thể thay đổi số điện thoại">
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label class="text-gray-300 text-sm font-medium">Email (Tùy chọn)</label>
-                                <input type="email" name="email" value="<c:out value='${customer.email}'/>"
-                                    placeholder="Nhập email..."
-                                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-btn-primary/50 focus:border-btn-primary transition-all placeholder:text-gray-500">
-                            </div>
-
-                            <!-- Footer / Actions -->
-                            <div class="pt-4 flex gap-3">
-                                <button type="button" onclick="closeProfileModal()"
-                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-600 text-white font-semibold hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500">
-                                    Hủy
-                                </button>
-                                <button type="submit"
-                                    class="flex-1 px-4 py-3 rounded-xl bg-btn-primary text-black font-bold hover:bg-cyan-400 shadow-[0_4px_16px_rgba(0,212,255,0.2)] hover:shadow-[0_4px_20px_rgba(0,212,255,0.4)] transition-all focus:outline-none focus:ring-2 focus:ring-btn-primary focus:ring-offset-2 focus:ring-offset-gray-900">
-                                    Lưu thay đổi
-                                </button>
-                            </div>
-                        </form>
+            <!-- Profile Overview Header -->
+            <section class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 border-t border-t-white/10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-[#00d4ff]/10 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32"></div>
+                
+                <div class="relative group cursor-pointer shrink-0">
+                    <div class="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-bg-surface bg-bg-primary flex items-center justify-center transition-transform group-hover:scale-105 shadow-[0_0_20px_rgba(0,212,255,0.2)] relative z-10">
+                        <c:choose>
+                            <c:when test="${not empty customer.avatar}">
+                                <img src="${pageContext.request.contextPath}/${customer.avatar}" alt="Avatar" class="w-full h-full object-cover">
+                            </c:when>
+                            <c:otherwise>
+                                <i data-lucide="user" class="w-12 h-12 text-text-muted"></i>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <!-- Nút thay đổi ảnh đại diện (hiện khi di chuột) -->
+                    <div class="absolute inset-0 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity z-20" onclick="openProfileModal()">
+                        <i data-lucide="camera" class="w-6 h-6 text-white mb-1"></i>
+                        <span class="text-[10px] font-bold text-white uppercase tracking-wider">Cập nhật</span>
                     </div>
                 </div>
 
-                <script>
-                    const profileModal = document.getElementById('profileModal');
-                    const profileModalContent = document.getElementById('profileModalContent');
+                <div class="flex flex-col items-center md:items-start text-center md:text-left z-10 flex-1 w-full">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-3">
+                        <i data-lucide="crown" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span class="text-[10px] font-bold text-white uppercase tracking-widest">${not empty customer.tierStatus ? customer.tierStatus : 'MEMBER'}</span>
+                    </div>
+                    <h2 class="text-2xl md:text-4xl font-display font-bold text-white mb-2">
+                        <c:out value="${customer.fullName}" />
+                    </h2>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-text-muted font-medium w-full justify-center md:justify-start">
+                        <span class="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg border border-border-glass w-full sm:w-auto justify-center"><i data-lucide="phone" class="w-4 h-4 text-[#00d4ff]"></i> <c:out value="${customer.phone}" /></span>
+                        <c:if test="${not empty customer.email}">
+                            <span class="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg border border-border-glass w-full sm:w-auto justify-center"><i data-lucide="mail" class="w-4 h-4 text-[#00d4ff]"></i> <c:out value="${customer.email}" /></span>
+                        </c:if>
+                    </div>
+                </div>
+            </section>
 
-                    function openProfileModal() {
-                        profileModal.classList.remove('hidden');
-                        profileModal.classList.add('flex');
+            <!-- Stats -->
+            <section class="grid grid-cols-2 gap-4">
+                <article class="glass-panel flex flex-col items-center justify-center p-6 border-b-2 border-b-[#00d4ff]/50 rounded-2xl hover:-translate-y-1 transition-transform group">
+                    <div class="w-10 h-10 rounded-full bg-[#00d4ff]/10 flex items-center justify-center mb-3 group-hover:bg-[#00d4ff]/20 transition-colors">
+                        <i data-lucide="wallet" class="w-5 h-5 text-[#00d4ff]"></i>
+                    </div>
+                    <p class="text-text-muted text-xs md:text-sm mb-1 font-medium uppercase tracking-widest">Tổng chi tiêu</p>
+                    <p class="text-white text-xl md:text-3xl font-display font-bold">
+                        <fmt:formatNumber value="${customer.totalSpend}" type="number" maxFractionDigits="0"/> <span class="text-base text-text-muted font-sans font-normal ml-1">VND</span>
+                    </p>
+                </article>
+                <article class="glass-panel flex flex-col items-center justify-center p-6 border-b-2 border-b-amber-500/50 rounded-2xl hover:-translate-y-1 transition-transform group">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
+                        <i data-lucide="car" class="w-5 h-5 text-amber-500"></i>
+                    </div>
+                    <p class="text-text-muted text-xs md:text-sm mb-1 font-medium uppercase tracking-widest">Số lần rửa</p>
+                    <p class="text-white text-xl md:text-3xl font-display font-bold">
+                        <c:out value="${customer.totalWashes}" /> <span class="text-base text-text-muted font-sans font-normal ml-1">lần</span>
+                    </p>
+                </article>
+            </section>
 
-                        setTimeout(() => {
-                            profileModalContent.classList.remove('scale-95', 'opacity-0');
-                            profileModalContent.classList.add('scale-100', 'opacity-100');
-                        }, 10);
-                    }
+            <!-- Actions List -->
+            <section class="space-y-4">
+                <h3 class="font-display font-bold text-lg text-white ml-2">Cài đặt Tài khoản</h3>
+                <nav class="flex flex-col gap-3">
+                    <a href="${pageContext.request.contextPath}/vehicles" class="flex items-center justify-between p-4 glass-panel hover:bg-white/5 border border-transparent hover:border-[#00d4ff]/30 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-bg-primary rounded-xl flex items-center justify-center border border-border-glass group-hover:border-[#00d4ff]/50 transition-colors shadow-inner">
+                                <i data-lucide="car-front" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-colors"></i>
+                            </div>
+                            <span class="font-bold text-white text-base">Quản lý xe</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-transform group-hover:translate-x-1"></i>
+                    </a>
 
-                    function closeProfileModal() {
-                        profileModalContent.classList.remove('scale-100', 'opacity-100');
-                        profileModalContent.classList.add('scale-95', 'opacity-0');
+                    <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex items-center justify-between p-4 glass-panel hover:bg-white/5 border border-transparent hover:border-[#00d4ff]/30 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-bg-primary rounded-xl flex items-center justify-center border border-border-glass group-hover:border-[#00d4ff]/50 transition-colors shadow-inner">
+                                <i data-lucide="receipt" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-colors"></i>
+                            </div>
+                            <span class="font-bold text-white text-base">Lịch sử giao dịch</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-transform group-hover:translate-x-1"></i>
+                    </a>
 
-                        setTimeout(() => {
-                            profileModal.classList.remove('flex');
-                            profileModal.classList.add('hidden');
-                        }, 300);
-                    }
+                    <a href="${pageContext.request.contextPath}/account/payment-methods" class="flex items-center justify-between p-4 glass-panel hover:bg-white/5 border border-transparent hover:border-[#00d4ff]/30 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-bg-primary rounded-xl flex items-center justify-center border border-border-glass group-hover:border-[#00d4ff]/50 transition-colors shadow-inner">
+                                <i data-lucide="credit-card" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-colors"></i>
+                            </div>
+                            <span class="font-bold text-white text-base">Phương thức thanh toán</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-transform group-hover:translate-x-1"></i>
+                    </a>
 
-                    function previewAvatar(event) {
-                        const reader = new FileReader();
-                        reader.onload = function () {
-                            const preview = document.getElementById('avatarPreview');
-                            const placeholder = document.getElementById('avatarPlaceholder');
-                            preview.src = reader.result;
-                            preview.classList.remove('hidden');
-                            if (placeholder)
-                                placeholder.classList.add('hidden');
-                        }
-                        if (event.target.files[0]) {
-                            reader.readAsDataURL(event.target.files[0]);
-                        }
-                    }
+                    <a href="${pageContext.request.contextPath}/account/change-password" class="flex items-center justify-between p-4 glass-panel hover:bg-white/5 border border-transparent hover:border-[#00d4ff]/30 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-bg-primary rounded-xl flex items-center justify-center border border-border-glass group-hover:border-[#00d4ff]/50 transition-colors shadow-inner">
+                                <i data-lucide="key-round" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-colors"></i>
+                            </div>
+                            <span class="font-bold text-white text-base">Đổi mật khẩu</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-text-muted group-hover:text-[#00d4ff] transition-transform group-hover:translate-x-1"></i>
+                    </a>
+                </nav>
 
-                    // Nếu trang load lên mà phát hiện có lỗi (do submit thất bại từ Servlet), tự động mở lại modal chỉnh sửa
-                    <c:if test="${not empty sessionScope.errorMessage or not empty sessionScope.successMessage}">
-                        openProfileModal();
-                    </c:if>
-                </script>
+                <form action="${pageContext.request.contextPath}/auth/logout" method="post" class="mt-8 pt-4">
+                    <button type="submit" class="flex items-center justify-center gap-3 w-full p-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500 hover:border-rose-500 text-rose-500 hover:text-white transition-all font-bold text-base shadow-lg group">
+                        <i data-lucide="log-out" class="w-5 h-5 transition-transform group-hover:-translate-x-1 group-hover:scale-110"></i>
+                        <span>Đăng xuất</span>
+                    </button>
+                </form>
+            </section>
+        </div>
+    </main>
 
-                <!-- xoá session của thông báo lỗi để ko bị lưu cho những cái sau -->
-                <c:remove var="errorMessage" scope="session" />
-                <c:remove var="successMessage" scope="session" />
-            </body>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-border-glass z-40 pb-safe">
+        <div class="flex items-center justify-around p-2">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Tổng quan</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/bookings" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Đặt lịch</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+                <i data-lucide="award" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Loyalty</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-[#00d4ff]">
+                <i data-lucide="user" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"></i>
+                <span class="text-[10px] font-medium">Cá nhân</span>
+            </a>
+        </div>
+    </nav>
 
-            </html>
+    <!-- Profile Edit Modal -->
+    <div id="profileModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-[#070b14]/80 backdrop-blur-md transition-opacity" onclick="closeProfileModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative glass-panel w-full max-w-md rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="profileModalContent">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-white/5 relative bg-gradient-to-r from-[#00d4ff]/10 to-transparent">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00d4ff] to-blue-500"></div>
+                <h3 class="text-xl font-display font-bold text-white flex items-center gap-2"><i data-lucide="user-pen" class="w-5 h-5 text-[#00d4ff]"></i> Chỉnh Sửa Hồ Sơ</h3>
+                <button type="button" onclick="closeProfileModal()" class="text-text-muted hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Body Form -->
+            <form action="${pageContext.request.contextPath}/CustomerProfileServlet" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <c:out value="${sessionScope.errorMessage}" />
+                    </div>
+                </c:if>
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                        <c:out value="${sessionScope.successMessage}" />
+                    </div>
+                </c:if>
+
+                <!-- Avatar Upload -->
+                <div class="flex flex-col items-center gap-3 mb-2">
+                    <label for="avatarUpload" class="w-24 h-24 rounded-full border-2 border-dashed border-border-glass flex items-center justify-center bg-bg-primary hover:border-[#00d4ff] transition-colors cursor-pointer group overflow-hidden relative shadow-inner">
+                        <c:choose>
+                            <c:when test="${not empty customer.avatar}">
+                                <img id="avatarPreview" src="${pageContext.request.contextPath}/${customer.avatar}" alt="Avatar" class="w-full h-full object-cover">
+                            </c:when>
+                            <c:otherwise>
+                                <img id="avatarPreview" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                                <i id="avatarPlaceholder" data-lucide="image-plus" class="w-8 h-8 text-text-muted group-hover:text-[#00d4ff] transition-colors absolute"></i>
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <i data-lucide="upload" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <input type="file" id="avatarUpload" name="avatarUpload" accept="image/*" class="hidden" onchange="previewAvatar(event)">
+                    </label>
+                    <span class="text-xs text-text-muted font-medium bg-black/20 px-3 py-1 rounded-full border border-border-glass">Nhấn vào ảnh để thay đổi</span>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-gray-300 text-sm font-medium ml-1">Họ và Tên</label>
+                    <input type="text" name="txtfullname" value="<c:out value='${customer.fullName}'/>" required class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-gray-300 text-sm font-medium ml-1">Số điện thoại</label>
+                    <div class="relative">
+                        <input type="tel" name="phone" value="<c:out value='${customer.phone}'/>" required readonly class="w-full bg-black/30 border border-border-glass text-text-muted rounded-xl px-4 py-3 pl-11 focus:outline-none cursor-not-allowed" title="Không thể thay đổi số điện thoại">
+                        <i data-lucide="lock" class="w-4 h-4 text-text-muted absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-gray-300 text-sm font-medium ml-1">Email (Tùy chọn)</label>
+                    <input type="email" name="email" value="<c:out value='${customer.email}'/>" placeholder="Nhập email của bạn..." class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all placeholder:text-gray-600">
+                </div>
+
+                <!-- Footer / Actions -->
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeProfileModal()" class="flex-1 px-4 py-3.5 rounded-xl border border-border-glass text-white font-bold hover:bg-white/5 transition-colors">
+                        Hủy
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-3.5 rounded-xl btn-glow bg-[#00d4ff] hover:bg-white text-black font-bold shadow-[0_0_20px_rgba(0,212,255,0.3)] transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const profileModal = document.getElementById('profileModal');
+        const profileModalContent = document.getElementById('profileModalContent');
+
+        function openProfileModal() {
+            profileModal.classList.remove('hidden');
+            profileModal.classList.add('flex');
+
+            setTimeout(() => {
+                profileModalContent.classList.remove('scale-95', 'opacity-0');
+                profileModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeProfileModal() {
+            profileModalContent.classList.remove('scale-100', 'opacity-100');
+            profileModalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                profileModal.classList.remove('flex');
+                profileModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function previewAvatar(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const preview = document.getElementById('avatarPreview');
+                const placeholder = document.getElementById('avatarPlaceholder');
+                preview.src = reader.result;
+                preview.classList.remove('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+            }
+            if (event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+
+        <c:if test="${not empty sessionScope.errorMessage or not empty sessionScope.successMessage}">
+            openProfileModal();
+        </c:if>
+    </script>
+
+    <c:remove var="errorMessage" scope="session" />
+    <c:remove var="successMessage" scope="session" />
+</body>
+</html>

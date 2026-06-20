@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" style="color-scheme: dark;">
     <head>
 <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,6 +10,17 @@
 <style>
   body, .font-sans { font-family: 'Inter', sans-serif !important; }
   .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
+  
+  /* Force dark background for autofilled inputs */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #0a1128 inset !important;
+      -webkit-text-fill-color: white !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+      color: white !important;
+  }
 </style>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta charset="utf-8" />
@@ -45,7 +56,7 @@
                 
                 <h2 class="text-4xl font-display font-bold mb-6 text-white leading-tight">Khởi đầu kỷ nguyên<br/>chăm sóc xe <span class="text-[#00d4ff] glow-text">thông minh</span></h2>
                 <p class="text-text-muted text-lg leading-relaxed max-w-lg mb-12">
-                    Hệ thống đặt lịch tự động tích hợp Loyalty Program. Đặt lịch trước 14 ngày, tích Ä'iểm đổi quà và tận hưởng đặc quyền ưu tiên.
+                    Hệ thống đặt lịch tự động tích hợp Loyalty Program. Đặt lịch trước 14 ngày, tích điểm đổi quà và tận hưởng đặc quyền ưu tiên.
                 </p>
 
                 <div class="flex items-center gap-4 text-gray-300">
@@ -116,7 +127,7 @@
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
                             <label class="text-gray-300 text-sm font-semibold">Mật Khẩu</label>
-                            <a href="#" class="text-[#00d4ff] text-xs font-semibold hover:text-white transition-colors">Quên mật khẩu?</a>
+                            <a href="${pageContext.request.contextPath}/auth/forgot-password" class="text-[#00d4ff] text-xs font-semibold hover:text-white transition-colors">Quên mật khẩu?</a>
                         </div>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

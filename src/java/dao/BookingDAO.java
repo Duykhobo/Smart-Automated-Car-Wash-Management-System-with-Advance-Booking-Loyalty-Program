@@ -1,5 +1,7 @@
 package dao;
 
+import dto.Booking;
+import dto.Voucher;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -111,12 +113,12 @@ public class BookingDAO {
     }
 
     public dto.Booking getBookingById(int bookingId) throws SQLException {
-        dto.Booking booking = null;
+        Booking booking = null;
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
         try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+                PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, bookingId);
-            try (java.sql.ResultSet rs = st.executeQuery()) {
+            try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     booking = new dto.Booking(
                         rs.getInt("BookingID"),
@@ -143,6 +145,33 @@ public class BookingDAO {
         }
         return booking;
     }
+
+    public Voucher getActiveVoucherByCode(String voucherCode, int customerId) throws Exception {
+    String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status " +
+                 "FROM Vouchers " +
+                 "WHERE VoucherCode = ? AND CustomerID = ? AND Status = 'Unused' AND ExpiryDate >= GETDATE()";
+    try (Connection cn = utils.DBContext.getConnection();
+         PreparedStatement st = cn.prepareStatement(sql)) {
+        st.setString(1, voucherCode);
+        st.setInt(2, customerId);
+        try (ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return new Voucher(
+                    rs.getInt("VoucherID"),
+                    rs.getInt("CustomerID"),
+                    rs.getString("VoucherCode"),
+                    rs.getString("RewardType"),
+                    rs.getInt("PointsCost"),
+                    rs.getTimestamp("ExpiryDate"),
+                    rs.getString("Status")
+                );
+            }
+        }
+    } catch (SQLException e) {
+        throw new Exception("Lỗi khi kiểm tra mã Voucher: " + e.getMessage(),e);
+    }
+    return null;
+}
 
     public List<BookingSlotCapacity> getSlotsByDate(Date date) throws Exception {
         List<BookingSlotCapacity> list = new ArrayList<>();

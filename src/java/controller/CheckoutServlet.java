@@ -1,12 +1,5 @@
 package controller;
 
-import dao.BookingDAO;
-import dao.CustomerDAO;
-import dao.ServiceDAO;
-import dto.Customer;
-import dto.Service;
-import dto.User;
-import dto.Voucher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -15,23 +8,32 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import dao.BookingDAO;
+import dao.CustomerDAO;
+import dao.ServiceDAO;
+import dto.Customer;
+import dto.Service;
+import dto.User;
+import dto.Voucher;
 import utils.AppConstants;
 
-@WebServlet(name = "CheckoutServlet", urlPatterns = {"/checkout"})
+@WebServlet(name = "CheckoutServlet", urlPatterns = { "/checkout" })
 public class CheckoutServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(CheckoutServlet.class.getName());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
-        
+
         // 1. Xác thực trạng thái đăng nhập
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
@@ -70,6 +72,43 @@ public class CheckoutServlet extends HttpServlet {
             int serviceId = Integer.parseInt(serviceIdStr);
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
 
+            // Lấy ngày khách hàng muốn đặt
+            LocalDate requestDate = LocalDate.parse(dateStr);
+            LocalDate today = LocalDate.now();
+
+            // Kiểm tra xem ngày khách đặt có phải là ngày trong quá khứ không
+            if (requestDate.isBefore(today)) {
+                sendErrorResponse(request, response, "Không thể đặt lịch cho ngày trong quá khứ.");
+                return;
+            }
+
+            // Logic: Tính toán số ngày tối đa được phép đặt dựa trên Tier
+            String tierStatus = customer.getTierStatus();
+            int maxDaysAllowed = 7; // Default cho Member
+
+            if (tierStatus != null) {
+                switch (tierStatus.trim().toUpperCase()) {
+                    case "SILVER":
+                        maxDaysAllowed = 10;
+                        break;
+                    case "GOLD":
+                        maxDaysAllowed = 12;
+                        break;
+                    case "PLATINUM":
+                        maxDaysAllowed = 14;
+                        break;
+                }
+            }
+            LocalDate maxAllowedDate = today.plusDays(maxDaysAllowed);
+
+            // Chặn nếu ngày đặt vượt quá quy định của Hạng
+            if (requestDate.isAfter(maxAllowedDate)) {
+                sendErrorResponse(request, response,
+                        "Hạng " + tierStatus + " của bạn chỉ được đặt trước tối đa " + maxDaysAllowed + " ngày. " +
+                                "Vui lòng chọn ngày từ " + maxAllowedDate.toString() + " trở lại.");
+                return;
+            }
+
             // 4. Lấy thông tin gói dịch vụ từ DB để xác định giá gốc
             ServiceDAO serviceDAO = new ServiceDAO();
             Service selectedService = serviceDAO.getServiceById(serviceId);
@@ -82,16 +121,17 @@ public class CheckoutServlet extends HttpServlet {
             double discountAmount = 0.0;
             Integer voucherId = null;
             BookingDAO bookingDAO = new BookingDAO();
+
             // 5. Kiểm tra và áp dụng Voucher giảm giá nếu khách hàng có điền
             if (voucherCode != null && !voucherCode.trim().isEmpty()) {
-                
+
                 Voucher voucher = bookingDAO.getActiveVoucherByCode(voucherCode.trim(), customer.getCustomerId());
-                
+
                 if (voucher == null) {
                     sendErrorResponse(request, response, "Mã Voucher không hợp lệ hoặc đã hết hạn sử dụng.");
                     return;
                 }
-                
+
                 voucherId = voucher.getVoucherId();
                 String rewardType = voucher.getRewardType();
 
@@ -126,11 +166,14 @@ public class CheckoutServlet extends HttpServlet {
                     scheduledTime,
                     originalPrice,
                     discountAmount,
-                    finalPrice
-            );
+                    finalPrice);
 
             if (success) {
-                sendSuccessResponse(request, response, "Đặt lịch thành công!");
+                if (bookingDAO.isSlotAvailable(bookingDate, scheduledTime)) {
+                    sendSuccessResponse(request, response, "Đặt lịch thành công!");
+                } else {
+                    sendSuccessResponse(request, response, "Khung giờ đã đầy. Bạn đã được đưa vào Danh sách chờ Ưu tiên (Waitlist). Chúng tôi sẽ xếp lịch ngay khi có người hủy!");
+                }
             } else {
                 sendErrorResponse(request, response, "Hệ thống không thể lưu lịch đặt của bạn lúc này.");
             }
@@ -141,27 +184,28 @@ public class CheckoutServlet extends HttpServlet {
             // QUAN TRỌNG: Bẫy lỗi và bắt chuỗi lỗi cụ thể từ Stored Procedure văng ra
             // Ví dụ: "Khung giờ này đã đầy, vui lòng chọn giờ khác."
             LOGGER.log(Level.SEVERE, "Lỗi xảy ra trong quá trình thực hiện Checkout:", ex);
-            
+
             String errMsg = ex.getMessage();
             if (errMsg == null || errMsg.trim().isEmpty()) {
                 errMsg = "Lỗi hệ thống khi tạo lịch đặt.";
             }
-            
+
             // Trả lỗi ngược về phía giao diện (Frontend)
             sendErrorResponse(request, response, errMsg);
         }
     }
 
     /**
-     * Gửi phản hồi lỗi về Frontend. Hỗ trợ tự động chuyển đổi JSON (nếu là AJAX) hoặc Redirect (nếu là Form submit thường).
+     * Gửi phản hồi lỗi về Frontend. Hỗ trợ tự động chuyển đổi JSON (nếu là AJAX)
+     * hoặc Redirect (nếu là Form submit thường).
      */
     private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
-        
+
         String acceptHeader = request.getHeader("Accept");
         String requestedWith = request.getHeader("X-Requested-With");
-        
-        if ((acceptHeader != null && acceptHeader.contains("application/json")) 
+
+        if ((acceptHeader != null && acceptHeader.contains("application/json"))
                 || "XMLHttpRequest".equals(requestedWith)) {
             response.setContentType("application/json;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
@@ -179,11 +223,11 @@ public class CheckoutServlet extends HttpServlet {
      */
     private void sendSuccessResponse(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
-        
+
         String acceptHeader = request.getHeader("Accept");
         String requestedWith = request.getHeader("X-Requested-With");
-        
-        if ((acceptHeader != null && acceptHeader.contains("application/json")) 
+
+        if ((acceptHeader != null && acceptHeader.contains("application/json"))
                 || "XMLHttpRequest".equals(requestedWith)) {
             response.setContentType("application/json;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
@@ -197,13 +241,14 @@ public class CheckoutServlet extends HttpServlet {
     }
 
     private String escapeJson(String text) {
-        if (text == null) return "";
+        if (text == null)
+            return "";
         return text.replace("\\", "\\\\")
-                   .replace("\"", "\\\"")
-                   .replace("\b", "\\b")
-                   .replace("\f", "\\f")
-                   .replace("\n", "\\n")
-                   .replace("\r", "\\r")
-                   .replace("\t", "\\t");
+                .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }

@@ -1,7 +1,5 @@
 package dao;
 
-import dto.Booking;
-import dto.Voucher;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,32 +11,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import dto.Booking;
 import dto.BookingSlotCapacity;
+import dto.Voucher;
 import utils.DBContext;
 
 public class BookingDAO {
     private static final Logger LOGGER = Logger.getLogger(BookingDAO.class.getName());
 
     public boolean createBookingTransaction(int customerId, int serviceId, int vehicleId, Integer voucherId,
-                                            Date bookingDate, Time scheduledTime,
-                                            double originalPrice, double discountAmount, double finalPrice) throws Exception {
+            Date bookingDate, Time scheduledTime,
+            double originalPrice, double discountAmount, double finalPrice) throws Exception {
         boolean success = false;
         String sql = "{CALL sp_CreateBookingTransaction(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
         try (Connection cn = DBContext.getConnection();
-             CallableStatement cs = cn.prepareCall(sql)) {
+                CallableStatement cs = cn.prepareCall(sql)) {
 
             cs.setInt(1, customerId);
             cs.setInt(2, serviceId);
             cs.setInt(3, vehicleId);
-            
+
             if (voucherId != null) {
                 cs.setInt(4, voucherId);
             } else {
                 cs.setNull(4, java.sql.Types.INTEGER);
             }
-            
+
             cs.setDate(5, bookingDate);
             cs.setTime(6, scheduledTime);
             cs.setDouble(7, originalPrice);
@@ -63,24 +63,23 @@ public class BookingDAO {
         List<dto.Booking> list = new java.util.ArrayList<>();
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
         try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+                java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
             try (java.sql.ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     list.add(new dto.Booking(
-                        rs.getInt("BookingID"),
-                        rs.getInt("CustomerID"),
-                        rs.getInt("ServiceID"),
-                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
-                        rs.getString("LicensePlate"),
-                        rs.getTimestamp("BookingDate"),
-                        rs.getTimestamp("ScheduledTime"),
-                        rs.getDouble("OriginalPrice"),
-                        rs.getDouble("DiscountAmount"),
-                        rs.getDouble("FinalPrice"),
-                        rs.getString("Status"),
-                        rs.getInt("PriorityScore")
-                    ));
+                            rs.getInt("BookingID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("ServiceID"),
+                            rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                            rs.getString("LicensePlate"),
+                            rs.getTimestamp("BookingDate"),
+                            rs.getTimestamp("ScheduledTime"),
+                            rs.getDouble("OriginalPrice"),
+                            rs.getDouble("DiscountAmount"),
+                            rs.getDouble("FinalPrice"),
+                            rs.getString("Status"),
+                            rs.getInt("PriorityScore")));
                 }
             }
         } catch (SQLException e) {
@@ -93,11 +92,11 @@ public class BookingDAO {
         boolean success = false;
         String sql = "UPDATE [Bookings] SET [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
         try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
-            
+                java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, newStatus);
             st.setInt(2, bookingId);
-            
+
             int rows = st.executeUpdate();
             if (rows > 0) {
                 success = true;
@@ -121,19 +120,18 @@ public class BookingDAO {
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     booking = new dto.Booking(
-                        rs.getInt("BookingID"),
-                        rs.getInt("CustomerID"),
-                        rs.getInt("ServiceID"),
-                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
-                        rs.getString("LicensePlate"),
-                        rs.getTimestamp("BookingDate"),
-                        rs.getTimestamp("ScheduledTime"),
-                        rs.getDouble("OriginalPrice"),
-                        rs.getDouble("DiscountAmount"),
-                        rs.getDouble("FinalPrice"),
-                        rs.getString("Status"),
-                        rs.getInt("PriorityScore")
-                    );
+                            rs.getInt("BookingID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("ServiceID"),
+                            rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                            rs.getString("LicensePlate"),
+                            rs.getTimestamp("BookingDate"),
+                            rs.getTimestamp("ScheduledTime"),
+                            rs.getDouble("OriginalPrice"),
+                            rs.getDouble("DiscountAmount"),
+                            rs.getDouble("FinalPrice"),
+                            rs.getString("Status"),
+                            rs.getInt("PriorityScore"));
                 }
             }
         } catch (SQLException e) {
@@ -147,47 +145,45 @@ public class BookingDAO {
     }
 
     public Voucher getActiveVoucherByCode(String voucherCode, int customerId) throws Exception {
-    String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status " +
-                 "FROM Vouchers " +
-                 "WHERE VoucherCode = ? AND CustomerID = ? AND Status = 'Unused' AND ExpiryDate >= GETDATE()";
-    try (Connection cn = utils.DBContext.getConnection();
-         PreparedStatement st = cn.prepareStatement(sql)) {
-        st.setString(1, voucherCode);
-        st.setInt(2, customerId);
-        try (ResultSet rs = st.executeQuery()) {
-            if (rs.next()) {
-                return new Voucher(
-                    rs.getInt("VoucherID"),
-                    rs.getInt("CustomerID"),
-                    rs.getString("VoucherCode"),
-                    rs.getString("RewardType"),
-                    rs.getInt("PointsCost"),
-                    rs.getTimestamp("ExpiryDate"),
-                    rs.getString("Status")
-                );
+        String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status " +
+                "FROM Vouchers " +
+                "WHERE VoucherCode = ? AND CustomerID = ? AND Status = 'Unused' AND ExpiryDate >= GETDATE()";
+        try (Connection cn = utils.DBContext.getConnection();
+                PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setString(1, voucherCode);
+            st.setInt(2, customerId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return new Voucher(
+                            rs.getInt("VoucherID"),
+                            rs.getInt("CustomerID"),
+                            rs.getString("VoucherCode"),
+                            rs.getString("RewardType"),
+                            rs.getInt("PointsCost"),
+                            rs.getTimestamp("ExpiryDate"),
+                            rs.getString("Status"));
+                }
             }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi khi kiểm tra mã Voucher: " + e.getMessage(), e);
         }
-    } catch (SQLException e) {
-        throw new Exception("Lỗi khi kiểm tra mã Voucher: " + e.getMessage(),e);
+        return null;
     }
-    return null;
-}
 
     public List<BookingSlotCapacity> getSlotsByDate(Date date) throws Exception {
         List<BookingSlotCapacity> list = new ArrayList<>();
         String sql = "SELECT * FROM BookingSlotCapacity WHERE SlotDate = ?";
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
+                PreparedStatement st = conn.prepareStatement(sql)) {
             st.setDate(1, date);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     BookingSlotCapacity slot = new BookingSlotCapacity(
-                        rs.getInt("SlotID"),
-                        rs.getDate("SlotDate"),
-                        rs.getTime("TimeSlot"),
-                        rs.getInt("MaxCapacity"),
-                        rs.getInt("CurrentBooked")
-                    );
+                            rs.getInt("SlotID"),
+                            rs.getDate("SlotDate"),
+                            rs.getTime("TimeSlot"),
+                            rs.getInt("MaxCapacity"),
+                            rs.getInt("CurrentBooked"));
                     list.add(slot);
                 }
             }
@@ -202,24 +198,23 @@ public class BookingDAO {
         List<dto.Booking> list = new java.util.ArrayList<>();
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show') ORDER BY b.BookingDate DESC, b.ScheduledTime DESC";
         try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+                java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
             try (java.sql.ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     list.add(new dto.Booking(
-                        rs.getInt("BookingID"),
-                        rs.getInt("CustomerID"),
-                        rs.getInt("ServiceID"),
-                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
-                        rs.getString("LicensePlate"),
-                        rs.getTimestamp("BookingDate"),
-                        rs.getTimestamp("ScheduledTime"),
-                        rs.getDouble("OriginalPrice"),
-                        rs.getDouble("DiscountAmount"),
-                        rs.getDouble("FinalPrice"),
-                        rs.getString("Status"),
-                        rs.getInt("PriorityScore")
-                    ));
+                            rs.getInt("BookingID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("ServiceID"),
+                            rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                            rs.getString("LicensePlate"),
+                            rs.getTimestamp("BookingDate"),
+                            rs.getTimestamp("ScheduledTime"),
+                            rs.getDouble("OriginalPrice"),
+                            rs.getDouble("DiscountAmount"),
+                            rs.getDouble("FinalPrice"),
+                            rs.getString("Status"),
+                            rs.getInt("PriorityScore")));
                 }
             }
         } catch (SQLException e) {
@@ -232,7 +227,7 @@ public class BookingDAO {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM Bookings WHERE CustomerID = ? AND Status = 'Completed'";
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
+                PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, customerId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -249,7 +244,7 @@ public class BookingDAO {
         double total = 0;
         String sql = "SELECT SUM(FinalPrice) FROM Bookings WHERE CustomerID = ? AND Status = 'Completed'";
         try (Connection conn = DBContext.getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
+                PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, customerId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -260,5 +255,51 @@ public class BookingDAO {
             LOGGER.log(Level.SEVERE, "Error summing total spend", e);
         }
         return total;
+    }
+
+    public boolean isSlotAvailable(Date date, Time time) throws SQLException {
+        boolean isAvailable = false;
+
+        String sql = "SELECT (MaxCapacity - CurrentBooked) AS AvailableSlots " +
+                "FROM BookingSlotCapacity " +
+                "WHERE SlotDate = ? AND TimeSlot = ?";
+        try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setDate(1, date);
+            st.setTime(2, time);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    int available = rs.getInt("AvailableSlots");
+                    if (available > 0) {
+                        isAvailable = true;
+                    }
+                } else {
+                    isAvailable = true;
+                }
+            }
+        }
+        return isAvailable;
+    }
+
+    /**
+     * Tự động quét và hủy các lịch đặt quá hạn 15 phút chưa Check-in.
+     */
+    public void autoCancelExpiredBookings() {
+        // Cộng BookingDate và ScheduledTime thành 1 biến DateTime hoàn chỉnh,
+        // sau đó so sánh xem nó có cũ hơn (Thời gian hiện tại - 15 phút) hay không.
+        String sql = "UPDATE Bookings " +
+                     "SET Status = 'Cancelled', UpdatedAt = GETDATE() " +
+                     "WHERE Status = 'Pending' " +
+                     "AND CAST(CONCAT(BookingDate, ' ', ScheduledTime) AS DATETIME) <= DATEADD(MINUTE, -15, GETDATE())";
+                     
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+             
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                LOGGER.info("Hệ thống (Background Job) đã tự động hủy " + rowsAffected + " lịch hẹn quá hạn 15 phút. Trigger tự động đã được kích hoạt.");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Lỗi Background Job khi quét lịch hẹn quá hạn", e);
+        }
     }
 }

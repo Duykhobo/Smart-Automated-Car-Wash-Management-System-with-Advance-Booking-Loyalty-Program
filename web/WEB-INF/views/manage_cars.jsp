@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <!DOCTYPE html>
         <html lang="vi">
@@ -34,9 +34,13 @@
 
             <!-- Sidebar -->
             <aside class="w-64 bg-black/40 border-r border-gray-800 hidden md:flex flex-col">
-                <a href="${pageContext.request.contextPath}/account/dashboard" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="AutoWash Logo" class="h-10 w-10 object-cover rounded-xl shadow-md" onerror="this.onerror=null; this.outerHTML='<div class=\'w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center\'><svg class=\'w-6 h-6 text-black\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13 10V3L4 14h7v7l9-11h-7z\'></path></svg></div>';">
-                    <span class="text-xl font-bold tracking-tight text-white">AutoWash<span class="text-btn-primary">Pro</span></span>
+                <a href="${pageContext.request.contextPath}/account/dashboard"
+                    class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <img src="${pageContext.request.contextPath}/assets/images/logo.jpg" alt="AutoWash Logo"
+                        class="h-10 w-10 object-cover rounded-xl shadow-md"
+                        onerror="this.onerror=null; this.outerHTML='<div class=\'w-10 h-10 bg-btn-primary rounded-xl flex items-center justify-center\'><svg class=\'w-6 h-6 text-black\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M13 10V3L4 14h7v7l9-11h-7z\'></path></svg></div>';">
+                    <span class="text-xl font-bold tracking-tight text-white">AutoWash<span
+                            class="text-btn-primary">Pro</span></span>
                 </a>
 
                 <nav class="flex-1 px-4 py-6 space-y-2">

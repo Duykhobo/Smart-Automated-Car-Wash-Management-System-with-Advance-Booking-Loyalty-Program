@@ -1,4 +1,4 @@
-<%@page import="dto.User" %>
+﻿<%@page import="dto.User" %>
     <%@page import="dto.Customer" %>
         <%@page import="dao.CustomerDAO" %>
             <%@page import="utils.AppConstants" %>
@@ -68,7 +68,7 @@
                                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                                                 </path>
                                             </svg>
-                                            <span class="font-medium">Trang chủ</span>
+                                            <span class="font-medium">Trang chá»§</span>
                                         </a>
                                         <a href="${pageContext.request.contextPath}/bookings"
                                             class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors">
@@ -294,7 +294,7 @@
                                                 <!-- Nhập lại mật khẩu mới -->
                                                 <div class="space-y-1.5">
                                                     <label class="text-gray-300 text-sm font-medium">Nhập lại mật khẩu
-                                                        mới *</label>
+                                                        má»›i *</label>
                                                     <div class="relative">
                                                         <div
                                                             class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
@@ -363,7 +363,7 @@
                                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                                                 </path>
                                             </svg>
-                                            <span class="text-[10px] font-medium">Trang chủ</span>
+                                            <span class="text-[10px] font-medium">Trang chá»§</span>
                                         </a>
                                         <a href="${pageContext.request.contextPath}/bookings"
                                             class="flex flex-col items-center gap-1 w-16 text-gray-400 hover:text-white transition-colors">
@@ -415,3 +415,7 @@
                     </body>
 
                     </html>
+
+
+
+

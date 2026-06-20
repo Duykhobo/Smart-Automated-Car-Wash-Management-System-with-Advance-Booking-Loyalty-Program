@@ -1,22 +1,22 @@
 /**
  * Validate the registration form and prepare the submit button before form submission.
- * If validation fails, the submission is prevented and the function returns `false`. If validation succeeds, the submit button text is changed to "Đang xử lý..." and the button is disabled shortly after to help prevent double submission.
+ * If validation fails, the submission is prevented and the function returns `false`. If validation succeeds, the submit button text is changed to "\u0110ang x\u1eed l\u00fd..." and the button is disabled shortly after to help prevent double submission.
  * @param {Event} event - The form submit event.
  * @returns {boolean} `true` if validation passed and submission may proceed, `false` if validation failed and submission was prevented.
  */
 function handleRegister(event) {
-    // 1. Chạy Validation Front-end
+    // 1. Ch\u1ea1y Validation Front-end
     if (!validateForm()) {
-        event.preventDefault(); // Chặn submit nếu form không hợp lệ (báo đỏ)
+        event.preventDefault(); // Ch\u1eb7n submit n\u1ebfu form kh\u00f4ng h\u1ee3p l\u1ec7 (b\u00e1o \u0111\u1ecf)
         return false;
     }
 
-    // Form hợp lệ -> Để cho HTML tự submit lên Servlet!
+    // Form h\u1ee3p l\u1ec7 -> \u0110\u1ec3 cho HTML t\u1ef1 submit l\u00ean Servlet!
     const submitBtn = document.querySelector('button[type="submit"]');
-    submitBtn.innerText = "Đang xử lý...";
+    submitBtn.innerText = "\u0110ang x\u1eed l\u00fd...";
     
-    // Dùng setTimeout để tránh vô hiệu hóa nút ngay lập tức trong luồng đồng bộ, 
-    // tránh làm trình duyệt dừng hoặc từ chối gửi form đi.
+    // D\u00f9ng setTimeout \u0111\u1ec3 tr\u00e1nh v\u00f4 hi\u1ec7u h\u00f3a n\u00fat ngay l\u1eadp t\u1ee9c trong lu\u1ed3ng \u0111\u1ed3ng b\u1ed9, 
+    // tr\u00e1nh l\u00e0m tr\u00ecnh duy\u1ec7t d\u1eebng ho\u1eb7c t\u1eeb ch\u1ed1i g\u1eedi form \u0111i.
     setTimeout(() => {
         submitBtn.disabled = true;
     }, 10);
@@ -81,38 +81,38 @@ function validateField(id) {
     switch (id) {
         case 'fullname':
             if (val.length < 2) {
-                showErrorInline(id, "Họ và Tên phải có ít nhất 2 ký tự.");
+                showErrorInline(id, "H\u1ecd v\u00e0 T\u00ean ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t 2 k\u00fd t\u1ef1.");
                 return false;
             }
             break;
         case 'phone':
             if (!RegexConstants.PHONE_VN.test(val)) {
-                showErrorInline(id, "Số điện thoại không hợp lệ (Phải là đầu số VN hợp lệ như 03, 09... và đủ 10 số).");
+                showErrorInline(id, "S\u1ed1 \u0111i\u1ec7n tho\u1ea1i kh\u00f4ng h\u1ee3p l\u1ec7 (Ph\u1ea3i l\u00e0 \u0111\u1ea7u s\u1ed1 VN h\u1ee3p l\u1ec7 nh\u01b0 03, 09... v\u00e0 \u0111\u1ee7 10 s\u1ed1).");
                 return false;
             }
             break;
         case 'plate':
             if (!RegexConstants.PLATE_VN.test(val.toUpperCase())) {
-                showErrorInline(id, "Biển số xe không hợp lệ (VD chuẩn: 51F-12345, 29A1-123.45).");
+                showErrorInline(id, "Bi\u1ec3n s\u1ed1 xe kh\u00f4ng h\u1ee3p l\u1ec7 (VD chu\u1ea9n: 51F-12345, 29A1-123.45).");
                 return false;
             }
             break;
         case 'password':
             if (!RegexConstants.PASSWORD_STRONG.test(val)) {
-                showErrorInline(id, "Mật khẩu phải có ít nhất 8 ký tự, chứa chữ viết hoa và ký tự đặc biệt.");
+                showErrorInline(id, "M\u1eadt kh\u1ea9u ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t 8 k\u00fd t\u1ef1, ch\u1ee9a ch\u1eef vi\u1ebft hoa v\u00e0 k\u00fd t\u1ef1 \u0111\u1eb7c bi\u1ec7t.");
                 return false;
             }
             break;
         case 'confirm_password':
             const pwd = document.getElementById('password').value;
             if (val !== pwd || val === '') {
-                showErrorInline(id, "Xác nhận mật khẩu không khớp!");
+                showErrorInline(id, "X\u00e1c nh\u1eadn m\u1eadt kh\u1ea9u kh\u00f4ng kh\u1edbp!");
                 return false;
             }
             break;
         case 'terms':
             if (!el.checked) {
-                showErrorInline(id, "Bạn phải đồng ý với Điều khoản dịch vụ.");
+                showErrorInline(id, "B\u1ea1n ph\u1ea3i \u0111\u1ed3ng \u00fd v\u1edbi \u0110i\u1ec1u kho\u1ea3n d\u1ecbch v\u1ee5.");
                 return false;
             }
             break;

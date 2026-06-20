@@ -94,7 +94,7 @@
 
                     <p class="font-sans font-normal text-text-muted text-base md:text-xl max-w-2xl leading-relaxed">
                         Hệ thống đặt lịch thông minh tích hợp Loyalty Program. Đặt lịch trước lên đến 14 ngày, tích
-                        Ä'iểm đổi quà và tận hưởng đặc quyền ưu tiên.
+                        điểm đổi quà và tận hưởng đặc quyền ưu tiên.
                     </p>
 
                     <div class="flex flex-col sm:flex-row w-full max-w-md items-center justify-center gap-4 mt-8">
@@ -144,7 +144,7 @@
                                 bằng bọt tuyết.</p>
                         </div>
                         <div class="text-3xl font-display font-bold text-[#00d4ff]">100.000<span
-                                class="text-base text-text-muted font-sans font-normal">Ä'</span></div>
+                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
                                     class="w-4 h-4 text-success"></i> Xịt gầm</li>
@@ -175,7 +175,7 @@
                                 tiết không gian bên trong.</p>
                         </div>
                         <div class="text-3xl font-display font-bold text-[#00d4ff] relative z-10">150.000<span
-                                class="text-base text-text-muted font-sans font-normal">Ä'</span></div>
+                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6 relative z-10">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
                                     class="w-4 h-4 text-success"></i> Bao gồm Rửa Bọt Tuyết</li>
@@ -200,7 +200,7 @@
                                 bóng tối đa.</p>
                         </div>
                         <div class="text-3xl font-display font-bold text-amber-400">350.000<span
-                                class="text-base text-text-muted font-sans font-normal">Ä'</span></div>
+                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
                                     class="w-4 h-4 text-amber-400"></i> Bao gồm Vệ Sinh Nội Thất</li>
@@ -308,7 +308,8 @@
                         <ul class="flex flex-col gap-2 relative z-10">
                             <li class="flex items-start gap-2 text-sm text-white font-medium"><i
                                     data-lucide="calendar-clock" class="w-4 h-4 mt-0.5 text-[#00d4ff]"></i> Đặt trước
-                                <b>14 ngày</b></li>
+                                <b>14 ngày</b>
+                            </li>
                             <li class="flex items-start gap-2 text-sm text-white"><i data-lucide="coins"
                                     class="w-4 h-4 mt-0.5 text-[#00d4ff]"></i> Tích lũy 1.3x điểm</li>
                             <li class="flex items-start gap-2 text-sm text-white font-medium"><i data-lucide="zap"

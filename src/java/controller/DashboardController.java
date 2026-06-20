@@ -60,10 +60,14 @@ public class DashboardController extends HttpServlet {
         CustomerDAO cusDAO = new CustomerDAO();
         Customer cus = cusDAO.getCustomerByAccountId(user.getUserId());
         if (cus != null) {
+            dao.BookingDAO bookingDAO = new dao.BookingDAO();
+            // Lấy dữ liệu thật từ Bookings table
+            cus.setTotalWashes(bookingDAO.getTotalWashes(cus.getCustomerId()));
+            cus.setTotalSpend(bookingDAO.getTotalSpend(cus.getCustomerId()));
+            
             request.setAttribute("customer", cus);
             
             // 1. Fetch upcoming bookings
-            dao.BookingDAO bookingDAO = new dao.BookingDAO();
             java.util.List<dto.Booking> upcomingBookings = bookingDAO.getUpcomingBookings(cus.getCustomerId());
             if (!upcomingBookings.isEmpty()) {
                 request.setAttribute("upcomingBooking", upcomingBookings.get(0)); // Show the next immediate booking

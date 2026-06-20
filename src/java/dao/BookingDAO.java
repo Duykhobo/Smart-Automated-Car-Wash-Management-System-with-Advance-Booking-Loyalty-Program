@@ -168,7 +168,7 @@ public class BookingDAO {
             }
         }
     } catch (SQLException e) {
-        throw new Exception("Lỗi khi kiểm tra mã Voucher: " + e.getMessage());
+        throw new Exception("Lỗi khi kiểm tra mã Voucher: " + e.getMessage(),e);
     }
     return null;
 }

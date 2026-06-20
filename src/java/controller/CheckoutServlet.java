@@ -62,11 +62,13 @@ public class CheckoutServlet extends HttpServlet {
                 sendErrorResponse(request, response, "Thông tin đặt lịch không đầy đủ. Vui lòng kiểm tra lại.");
                 return;
             }
-
+            if (timeStr.length() == 5) { // Chỉ có HH:mm
+                timeStr += ":00";
+            }
+            Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr));
             int vehicleId = Integer.parseInt(vehicleIdStr);
             int serviceId = Integer.parseInt(serviceIdStr);
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
-            Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr + ":00"));
 
             // 4. Lấy thông tin gói dịch vụ từ DB để xác định giá gốc
             ServiceDAO serviceDAO = new ServiceDAO();
@@ -79,10 +81,10 @@ public class CheckoutServlet extends HttpServlet {
             double originalPrice = selectedService.getBasePrice();
             double discountAmount = 0.0;
             Integer voucherId = null;
-
+            BookingDAO bookingDAO = new BookingDAO();
             // 5. Kiểm tra và áp dụng Voucher giảm giá nếu khách hàng có điền
             if (voucherCode != null && !voucherCode.trim().isEmpty()) {
-                BookingDAO bookingDAO = new BookingDAO();
+                
                 Voucher voucher = bookingDAO.getActiveVoucherByCode(voucherCode.trim(), customer.getCustomerId());
                 
                 if (voucher == null) {
@@ -115,7 +117,6 @@ public class CheckoutServlet extends HttpServlet {
             }
 
             // 6. Thực thi Booking Transaction
-            BookingDAO bookingDAO = new BookingDAO();
             boolean success = bookingDAO.createBookingTransaction(
                     customer.getCustomerId(),
                     serviceId,

@@ -88,6 +88,8 @@
     <body
         class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden relative">
 
+        <!-- Modals injected at bottom -->
+
         <!-- Global toast included at bottom -->
 
         <!-- Desktop Sidebar -->
@@ -236,10 +238,10 @@
                                                     <a href="${pageContext.request.contextPath}/customer/booking_history?action=edit&id=${booking.bookingId}" class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30 text-sm font-semibold transition-colors text-center">
                                                         Sửa
                                                     </a>
-                                                    <form action="${pageContext.request.contextPath}/BookingHistoryController" method="POST" class="flex-1 sm:flex-none m-0 p-0" onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác.');">
+                                                    <form action="${pageContext.request.contextPath}/BookingHistoryController" method="POST" class="flex-1 sm:flex-none m-0 p-0" id="cancelForm_${booking.bookingId}">
                                                         <input type="hidden" name="action" value="cancel" />
                                                         <input type="hidden" name="bookingId" value="${booking.bookingId}" />
-                                                        <button type="submit" class="w-full px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
+                                                        <button type="button" onclick="showGlobalConfirmModal('Hủy lịch hẹn', 'Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác và số suất sẽ được nhường cho người khác.', 'Xác nhận Hủy', function() { document.getElementById('cancelForm_${booking.bookingId}').submit(); })" class="w-full px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
                                                             Hủy Lịch
                                                         </button>
                                                     </form>
@@ -334,7 +336,8 @@
         <script>
             lucide.createIcons();
         </script>
-        <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 
 </html>

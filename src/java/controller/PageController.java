@@ -59,19 +59,40 @@ public class PageController extends HttpServlet {
                     dao.CustomerDAO cDAO = new dao.CustomerDAO();
                     dto.Customer c = cDAO.getCustomerByAccountId(currentUser.getUserId());
                     if (c != null) {
-                        // Gọi SQL chèn dữ liệu
-                        String sql = "INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, FinalPrice, Status) VALUES "
-                                + "(?, 1, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() + 1 AS DATE), '10:00:00', 100000, 100000, 'Pending'),"
-                                + "(?, 2, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 1 AS DATE), '14:00:00', 150000, 150000, 'Completed'),"
-                                + "(?, 3, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 3 AS DATE), '09:00:00', 350000, 350000, 'Cancelled')";
-                        try ( java.sql.Connection conn = utils.DBContext.getConnection();  java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
+                        try ( java.sql.Connection conn = utils.DBContext.getConnection(); 
+                              java.sql.PreparedStatement st = conn.prepareStatement("SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?")) {
                             st.setInt(1, c.getCustomerId());
-                            st.setInt(2, c.getCustomerId());
-                            st.setInt(3, c.getCustomerId());
-                            st.setInt(4, c.getCustomerId());
-                            st.setInt(5, c.getCustomerId());
-                            st.setInt(6, c.getCustomerId());
-                            st.executeUpdate();
+                            java.sql.ResultSet rs = st.executeQuery();
+                            if (rs.next()) {
+                                int vehicleId = rs.getInt("VehicleID");
+                                dao.BookingDAO bDAO = new dao.BookingDAO();
+                                
+                                // 1. Upcoming Booking (Ngày mai, 10:00)
+                                java.sql.Date tomorrow = new java.sql.Date(System.currentTimeMillis() + 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 1, vehicleId, null, tomorrow, java.sql.Time.valueOf("10:00:00"), 100000, 0, 100000);
+                                
+                                // 2. Past Completed Booking (Hôm qua, 14:00)
+                                java.sql.Date yesterday = new java.sql.Date(System.currentTimeMillis() - 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 2, vehicleId, null, yesterday, java.sql.Time.valueOf("14:00:00"), 150000, 0, 150000);
+                                // Set status to Completed
+                                String sqlComplete = "UPDATE Bookings SET Status = 'Completed' WHERE CustomerID = ? AND BookingDate = ?";
+                                try (java.sql.PreparedStatement st2 = conn.prepareStatement(sqlComplete)) {
+                                    st2.setInt(1, c.getCustomerId());
+                                    st2.setDate(2, yesterday);
+                                    st2.executeUpdate();
+                                }
+                                
+                                // 3. Past Cancelled Booking (3 ngày trước, 09:00)
+                                java.sql.Date pastDay = new java.sql.Date(System.currentTimeMillis() - 3 * 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 3, vehicleId, null, pastDay, java.sql.Time.valueOf("09:00:00"), 350000, 0, 350000);
+                                // Set status to Cancelled
+                                String sqlCancel = "UPDATE Bookings SET Status = 'Cancelled' WHERE CustomerID = ? AND BookingDate = ?";
+                                try (java.sql.PreparedStatement st3 = conn.prepareStatement(sqlCancel)) {
+                                    st3.setInt(1, c.getCustomerId());
+                                    st3.setDate(2, pastDay);
+                                    st3.executeUpdate();
+                                }
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

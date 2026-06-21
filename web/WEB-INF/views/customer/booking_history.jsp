@@ -80,7 +80,7 @@
         </style>
         <c:if test="${param.msg == 'UpdateError'}">
         <script>
-            alert('Cập nhật thất bại. Lỗi: ${param.err}');
+            showJSToast('error', 'Cập nhật thất bại. Lỗi: ${param.err}');
         </script>
     </c:if>
 </head>

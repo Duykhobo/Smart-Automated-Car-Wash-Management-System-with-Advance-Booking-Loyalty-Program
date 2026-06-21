@@ -11,27 +11,27 @@ import java.util.List;
 import utils.DBContext;
 
 public class BookingDAO {
+
     private static final Logger LOGGER = Logger.getLogger(BookingDAO.class.getName());
 
     public boolean createBookingTransaction(int customerId, int serviceId, int vehicleId, Integer voucherId,
-                                            Date bookingDate, Time scheduledTime,
-                                            double originalPrice, double discountAmount, double finalPrice) throws Exception {
+            Date bookingDate, Time scheduledTime,
+            double originalPrice, double discountAmount, double finalPrice) throws Exception {
         boolean success = false;
         String sql = "{CALL sp_CreateBookingTransaction(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try (Connection cn = DBContext.getConnection();
-             CallableStatement cs = cn.prepareCall(sql)) {
+        try ( Connection cn = DBContext.getConnection();  CallableStatement cs = cn.prepareCall(sql)) {
 
             cs.setInt(1, customerId);
             cs.setInt(2, serviceId);
             cs.setInt(3, vehicleId);
-            
+
             if (voucherId != null) {
                 cs.setInt(4, voucherId);
             } else {
                 cs.setNull(4, java.sql.Types.INTEGER);
             }
-            
+
             cs.setDate(5, bookingDate);
             cs.setTime(6, scheduledTime);
             cs.setDouble(7, originalPrice);
@@ -55,24 +55,23 @@ public class BookingDAO {
     public List<dto.Booking> getUpcomingBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed') ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
-        try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+        try ( Connection cn = DBContext.getConnection();  java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
-            try (java.sql.ResultSet rs = st.executeQuery()) {
+            try ( java.sql.ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     list.add(new dto.Booking(
-                        rs.getInt("BookingID"),
-                        rs.getInt("CustomerID"),
-                        rs.getInt("ServiceID"),
-                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
-                        rs.getString("LicensePlate"),
-                        rs.getTimestamp("BookingDate"),
-                        rs.getTimestamp("ScheduledTime"),
-                        rs.getDouble("OriginalPrice"),
-                        rs.getDouble("DiscountAmount"),
-                        rs.getDouble("FinalPrice"),
-                        rs.getString("Status"),
-                        rs.getInt("PriorityScore")
+                            rs.getInt("BookingID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("ServiceID"),
+                            rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                            rs.getString("LicensePlate"),
+                            rs.getTimestamp("BookingDate"),
+                            rs.getTimestamp("ScheduledTime"),
+                            rs.getDouble("OriginalPrice"),
+                            rs.getDouble("DiscountAmount"),
+                            rs.getDouble("FinalPrice"),
+                            rs.getString("Status"),
+                            rs.getInt("PriorityScore")
                     ));
                 }
             }
@@ -85,12 +84,11 @@ public class BookingDAO {
     public boolean updateBookingStatus(int bookingId, String newStatus) throws SQLException {
         boolean success = false;
         String sql = "UPDATE [Bookings] SET [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
-        try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
-            
+        try ( Connection cn = DBContext.getConnection();  java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+
             st.setString(1, newStatus);
             st.setInt(2, bookingId);
-            
+
             int rows = st.executeUpdate();
             if (rows > 0) {
                 success = true;
@@ -105,27 +103,45 @@ public class BookingDAO {
         return success;
     }
 
+    public boolean cancelBookingTransaction(
+            int bookingId,
+            int customerId) throws Exception {
+
+        String sql = "{CALL sp_CancelBookingTransaction(?, ?)}";
+
+        try ( Connection cn = DBContext.getConnection();  CallableStatement cs = cn.prepareCall(sql)) {
+
+            cs.setInt(1, bookingId);
+            cs.setInt(2, customerId);
+            cs.execute();
+            return true;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error cancelling booking", e);
+            throw new Exception(e.getMessage(), e);
+        }
+    }
+
     public dto.Booking getBookingById(int bookingId) throws SQLException {
         dto.Booking booking = null;
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
-        try (Connection cn = DBContext.getConnection();
-             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+        try ( Connection cn = DBContext.getConnection();  java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, bookingId);
-            try (java.sql.ResultSet rs = st.executeQuery()) {
+            try ( java.sql.ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     booking = new dto.Booking(
-                        rs.getInt("BookingID"),
-                        rs.getInt("CustomerID"),
-                        rs.getInt("ServiceID"),
-                        rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
-                        rs.getString("LicensePlate"),
-                        rs.getTimestamp("BookingDate"),
-                        rs.getTimestamp("ScheduledTime"),
-                        rs.getDouble("OriginalPrice"),
-                        rs.getDouble("DiscountAmount"),
-                        rs.getDouble("FinalPrice"),
-                        rs.getString("Status"),
-                        rs.getInt("PriorityScore")
+                            rs.getInt("BookingID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("ServiceID"),
+                            rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
+                            rs.getString("LicensePlate"),
+                            rs.getTimestamp("BookingDate"),
+                            rs.getTimestamp("ScheduledTime"),
+                            rs.getDouble("OriginalPrice"),
+                            rs.getDouble("DiscountAmount"),
+                            rs.getDouble("FinalPrice"),
+                            rs.getString("Status"),
+                            rs.getInt("PriorityScore")
                     );
                 }
             }

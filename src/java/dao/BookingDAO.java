@@ -20,6 +20,23 @@ import utils.DBContext;
 public class BookingDAO {
     private static final Logger LOGGER = Logger.getLogger(BookingDAO.class.getName());
 
+    /**
+     * Khởi tạo giao dịch đặt lịch mới (Booking Transaction)
+     * Đây là hàm quan trọng nhất của Booking Engine. Nó gọi Stored Procedure: sp_CreateBookingTransaction.
+     * Stored Procedure này đảm bảo an toàn về dữ liệu, chống Race Condition,
+     * tự động cộng dồn số lượng đặt chỗ và tự đưa vào danh sách Waitlist nếu khung giờ đã đầy.
+     * 
+     * @param customerId ID của khách hàng
+     * @param serviceId Gói dịch vụ đã chọn
+     * @param vehicleId Xe sẽ rửa
+     * @param voucherId Mã giảm giá (nếu có)
+     * @param bookingDate Ngày rửa xe
+     * @param scheduledTime Giờ rửa xe
+     * @param originalPrice Giá gốc
+     * @param discountAmount Số tiền giảm giá
+     * @param finalPrice Giá cuối cùng phải trả
+     * @return true nếu gọi Transaction thành công (Không phân biệt Pending hay Waitlisted)
+     */
     public boolean createBookingTransaction(int customerId, int serviceId, int vehicleId, Integer voucherId,
             Date bookingDate, Time scheduledTime,
             double originalPrice, double discountAmount, double finalPrice) throws Exception {

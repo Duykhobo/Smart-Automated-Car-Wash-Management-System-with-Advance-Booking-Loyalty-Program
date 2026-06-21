@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.annotation.MultipartConfig;
 
+/**
+ * PageController: Front Controller / Router điều hướng các trang cơ bản.
+ * Chịu trách nhiệm nhận các URL ảo (như /home, /account/dashboard) và forward 
+ * tới các JSP view hoặc các Servlet xử lý logic tương ứng.
+ * Giúp tạo URL thân thiện (SEO/User-friendly URL) thay vì lộ tên file .jsp hay Servlet.
+ */
 @WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/account/dashboard", "/bookings", "/account/profile", "/account/change-password", "/account/payment-methods", "/customer/booking_history", "/customer/loyalty", "/customer/seed_demo"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
 public class PageController extends HttpServlet {

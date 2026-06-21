@@ -224,7 +224,7 @@ public class BookingHistoryController extends HttpServlet {
                     double oldOriginalPrice = oldBooking.getOriginalPrice();
                     double discountAmount = 0;
                     
-                    // Sửa lỗi Hack Voucher: Tính lại số tiền giảm giá dựa trên TỈ LỆ (%) thay vì giữ nguyên con số tuyệt đối
+                    // Tính lại số tiền giảm giá dựa trên TỈ LỆ (%) thay vì giữ nguyên con số tuyệt đối
                     if (oldOriginalPrice > 0 && oldBooking.getDiscountAmount() > 0) {
                         double discountPercent = oldBooking.getDiscountAmount() / oldOriginalPrice;
                         discountAmount = originalPrice * discountPercent;

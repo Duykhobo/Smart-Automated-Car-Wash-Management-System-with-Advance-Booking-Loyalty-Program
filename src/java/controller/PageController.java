@@ -63,8 +63,24 @@ public class PageController extends HttpServlet {
                               java.sql.PreparedStatement st = conn.prepareStatement("SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?")) {
                             st.setInt(1, c.getCustomerId());
                             java.sql.ResultSet rs = st.executeQuery();
+                            int vehicleId = -1;
                             if (rs.next()) {
-                                int vehicleId = rs.getInt("VehicleID");
+                                vehicleId = rs.getInt("VehicleID");
+                            } else {
+                                // Khách chưa có xe -> Tạo tự động 1 chiếc xe để làm dữ liệu mẫu
+                                try (java.sql.PreparedStatement stV = conn.prepareStatement("INSERT INTO Vehicles (CustomerID, LicensePlate) VALUES (?, ?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                                    stV.setInt(1, c.getCustomerId());
+                                    stV.setString(2, "51F-" + (10000 + new java.util.Random().nextInt(90000)));
+                                    stV.executeUpdate();
+                                    try (java.sql.ResultSet rsV = stV.getGeneratedKeys()) {
+                                        if (rsV.next()) {
+                                            vehicleId = rsV.getInt(1);
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (vehicleId != -1) {
                                 dao.BookingDAO bDAO = new dao.BookingDAO();
                                 
                                 // 1. Upcoming Booking (Ngày mai, 10:00)

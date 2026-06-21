@@ -44,23 +44,7 @@ public class PageController extends HttpServlet {
                 view = "/WEB-INF/views/payment_methods.jsp";
                 break;
             case "/customer/booking_history":
-                dto.User sessionUserForHistory = (dto.User) request.getSession().getAttribute(utils.AppConstants.SESSION_USER_ACCOUNT);
-                if (sessionUserForHistory != null) {
-                    dao.CustomerDAO cusDAO = new dao.CustomerDAO();
-                    dto.Customer customer = cusDAO.getCustomerByAccountId(sessionUserForHistory.getUserId());
-                    if (customer != null) {
-                        dao.BookingDAO bDao = new dao.BookingDAO();
-                        
-                        customer.setTotalWashes(bDao.getTotalWashes(customer.getCustomerId()));
-                        
-                        java.util.List<dto.Booking> upcomingBookings = bDao.getUpcomingBookings(customer.getCustomerId());
-                        java.util.List<dto.Booking> historyBookings = bDao.getHistoryBookings(customer.getCustomerId());
-                        request.setAttribute("upcomingBookings", upcomingBookings);
-                        request.setAttribute("historyBookings", historyBookings);
-                        request.setAttribute("customer", customer);
-                    }
-                }
-                view = "/WEB-INF/views/customer/booking_history.jsp";
+                view = "/BookingHistoryController";
                 break;
             case "/customer/seed_demo":
                 // Tự động tạo dữ liệu mẫu (Bookings) cho người dùng hiện tại
@@ -70,15 +54,17 @@ public class PageController extends HttpServlet {
                     dto.Customer c = cDAO.getCustomerByAccountId(currentUser.getUserId());
                     if (c != null) {
                         // Gọi SQL chèn dữ liệu
-                        String sql = "INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, FinalPrice, Status) VALUES " +
-                                     "(?, 1, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() + 1 AS DATE), '10:00:00', 100000, 100000, 'Pending')," +
-                                     "(?, 2, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 1 AS DATE), '14:00:00', 150000, 150000, 'Completed')," +
-                                     "(?, 3, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 3 AS DATE), '09:00:00', 350000, 350000, 'Cancelled')";
-                        try (java.sql.Connection conn = utils.DBContext.getConnection();
-                             java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
-                            st.setInt(1, c.getCustomerId()); st.setInt(2, c.getCustomerId());
-                            st.setInt(3, c.getCustomerId()); st.setInt(4, c.getCustomerId());
-                            st.setInt(5, c.getCustomerId()); st.setInt(6, c.getCustomerId());
+                        String sql = "INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, FinalPrice, Status) VALUES "
+                                + "(?, 1, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() + 1 AS DATE), '10:00:00', 100000, 100000, 'Pending'),"
+                                + "(?, 2, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 1 AS DATE), '14:00:00', 150000, 150000, 'Completed'),"
+                                + "(?, 3, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 3 AS DATE), '09:00:00', 350000, 350000, 'Cancelled')";
+                        try ( java.sql.Connection conn = utils.DBContext.getConnection();  java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
+                            st.setInt(1, c.getCustomerId());
+                            st.setInt(2, c.getCustomerId());
+                            st.setInt(3, c.getCustomerId());
+                            st.setInt(4, c.getCustomerId());
+                            st.setInt(5, c.getCustomerId());
+                            st.setInt(6, c.getCustomerId());
                             st.executeUpdate();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -92,13 +78,13 @@ public class PageController extends HttpServlet {
                 if (sessionUser != null) {
                     dao.CustomerDAO cusDAO = new dao.CustomerDAO();
                     dto.Customer customer = cusDAO.getCustomerByAccountId(sessionUser.getUserId());
-                    
+
                     if (customer != null) {
                         int points = customer.getPointsBalance();
                         String tier = customer.getTierStatus() != null ? customer.getTierStatus().toUpperCase() : "MEMBER";
                         String nextTier = "SILVER";
                         int targetPoints = 500;
-                        
+
                         if ("SILVER".equals(tier)) {
                             nextTier = "GOLD";
                             targetPoints = 1500;
@@ -109,10 +95,10 @@ public class PageController extends HttpServlet {
                             nextTier = "MAX";
                             targetPoints = points; // Already at max
                         }
-                        
+
                         int pointsNeeded = Math.max(0, targetPoints - points);
                         int progressPercent = (targetPoints > 0) ? (int) Math.min(100, ((double) points / targetPoints) * 100) : 100;
-                        
+
                         request.setAttribute("customer", customer);
                         request.setAttribute("nextTier", nextTier);
                         request.setAttribute("targetPoints", targetPoints);

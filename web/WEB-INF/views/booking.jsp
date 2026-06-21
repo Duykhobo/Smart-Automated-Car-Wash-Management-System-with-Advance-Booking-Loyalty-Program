@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <form id="bookingForm" action="<c:url value='/BookingController'/>" method="POST" class="space-y-8">
+            <form id="bookingForm" action="${pageContext.request.contextPath}/customer/booking_history" method="POST" class="space-y-8">
             
             <!-- Select Car -->
             <section class="space-y-4">
@@ -409,9 +409,6 @@
     }
 </script>
 </body>
-</html>
-
-
 
 
 

@@ -57,7 +57,7 @@ public class BookingDAO {
             }
 
             cs.setDate(5, bookingDate);
-            cs.setTime(6, scheduledTime);
+            cs.setString(6, scheduledTime.toString());
             cs.setDouble(7, originalPrice);
             cs.setDouble(8, discountAmount);
             cs.setDouble(9, finalPrice);
@@ -147,7 +147,7 @@ public class BookingDAO {
                 String decSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] - 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME) AND [CurrentBooked] > 0";
                 try (PreparedStatement st2 = cn.prepareStatement(decSql)) {
                     st2.setDate(1, oldDate);
-                    st2.setTime(2, oldTime);
+                    st2.setString(2, oldTime.toString());
                     st2.executeUpdate();
                 }
 
@@ -158,7 +158,7 @@ public class BookingDAO {
                 int max = 3;
                 try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
                     stCheck.setDate(1, newDate);
-                    stCheck.setTime(2, newTime);
+                    stCheck.setString(2, newTime.toString());
                     try (ResultSet rs = stCheck.executeQuery()) {
                         if (rs.next()) {
                             exists = true;
@@ -177,14 +177,14 @@ public class BookingDAO {
                         String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
                         try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
                             st3.setDate(1, newDate);
-                            st3.setTime(2, newTime);
+                            st3.setString(2, newTime.toString());
                             st3.executeUpdate();
                         }
                     } else {
                         String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
                         try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
                             st4.setDate(1, newDate);
-                            st4.setTime(2, newTime);
+                            st4.setString(2, newTime.toString());
                             st4.executeUpdate();
                         }
                     }
@@ -203,7 +203,7 @@ public class BookingDAO {
                 st1.setInt(1, vehicleId);
                 st1.setInt(2, serviceId);
                 st1.setDate(3, newDate);
-                st1.setTime(4, newTime);
+                st1.setString(4, newTime.toString());
                 st1.setDouble(5, originalPrice);
                 st1.setDouble(6, discountAmount);
                 st1.setDouble(7, finalPrice);
@@ -287,7 +287,7 @@ public class BookingDAO {
                         if ("Pending".equalsIgnoreCase(status)) {
                             try (PreparedStatement pstCap = cn.prepareStatement(decreaseCapacity)) {
                                 pstCap.setDate(1, bDate);
-                                pstCap.setTime(2, bTime);
+                                pstCap.setString(2, bTime.toString());
                                 pstCap.executeUpdate();
                             }
                         }
@@ -473,7 +473,7 @@ public class BookingDAO {
                 "WHERE SlotDate = ? AND TimeSlot = ?";
         try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
             st.setDate(1, date);
-            st.setTime(2, time);
+            st.setString(2, time.toString());
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     int available = rs.getInt("AvailableSlots");
@@ -497,7 +497,7 @@ public class BookingDAO {
         try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
             st.setDate(2, date);
-            st.setTime(3, time);
+            st.setString(3, time.toString());
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     status = rs.getString("Status");

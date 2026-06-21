@@ -1,5 +1,19 @@
 package controller;
 
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import dao.BookingDAO;
 import dao.CarDao;
 import dao.CustomerDAO;
@@ -8,21 +22,9 @@ import dto.Cars;
 import dto.Customer;
 import dto.Service;
 import dto.User;
-import java.io.IOException;
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import utils.AppConstants;
 
-@WebServlet(name = "BookingController", urlPatterns = {"/BookingController"})
+@WebServlet(name = "BookingController", urlPatterns = { "/BookingController" })
 public class BookingController extends HttpServlet {
 
     @Override
@@ -52,6 +54,7 @@ public class BookingController extends HttpServlet {
 
                 // Determine Tier Name and Max Booking Days
                 String tierStatus = customer.getTierStatus();
+                String cleanTier = (tierStatus != null) ? tierStatus.trim() : "";
                 String tierName = "Member";
                 int maxBookingDays = 7;
                 String badgeClass = "badge-member";
@@ -59,8 +62,8 @@ public class BookingController extends HttpServlet {
                 String bannerBg = "bg-slate-500/20";
                 String bannerIcon = "text-slate-500";
                 String bannerText = "text-slate-400";
-                
-                if ("SILVER".equalsIgnoreCase(tierStatus)) {
+
+                if ("SILVER".equalsIgnoreCase(cleanTier)) {
                     tierName = "Silver";
                     maxBookingDays = 10;
                     badgeClass = "badge-silver";
@@ -68,7 +71,7 @@ public class BookingController extends HttpServlet {
                     bannerBg = "bg-slate-400/20";
                     bannerIcon = "text-slate-400";
                     bannerText = "text-slate-300";
-                } else if ("GOLD".equalsIgnoreCase(tierStatus)) {
+                } else if ("GOLD".equalsIgnoreCase(cleanTier)) {
                     tierName = "Gold";
                     maxBookingDays = 12;
                     badgeClass = "badge-gold";
@@ -76,7 +79,7 @@ public class BookingController extends HttpServlet {
                     bannerBg = "bg-amber-500/20";
                     bannerIcon = "text-amber-500";
                     bannerText = "text-amber-400";
-                } else if ("PLATINUM".equalsIgnoreCase(tierStatus)) {
+                } else if ("PLATINUM".equalsIgnoreCase(cleanTier)) {
                     tierName = "Platinum";
                     maxBookingDays = 14;
                     badgeClass = "badge-platinum";
@@ -85,7 +88,7 @@ public class BookingController extends HttpServlet {
                     bannerIcon = "text-[#00d4ff]";
                     bannerText = "text-cyan-400";
                 }
-                
+
                 request.setAttribute("tierName", tierName);
                 request.setAttribute("maxBookingDays", maxBookingDays);
                 request.setAttribute("badgeClass", badgeClass);
@@ -101,7 +104,6 @@ public class BookingController extends HttpServlet {
                     dynamicDays.add(today.plusDays(i));
                 }
                 request.setAttribute("dynamicDays", dynamicDays);
-
                 // Generate time slots (08:00 to 17:00)
                 List<String> timeSlots = new ArrayList<>();
                 for (int i = 8; i <= 17; i++) {
@@ -175,8 +177,7 @@ public class BookingController extends HttpServlet {
                     scheduledTime,
                     originalPrice,
                     discountAmount,
-                    finalPrice
-            );
+                    finalPrice);
 
             if (success) {
                 request.getSession().setAttribute("successMessage", "Đặt lịch thành công!");

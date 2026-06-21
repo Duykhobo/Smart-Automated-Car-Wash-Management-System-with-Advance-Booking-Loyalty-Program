@@ -380,6 +380,8 @@
                 }
             });
         </script>
-    </body>
+        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+</body>
 
     </html>

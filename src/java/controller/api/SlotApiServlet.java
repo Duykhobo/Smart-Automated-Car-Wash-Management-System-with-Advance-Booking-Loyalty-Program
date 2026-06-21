@@ -17,6 +17,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.servlet.http.HttpSession;
+import utils.AppConstants;
+import dto.User;
+
+/**
+ * API Servlet cung cấp dữ liệu về các khung giờ (slots) và sức chứa (capacity).
+ * Trả về danh sách các slot (08:00 đến 17:30) dưới định dạng JSON.
+ * Endpoint này chỉ cho phép người dùng đã đăng nhập truy cập để tránh scraping.
+ */
 @WebServlet(name = "SlotApiServlet", urlPatterns = {"/api/slots"})
 public class SlotApiServlet extends HttpServlet {
 
@@ -31,6 +40,14 @@ public class SlotApiServlet extends HttpServlet {
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        
+        // Kiểm tra bảo mật: Ngăn chặn truy cập API trái phép (Scraping)
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute(AppConstants.SESSION_USER_ACCOUNT) == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Unauthorized access. Please login first.\"}");
+            return;
+        }
         
         String dateParam = request.getParameter("date");
         if (dateParam == null || dateParam.isEmpty()) {

@@ -11,6 +11,7 @@ public class Booking {
     private int bookingId;
     private int customerId;
     private int serviceId;
+    private int vehicleId;
     private Integer voucherId;
     private String licensePlate;
     private Timestamp bookingDate;
@@ -24,10 +25,11 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(int bookingId, int customerId, int serviceId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
+    public Booking(int bookingId, int customerId, int serviceId, int vehicleId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
         this.bookingId = bookingId;
         this.customerId = customerId;
         this.serviceId = serviceId;
+        this.vehicleId = vehicleId;
         this.voucherId = voucherId;
         this.licensePlate = licensePlate;
         this.bookingDate = bookingDate;
@@ -49,6 +51,10 @@ public class Booking {
 
     public int getServiceId() {
         return serviceId;
+    }
+
+    public int getVehicleId() {
+        return vehicleId;
     }
 
     public Integer getVoucherId() {
@@ -97,6 +103,10 @@ public class Booking {
 
     public void setServiceId(int serviceId) {
         this.serviceId = serviceId;
+    }
+
+    public void setVehicleId(int vehicleId) {
+        this.vehicleId = vehicleId;
     }
 
     public void setVoucherId(Integer voucherId) {

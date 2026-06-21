@@ -17,7 +17,7 @@ import utils.AppConstants;
  * Filter này chặn mọi request (tùy urlPatterns) để kiểm tra đăng nhập. Ở đây
  * chặn các trang yêu cầu người dùng phải có tài khoản.
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/account/*", "/vehicles/*", "/bookings"})
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/account/*", "/vehicles/*", "/bookings", "/customer/*"})
 public class AuthFilter implements Filter {
 
     @Override

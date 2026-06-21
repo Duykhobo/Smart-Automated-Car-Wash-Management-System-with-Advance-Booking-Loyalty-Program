@@ -35,21 +35,7 @@
         <script src="https://unpkg.com/lucide@latest"></script>
 
         <script>
-            function rebookMock(serviceName) {
-                // Show loading state on button or a generic loading toast
-                const toast = document.getElementById('successToast');
-                if (toast) {
-                    toast.querySelector('span.font-bold').innerText = "Đang tải cấu hình...";
-                    toast.querySelector('span.text-sm').innerText = `Tự động chọn xe và gói ${serviceName}`;
-                    toast.classList.remove('translate-y-full', 'opacity-0');
-                    toast.classList.add('translate-y-0', 'opacity-100');
 
-                    setTimeout(() => {
-                        // Simulate redirect to booking page with parameters
-                        window.location.href = "${pageContext.request.contextPath}/bookings?rebook=true";
-                    }, 1500);
-                }
-            }
 
             function switchTab(tabId) {
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -65,42 +51,22 @@
 
             // Function to show Toast Notification
             function showToast(message) {
-                const toast = document.getElementById('successToast');
-                if (toast) {
-                    toast.classList.remove('translate-y-full', 'opacity-0');
-                    toast.classList.add('translate-y-0', 'opacity-100');
-
-                    // Auto hide after 3 seconds
-                    setTimeout(() => {
-                        toast.classList.remove('translate-y-0', 'opacity-100');
-                        toast.classList.add('translate-y-full', 'opacity-0');
-                    }, 3000);
-                }
+                // Handled globally now
             }
 
-            // Check if URL has ?success=true (Mocking post-booking redirect)
             document.addEventListener("DOMContentLoaded", () => {
                 const urlParams = new URLSearchParams(window.location.search);
-                // Fallback for session successMessage from backend
-                const hasSuccessSession = "${sessionScope.successMessage}" !== "";
-                if (urlParams.has('success') || hasSuccessSession) {
-                    showToast();
+                if (urlParams.has('success')) {
+                    // Handled globally if passed in session
                 }
             });
         </script>
         <style>
             /* Glassmorphism Toast */
-            .glass-toast {
-                background: rgba(10, 20, 40, 0.6);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border: 1px solid rgba(0, 212, 255, 0.3);
-                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 212, 255, 0.1);
-            }
         </style>
         <c:if test="${param.msg == 'UpdateError'}">
         <script>
-            alert('Cập nhật thất bại. Lỗi: ${param.err}');
+            showJSToast('error', 'Cập nhật thất bại. Lỗi: ${param.err}');
         </script>
     </c:if>
 </head>
@@ -108,20 +74,9 @@
     <body
         class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden relative">
 
-        <!-- Glassmorphism Success Toast -->
-        <div id="successToast"
-             class="fixed top-24 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 transition-all duration-500 z-50 pointer-events-none">
-            <div class="glass-toast px-6 py-4 rounded-2xl flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-full bg-[#00d4ff]/20 flex items-center justify-center shrink-0 border border-[#00d4ff]/40">
-                    <i data-lucide="check" class="w-6 h-6 text-[#00d4ff]"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-display font-bold text-white text-lg">🎉 Đặt lịch thành công!</span>
-                    <span class="text-sm text-gray-300">Xe của bạn đã được ghi nhận vào hệ thống.</span>
-                </div>
-            </div>
-        </div>
+        <!-- Modals injected at bottom -->
+
+        <!-- Global toast included at bottom -->
 
         <!-- Desktop Sidebar -->
         <aside
@@ -269,9 +224,13 @@
                                                     <a href="${pageContext.request.contextPath}/customer/booking_history?action=edit&id=${booking.bookingId}" class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30 text-sm font-semibold transition-colors text-center">
                                                         Sửa
                                                     </a>
-                                                    <button class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
-                                                        Hủy Lịch
-                                                    </button>
+                                                    <form action="${pageContext.request.contextPath}/BookingHistoryController" method="POST" class="flex-1 sm:flex-none m-0 p-0" id="cancelForm_${booking.bookingId}">
+                                                        <input type="hidden" name="action" value="cancel" />
+                                                        <input type="hidden" name="bookingId" value="${booking.bookingId}" />
+                                                        <button type="button" onclick="showGlobalConfirmModal('Hủy lịch hẹn', 'Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác và số suất sẽ được nhường cho người khác.', 'Xác nhận Hủy', function() { document.getElementById('cancelForm_${booking.bookingId}').submit(); })" class="w-full px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
+                                                            Hủy Lịch
+                                                        </button>
+                                                    </form>
                                                 </c:if>
                                             </div>
                                         </div>
@@ -329,9 +288,9 @@
                                             <c:if test="${booking.status == 'Completed'}">
                                                 <button class="text-text-muted text-sm hover:text-white transition-colors">Đánh giá</button>
                                             </c:if>
-                                            <button onclick="rebookMock('Dịch Vụ Rửa Xe')" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
+                                            <a href="${pageContext.request.contextPath}/bookings?serviceId=${booking.serviceId}&vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
                                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i> Đặt lại
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </article>
@@ -363,6 +322,8 @@
         <script>
             lucide.createIcons();
         </script>
-    </body>
+        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+</body>
 
 </html>

@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.annotation.MultipartConfig;
 
+/**
+ * PageController: Front Controller / Router điều hướng các trang cơ bản.
+ * Chịu trách nhiệm nhận các URL ảo (như /home, /account/dashboard) và forward 
+ * tới các JSP view hoặc các Servlet xử lý logic tương ứng.
+ * Giúp tạo URL thân thiện (SEO/User-friendly URL) thay vì lộ tên file .jsp hay Servlet.
+ */
 @WebServlet(name = "PageController", urlPatterns = {"", "/home", "/index", "/account/dashboard", "/bookings", "/account/profile", "/account/change-password", "/account/payment-methods", "/customer/booking_history", "/customer/loyalty", "/customer/seed_demo"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
 public class PageController extends HttpServlet {
@@ -53,19 +59,56 @@ public class PageController extends HttpServlet {
                     dao.CustomerDAO cDAO = new dao.CustomerDAO();
                     dto.Customer c = cDAO.getCustomerByAccountId(currentUser.getUserId());
                     if (c != null) {
-                        // Gọi SQL chèn dữ liệu
-                        String sql = "INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, FinalPrice, Status) VALUES "
-                                + "(?, 1, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() + 1 AS DATE), '10:00:00', 100000, 100000, 'Pending'),"
-                                + "(?, 2, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 1 AS DATE), '14:00:00', 150000, 150000, 'Completed'),"
-                                + "(?, 3, (SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?), CAST(GETDATE() - 3 AS DATE), '09:00:00', 350000, 350000, 'Cancelled')";
-                        try ( java.sql.Connection conn = utils.DBContext.getConnection();  java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
+                        try ( java.sql.Connection conn = utils.DBContext.getConnection(); 
+                              java.sql.PreparedStatement st = conn.prepareStatement("SELECT TOP 1 VehicleID FROM Vehicles WHERE CustomerID = ?")) {
                             st.setInt(1, c.getCustomerId());
-                            st.setInt(2, c.getCustomerId());
-                            st.setInt(3, c.getCustomerId());
-                            st.setInt(4, c.getCustomerId());
-                            st.setInt(5, c.getCustomerId());
-                            st.setInt(6, c.getCustomerId());
-                            st.executeUpdate();
+                            java.sql.ResultSet rs = st.executeQuery();
+                            int vehicleId = -1;
+                            if (rs.next()) {
+                                vehicleId = rs.getInt("VehicleID");
+                            } else {
+                                // Khách chưa có xe -> Tạo tự động 1 chiếc xe để làm dữ liệu mẫu
+                                try (java.sql.PreparedStatement stV = conn.prepareStatement("INSERT INTO Vehicles (CustomerID, LicensePlate) VALUES (?, ?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                                    stV.setInt(1, c.getCustomerId());
+                                    stV.setString(2, "51F-" + (10000 + new java.util.Random().nextInt(90000)));
+                                    stV.executeUpdate();
+                                    try (java.sql.ResultSet rsV = stV.getGeneratedKeys()) {
+                                        if (rsV.next()) {
+                                            vehicleId = rsV.getInt(1);
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (vehicleId != -1) {
+                                dao.BookingDAO bDAO = new dao.BookingDAO();
+                                
+                                // 1. Upcoming Booking (Ngày mai, 10:00)
+                                java.sql.Date tomorrow = new java.sql.Date(System.currentTimeMillis() + 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 1, vehicleId, null, tomorrow, java.sql.Time.valueOf("10:00:00"), 100000, 0, 100000);
+                                
+                                // 2. Past Completed Booking (Hôm qua, 14:00)
+                                java.sql.Date yesterday = new java.sql.Date(System.currentTimeMillis() - 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 2, vehicleId, null, yesterday, java.sql.Time.valueOf("14:00:00"), 150000, 0, 150000);
+                                // Set status to Completed
+                                String sqlComplete = "UPDATE Bookings SET Status = 'Completed' WHERE CustomerID = ? AND BookingDate = ?";
+                                try (java.sql.PreparedStatement st2 = conn.prepareStatement(sqlComplete)) {
+                                    st2.setInt(1, c.getCustomerId());
+                                    st2.setDate(2, yesterday);
+                                    st2.executeUpdate();
+                                }
+                                
+                                // 3. Past Cancelled Booking (3 ngày trước, 09:00)
+                                java.sql.Date pastDay = new java.sql.Date(System.currentTimeMillis() - 3 * 86400000L);
+                                bDAO.createBookingTransaction(c.getCustomerId(), 3, vehicleId, null, pastDay, java.sql.Time.valueOf("09:00:00"), 350000, 0, 350000);
+                                // Set status to Cancelled
+                                String sqlCancel = "UPDATE Bookings SET Status = 'Cancelled' WHERE CustomerID = ? AND BookingDate = ?";
+                                try (java.sql.PreparedStatement st3 = conn.prepareStatement(sqlCancel)) {
+                                    st3.setInt(1, c.getCustomerId());
+                                    st3.setDate(2, pastDay);
+                                    st3.executeUpdate();
+                                }
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -80,29 +123,46 @@ public class PageController extends HttpServlet {
                     dto.Customer customer = cusDAO.getCustomerByAccountId(sessionUser.getUserId());
 
                     if (customer != null) {
-                        int points = customer.getPointsBalance();
-                        String tier = customer.getTierStatus() != null ? customer.getTierStatus().toUpperCase() : "MEMBER";
-                        String nextTier = "SILVER";
-                        int targetPoints = 500;
-
-                        if ("SILVER".equals(tier)) {
-                            nextTier = "GOLD";
-                            targetPoints = 1500;
-                        } else if ("GOLD".equals(tier)) {
-                            nextTier = "PLATINUM";
-                            targetPoints = 3000;
-                        } else if ("PLATINUM".equals(tier)) {
-                            nextTier = "MAX";
-                            targetPoints = points; // Already at max
+                        dao.MemberTierDAO tierDAO = new dao.MemberTierDAO();
+                        java.util.List<dto.MemberTier> tiers = tierDAO.getAllTiers();
+                        
+                        dto.MemberTier currentTier = null;
+                        dto.MemberTier nextTierObj = null;
+                        
+                        String tierStatus = customer.getTierStatus() != null ? customer.getTierStatus().trim() : "MEMBER";
+                        for (int i = 0; i < tiers.size(); i++) {
+                            if (tiers.get(i).getTierName().equalsIgnoreCase(tierStatus)) {
+                                currentTier = tiers.get(i);
+                                if (i < tiers.size() - 1) {
+                                    nextTierObj = tiers.get(i + 1);
+                                }
+                                break;
+                            }
+                        }
+                        
+                        String nextTierName = "MAX";
+                        double targetSpend = 0;
+                        double spendNeeded = 0;
+                        int progressPercent = 100;
+                        
+                        if (nextTierObj != null) {
+                            nextTierName = nextTierObj.getTierName();
+                            targetSpend = nextTierObj.getMinSpend();
+                            spendNeeded = Math.max(0, targetSpend - customer.getTotalSpend());
+                            
+                            double currentMinSpend = currentTier != null ? currentTier.getMinSpend() : 0;
+                            double spendRange = targetSpend - currentMinSpend;
+                            double currentProgress = customer.getTotalSpend() - currentMinSpend;
+                            double p = (currentProgress / spendRange) * 100;
+                            if (p > 100) p = 100;
+                            if (p < 0) p = 0;
+                            progressPercent = (int) p;
                         }
 
-                        int pointsNeeded = Math.max(0, targetPoints - points);
-                        int progressPercent = (targetPoints > 0) ? (int) Math.min(100, ((double) points / targetPoints) * 100) : 100;
-
                         request.setAttribute("customer", customer);
-                        request.setAttribute("nextTier", nextTier);
-                        request.setAttribute("targetPoints", targetPoints);
-                        request.setAttribute("pointsNeeded", pointsNeeded);
+                        request.setAttribute("nextTier", nextTierName);
+                        request.setAttribute("targetSpend", targetSpend);
+                        request.setAttribute("spendNeeded", spendNeeded);
                         request.setAttribute("progressPercent", progressPercent);
                     }
                 }

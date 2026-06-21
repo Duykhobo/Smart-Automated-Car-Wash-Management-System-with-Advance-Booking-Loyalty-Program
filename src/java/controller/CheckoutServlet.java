@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -148,6 +149,9 @@ public class CheckoutServlet extends HttpServlet {
                 } else if ("FREE_WASH".equalsIgnoreCase(rewardType)) {
                     // Voucher rửa xe gói Tiêu chuẩn miễn phí (tối đa 200,000 VND)
                     discountAmount = Math.min(originalPrice, 200000);
+                } else {
+                    sendErrorResponse(request, response, "Loại Voucher này hiện chưa được hỗ trợ áp dụng trên hệ thống.");
+                    return;
                 }
             }
 
@@ -169,10 +173,12 @@ public class CheckoutServlet extends HttpServlet {
                     finalPrice);
 
             if (success) {
-                if (bookingDAO.isSlotAvailable(bookingDate, scheduledTime)) {
-                    sendSuccessResponse(request, response, "Đặt lịch thành công!");
-                } else {
+                // Sửa lỗi Race Condition: Lấy trực tiếp trạng thái thật của Booking vừa được tạo ra
+                String actualStatus = bookingDAO.getLatestBookingStatus(customer.getCustomerId(), bookingDate, scheduledTime);
+                if ("Waitlisted".equalsIgnoreCase(actualStatus)) {
                     sendSuccessResponse(request, response, "Khung giờ đã đầy. Bạn đã được đưa vào Danh sách chờ Ưu tiên (Waitlist). Chúng tôi sẽ xếp lịch ngay khi có người hủy!");
+                } else {
+                    sendSuccessResponse(request, response, "Đặt lịch thành công!");
                 }
             } else {
                 sendErrorResponse(request, response, "Hệ thống không thể lưu lịch đặt của bạn lúc này.");
@@ -180,6 +186,8 @@ public class CheckoutServlet extends HttpServlet {
 
         } catch (NumberFormatException e) {
             sendErrorResponse(request, response, "Định dạng dữ liệu đầu vào không hợp lệ.");
+        } catch (DateTimeParseException e) {
+            sendErrorResponse(request, response, "Định dạng ngày/giờ không hợp lệ. Vui lòng kiểm tra lại.");
         } catch (Exception ex) {
             // QUAN TRỌNG: Bẫy lỗi và bắt chuỗi lỗi cụ thể từ Stored Procedure văng ra
             // Ví dụ: "Khung giờ này đã đầy, vui lòng chọn giờ khác."
@@ -236,7 +244,7 @@ public class CheckoutServlet extends HttpServlet {
             }
         } else {
             request.getSession().setAttribute("successMessage", message);
-            response.sendRedirect(request.getContextPath() + "/account/dashboard");
+            response.sendRedirect(request.getContextPath() + "/customer/booking_history");
         }
     }
 

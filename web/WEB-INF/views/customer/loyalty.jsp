@@ -116,7 +116,7 @@
                     <div class="w-full md:w-1/2 space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-300 font-medium">Tiến trình lên hạng <span class="text-[#00d4ff] font-bold">${not empty nextTier ? nextTier : 'PLATINUM'}</span></span>
-                            <span class="text-white font-bold"><fmt:formatNumber value="${not empty customer ? customer.pointsBalance : 0}" type="number" maxFractionDigits="0"/> / <fmt:formatNumber value="${not empty targetPoints ? targetPoints : 5000}" type="number" maxFractionDigits="0"/></span>
+                            <span class="text-white font-bold"><fmt:formatNumber value="${not empty customer ? customer.totalSpend : 0}" type="number" maxFractionDigits="0"/> đ / <fmt:formatNumber value="${not empty targetSpend ? targetSpend : 5000000}" type="number" maxFractionDigits="0"/> đ</span>
                         </div>
                         <div class="h-3 w-full bg-black/50 rounded-full overflow-hidden border border-border-glass">
                             <div class="h-full bg-gradient-to-r from-amber-500 to-[#00d4ff] rounded-full shadow-[0_0_10px_rgba(0,212,255,0.5)] relative" style="width: ${not empty progressPercent ? progressPercent : 49}%">
@@ -135,7 +135,7 @@
                                     Bạn đã đạt cấp độ cao nhất!
                                 </c:when>
                                 <c:otherwise>
-                                    Còn <fmt:formatNumber value="${not empty pointsNeeded ? pointsNeeded : 2550}" type="number" maxFractionDigits="0"/> điểm nữa để thăng hạng
+                                    Còn <fmt:formatNumber value="${not empty spendNeeded ? spendNeeded : 2550000}" type="number" maxFractionDigits="0"/> đ nữa để thăng hạng
                                 </c:otherwise>
                             </c:choose>
                         </p>
@@ -249,5 +249,7 @@
     <script>
         lucide.createIcons();
     </script>
+    <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 </html>

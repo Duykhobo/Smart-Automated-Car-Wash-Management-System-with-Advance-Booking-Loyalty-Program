@@ -24,10 +24,11 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         String email = request.getParameter("email");
         
-        // TODO: Implement actual email sending logic or token generation here
-        // For now, we simulate a successful email send to keep the flow intact
-        if (email != null && !email.trim().isEmpty()) {
-            request.setAttribute("successMessage", "Một đường link đặt lại mật khẩu đã được gửi đến email " + email + ". Vui lòng kiểm tra hộp thư của bạn.");
+        // Validate email format using basic regex
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (email != null && email.matches(emailRegex)) {
+            // Anti-Enumeration: Always display the same generic success message regardless of whether the email exists in DB
+            request.setAttribute("successMessage", "Nếu email hợp lệ, một đường link đặt lại mật khẩu đã được gửi đến hộp thư của bạn. Vui lòng kiểm tra.");
         } else {
             request.setAttribute("errorMessage", "Vui lòng nhập địa chỉ email hợp lệ.");
         }

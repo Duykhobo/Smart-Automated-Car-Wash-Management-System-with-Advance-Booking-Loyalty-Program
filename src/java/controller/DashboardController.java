@@ -18,7 +18,9 @@ import javax.xml.ws.BindingProvider;
 import utils.AppConstants;
 
 /**
- *
+ * DashboardController: Controller chính điều hướng và cung cấp dữ liệu cho trang Tổng quan (Dashboard) của khách hàng.
+ * Thu thập và tổng hợp các thông tin như: Thống kê chi tiêu, Lịch rửa xe sắp tới, Thông tin xe, và Tiến độ thăng hạng (Loyalty Tier).
+ * 
  * @author thien
  */
 @WebServlet(name = "DashboardController", urlPatterns = {"/DashboardController"})
@@ -67,13 +69,13 @@ public class DashboardController extends HttpServlet {
             
             request.setAttribute("customer", cus);
             
-            // 1. Fetch upcoming bookings
+            // 1. Fetch upcoming bookings (Lấy danh sách các lịch đặt rửa xe sắp tới)
             java.util.List<dto.Booking> upcomingBookings = bookingDAO.getUpcomingBookings(cus.getCustomerId());
             if (!upcomingBookings.isEmpty()) {
                 request.setAttribute("upcomingBooking", upcomingBookings.get(0)); // Show the next immediate booking
             }
             
-            // Fetch vehicles
+            // 2. Fetch vehicles (Lấy danh sách xe của khách hàng)
             dao.CarDao carDao = new dao.CarDao();
             try {
                 java.util.List<dto.Cars> vehicles = carDao.getAllCars(cus.getCustomerId());
@@ -82,7 +84,7 @@ public class DashboardController extends HttpServlet {
                 e.printStackTrace();
             }
             
-            // 2. Calculate Tier Progress
+            // 3. Calculate Tier Progress (Tính toán tiến trình lên hạng thành viên tiếp theo)
             dao.MemberTierDAO tierDAO = new dao.MemberTierDAO();
             java.util.List<dto.MemberTier> tiers = tierDAO.getAllTiers();
             
@@ -90,6 +92,7 @@ public class DashboardController extends HttpServlet {
             dto.MemberTier nextTier = null;
             
             // Tiers are sorted by PriorityRank ASC (1: Member, 2: Silver, 3: Gold, 4: Platinum)
+            // Tìm hạng hiện tại và hạng kế tiếp dựa trên danh sách Tier lấy từ DB
             for (int i = 0; i < tiers.size(); i++) {
                 if (tiers.get(i).getTierName().equalsIgnoreCase(cus.getTierStatus())) {
                     currentTier = tiers.get(i);

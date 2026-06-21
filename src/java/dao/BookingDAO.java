@@ -20,6 +20,23 @@ import utils.DBContext;
 public class BookingDAO {
     private static final Logger LOGGER = Logger.getLogger(BookingDAO.class.getName());
 
+    /**
+     * Khởi tạo giao dịch đặt lịch mới (Booking Transaction)
+     * Đây là hàm quan trọng nhất của Booking Engine. Nó gọi Stored Procedure: sp_CreateBookingTransaction.
+     * Stored Procedure này đảm bảo an toàn về dữ liệu, chống Race Condition,
+     * tự động cộng dồn số lượng đặt chỗ và tự đưa vào danh sách Waitlist nếu khung giờ đã đầy.
+     * 
+     * @param customerId ID của khách hàng
+     * @param serviceId Gói dịch vụ đã chọn
+     * @param vehicleId Xe sẽ rửa
+     * @param voucherId Mã giảm giá (nếu có)
+     * @param bookingDate Ngày rửa xe
+     * @param scheduledTime Giờ rửa xe
+     * @param originalPrice Giá gốc
+     * @param discountAmount Số tiền giảm giá
+     * @param finalPrice Giá cuối cùng phải trả
+     * @return true nếu gọi Transaction thành công (Không phân biệt Pending hay Waitlisted)
+     */
     public boolean createBookingTransaction(int customerId, int serviceId, int vehicleId, Integer voucherId,
             Date bookingDate, Time scheduledTime,
             double originalPrice, double discountAmount, double finalPrice) throws Exception {
@@ -40,7 +57,7 @@ public class BookingDAO {
             }
 
             cs.setDate(5, bookingDate);
-            cs.setTime(6, scheduledTime);
+            cs.setString(6, scheduledTime.toString());
             cs.setDouble(7, originalPrice);
             cs.setDouble(8, discountAmount);
             cs.setDouble(9, finalPrice);
@@ -61,7 +78,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getUpcomingBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress', 'Waitlisted') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -71,6 +88,7 @@ public class BookingDAO {
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
                             rs.getInt("ServiceID"),
+                            rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),
                             rs.getTimestamp("BookingDate"),
@@ -121,63 +139,82 @@ public class BookingDAO {
             cn = DBContext.getConnection();
             cn.setAutoCommit(false); // Begin transaction
 
-            // 1. Update Booking
-            String updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
-            try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
-                st1.setInt(1, vehicleId);
-                st1.setInt(2, serviceId);
-                st1.setDate(3, newDate);
-                st1.setTime(4, newTime);
-                st1.setDouble(5, originalPrice);
-                st1.setDouble(6, discountAmount);
-                st1.setDouble(7, finalPrice);
-                st1.setInt(8, bookingId);
-                st1.executeUpdate();
-            }
+            boolean dateChanged = !oldDate.toString().equals(newDate.toString()) || !oldTime.toString().equals(newTime.toString());
+            String targetStatus = null;
 
-            // If date/time changed, update capacity
-            if (!oldDate.toString().equals(newDate.toString()) || !oldTime.toString().equals(newTime.toString())) {
+            // If date/time changed, update capacity and determine new status
+            if (dateChanged) {
                 // Decrease old capacity
                 String decSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] - 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME) AND [CurrentBooked] > 0";
                 try (PreparedStatement st2 = cn.prepareStatement(decSql)) {
                     st2.setDate(1, oldDate);
-                    st2.setTime(2, oldTime);
+                    st2.setString(2, oldTime.toString());
                     st2.executeUpdate();
                 }
 
-                // Increase new capacity (insert if not exists)
+                // Check new capacity
                 String checkSql = "SELECT SlotID, CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
                 boolean exists = false;
+                int current = 0;
+                int max = 3;
                 try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
                     stCheck.setDate(1, newDate);
-                    stCheck.setTime(2, newTime);
+                    stCheck.setString(2, newTime.toString());
                     try (ResultSet rs = stCheck.executeQuery()) {
                         if (rs.next()) {
                             exists = true;
-                            int current = rs.getInt("CurrentBooked");
-                            int max = rs.getInt("MaxCapacity");
-                            if (current >= max) {
-                                throw new Exception("Slot is full");
-                            }
+                            current = rs.getInt("CurrentBooked");
+                            max = rs.getInt("MaxCapacity");
                         }
                     }
                 }
 
-                if (exists) {
-                    String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
-                    try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
-                        st3.setDate(1, newDate);
-                        st3.setTime(2, newTime);
-                        st3.executeUpdate();
-                    }
+                if (current >= max) {
+                    // Slot is full -> automatically put to Waitlist instead of throwing Exception
+                    targetStatus = "Waitlisted";
                 } else {
-                    String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
-                    try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
-                        st4.setDate(1, newDate);
-                        st4.setTime(2, newTime);
-                        st4.executeUpdate();
+                    targetStatus = "Pending";
+                    if (exists) {
+                        String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+                        try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
+                            st3.setDate(1, newDate);
+                            st3.setString(2, newTime.toString());
+                            st3.executeUpdate();
+                        }
+                    } else {
+                        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
+                        try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
+                            st4.setDate(1, newDate);
+                            st4.setString(2, newTime.toString());
+                            st4.executeUpdate();
+                        }
                     }
                 }
+            }
+
+            // 1. Update Booking
+            String updateBookingSql;
+            if (targetStatus != null) {
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+            } else {
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+            }
+
+            try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
+                st1.setInt(1, vehicleId);
+                st1.setInt(2, serviceId);
+                st1.setDate(3, newDate);
+                st1.setString(4, newTime.toString());
+                st1.setDouble(5, originalPrice);
+                st1.setDouble(6, discountAmount);
+                st1.setDouble(7, finalPrice);
+                if (targetStatus != null) {
+                    st1.setString(8, targetStatus);
+                    st1.setInt(9, bookingId);
+                } else {
+                    st1.setInt(8, bookingId);
+                }
+                st1.executeUpdate();
             }
 
             cn.commit();
@@ -205,6 +242,84 @@ public class BookingDAO {
         return success;
     }
 
+    /**
+     * Hủy một lịch đặt và trả lại sức chứa (Slot)
+     * Chỉ được phép hủy nếu trạng thái là Pending hoặc Waitlisted.
+     * 
+     * @param bookingId ID lịch đặt
+     * @param customerId ID khách hàng (để verify quyền)
+     * @return true nếu hủy thành công
+     */
+    public boolean cancelBookingTransaction(int bookingId, int customerId) {
+        boolean success = false;
+        String queryBooking = "SELECT BookingDate, ScheduledTime, Status FROM Bookings WHERE BookingID = ? AND CustomerID = ?";
+        String updateStatus = "UPDATE Bookings SET Status = 'Cancelled', UpdatedAt = GETDATE() WHERE BookingID = ?";
+        String decreaseCapacity = "UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked - 1 "
+                + "WHERE SlotDate = ? AND TimeSlot = CAST(? AS TIME) AND CurrentBooked > 0";
+
+        Connection cn = null;
+        try {
+            cn = DBContext.getConnection();
+            cn.setAutoCommit(false);
+            
+            try (PreparedStatement pstGet = cn.prepareStatement(queryBooking)) {
+                pstGet.setInt(1, bookingId);
+                pstGet.setInt(2, customerId);
+                try (ResultSet rs = pstGet.executeQuery()) {
+                    if (rs.next()) {
+                        String status = rs.getString("Status");
+                        if (!"Pending".equalsIgnoreCase(status) && !"Waitlisted".equalsIgnoreCase(status)) {
+                            return false; // Chỉ cho phép hủy Pending hoặc Waitlisted
+                        }
+                        Date bDate = rs.getDate("BookingDate");
+                        Time bTime = rs.getTime("ScheduledTime");
+                        
+                        // Update Status sang Cancelled
+                        try (PreparedStatement pstUpdate = cn.prepareStatement(updateStatus)) {
+                            pstUpdate.setInt(1, bookingId);
+                            int row = pstUpdate.executeUpdate();
+                            if (row == 0) {
+                                cn.rollback();
+                                return false;
+                            }
+                        }
+                        
+                        // Nếu là Pending thì mới chiếm slot -> phải giải phóng slot
+                        if ("Pending".equalsIgnoreCase(status)) {
+                            try (PreparedStatement pstCap = cn.prepareStatement(decreaseCapacity)) {
+                                pstCap.setDate(1, bDate);
+                                pstCap.setString(2, bTime.toString());
+                                pstCap.executeUpdate();
+                            }
+                        }
+                        
+                        cn.commit();
+                        success = true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Rollback cancelBooking failed", ex);
+                }
+            }
+            LOGGER.log(Level.SEVERE, "Error in cancelBookingTransaction", e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.setAutoCommit(true);
+                    cn.close();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Close connection failed", ex);
+                }
+            }
+        }
+        return success;
+    }
+
     public dto.Booking getBookingById(int bookingId) throws SQLException {
         Booking booking = null;
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
@@ -217,6 +332,7 @@ public class BookingDAO {
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
                             rs.getInt("ServiceID"),
+                            rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),
                             rs.getTimestamp("BookingDate"),
@@ -300,6 +416,7 @@ public class BookingDAO {
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
                             rs.getInt("ServiceID"),
+                            rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),
                             rs.getTimestamp("BookingDate"),
@@ -359,7 +476,7 @@ public class BookingDAO {
                 "WHERE SlotDate = ? AND TimeSlot = ?";
         try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
             st.setDate(1, date);
-            st.setTime(2, time);
+            st.setString(2, time.toString());
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     int available = rs.getInt("AvailableSlots");
@@ -375,6 +492,25 @@ public class BookingDAO {
     }
 
     /**
+     * Lấy trạng thái của lần đặt lịch gần nhất (dùng để fix Race Condition)
+     */
+    public String getLatestBookingStatus(int customerId, Date date, Time time) throws SQLException {
+        String status = null;
+        String sql = "SELECT TOP 1 Status FROM Bookings WHERE CustomerID = ? AND BookingDate = ? AND ScheduledTime = ? ORDER BY BookingID DESC";
+        try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, customerId);
+            st.setDate(2, date);
+            st.setString(3, time.toString());
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    status = rs.getString("Status");
+                }
+            }
+        }
+        return status;
+    }
+
+    /**
      * Tự động quét và hủy các lịch đặt quá hạn 15 phút chưa Check-in.
      */
     public void autoCancelExpiredBookings() {
@@ -382,7 +518,7 @@ public class BookingDAO {
         // sau đó so sánh xem nó có cũ hơn (Thời gian hiện tại - 15 phút) hay không.
         String sql = "UPDATE Bookings " +
                      "SET Status = 'Cancelled', UpdatedAt = GETDATE() " +
-                     "WHERE Status = 'Pending' " +
+                     "WHERE Status IN ('Pending', 'Waitlisted') " +
                      "AND CAST(CONCAT(BookingDate, ' ', ScheduledTime) AS DATETIME) <= DATEADD(MINUTE, -15, GETDATE())";
                      
         try (Connection conn = DBContext.getConnection();

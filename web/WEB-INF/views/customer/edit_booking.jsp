@@ -421,13 +421,15 @@
             function validateForm() {
                 const selectedTime = document.querySelector('input[name="time"]:checked');
                 if (!selectedTime) {
-                    alert("Vui lòng chọn một múi giờ trống trước khi cập nhật!");
+                    showJSToast('error', "Vui lòng chọn một múi giờ trống trước khi cập nhật!");
                     return false;
                 }
                 return true;
             }
         </script>
-    </body>
+        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+</body>
 </html>
 
 

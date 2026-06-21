@@ -221,7 +221,15 @@ public class BookingHistoryController extends HttpServlet {
                     }
 
                     double originalPrice = selectedService.getBasePrice();
-                    double discountAmount = oldBooking.getDiscountAmount(); // Giữ nguyên giảm giá nếu có
+                    double oldOriginalPrice = oldBooking.getOriginalPrice();
+                    double discountAmount = 0;
+                    
+                    // Tính lại số tiền giảm giá dựa trên TỈ LỆ (%) thay vì giữ nguyên con số tuyệt đối
+                    if (oldOriginalPrice > 0 && oldBooking.getDiscountAmount() > 0) {
+                        double discountPercent = oldBooking.getDiscountAmount() / oldOriginalPrice;
+                        discountAmount = originalPrice * discountPercent;
+                    }
+                    
                     double finalPrice = originalPrice - discountAmount;
                     if (finalPrice < 0) finalPrice = 0;
 
@@ -248,6 +256,25 @@ public class BookingHistoryController extends HttpServlet {
                     errMsg = java.net.URLEncoder.encode(errMsg, "UTF-8");
                 } catch (Exception ex) {}
                 response.sendRedirect(request.getContextPath() + "/customer/booking_history?msg=UpdateError&err=" + errMsg);
+            }
+        } else if ("cancel".equals(action)) {
+            try {
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                BookingDAO bookDao = new BookingDAO();
+                CustomerDAO cusDao = new CustomerDAO();
+                Customer cus = cusDao.getCustomerByAccountId(user.getUserId());
+                
+                boolean success = bookDao.cancelBookingTransaction(bookingId, cus.getCustomerId());
+                if (success) {
+                    request.getSession().setAttribute("successMessage", "Hủy lịch thành công!");
+                    response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+                } else {
+                    request.getSession().setAttribute("errorMessage", "Hủy lịch thất bại. Bạn chỉ có thể hủy các lịch đang chờ xử lý.");
+                    response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+                }
+            } catch (Exception e) {
+                request.getSession().setAttribute("errorMessage", "Lỗi hệ thống khi hủy lịch.");
+                response.sendRedirect(request.getContextPath() + "/customer/booking_history");
             }
         } else {
             response.sendRedirect(request.getContextPath() + "/customer/booking_history");

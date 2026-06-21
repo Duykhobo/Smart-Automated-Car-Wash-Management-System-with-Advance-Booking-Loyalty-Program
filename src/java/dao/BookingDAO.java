@@ -375,6 +375,25 @@ public class BookingDAO {
     }
 
     /**
+     * Lấy trạng thái của lần đặt lịch gần nhất (dùng để fix Race Condition)
+     */
+    public String getLatestBookingStatus(int customerId, Date date, Time time) throws SQLException {
+        String status = null;
+        String sql = "SELECT TOP 1 Status FROM Bookings WHERE CustomerID = ? AND BookingDate = ? AND ScheduledTime = ? ORDER BY BookingID DESC";
+        try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, customerId);
+            st.setDate(2, date);
+            st.setTime(3, time);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    status = rs.getString("Status");
+                }
+            }
+        }
+        return status;
+    }
+
+    /**
      * Tự động quét và hủy các lịch đặt quá hạn 15 phút chưa Check-in.
      */
     public void autoCancelExpiredBookings() {

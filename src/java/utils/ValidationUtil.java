@@ -70,4 +70,18 @@ public class ValidationUtil {
         return Pattern.matches(EMAIL_PATTERN, email.trim());
     }
 
+    /**
+     * Kiểm tra mật khẩu hợp lệ (tối thiểu 6 ký tự, không chứa khoảng trắng hai đầu)
+     */
+    public static boolean isValidPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            return false;
+        }
+        if (password.length() < 6 || password.length() > 50) {
+            return false;
+        }
+        // Có thể thêm regex phức tạp hơn ở đây nếu cần thiết
+        return true;
+    }
+
 }

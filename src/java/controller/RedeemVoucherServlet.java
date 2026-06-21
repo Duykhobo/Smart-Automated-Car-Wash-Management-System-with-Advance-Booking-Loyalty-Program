@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import utils.AppConstants;
 
-@WebServlet(name = "RedeemVoucherServlet", urlPatterns = {"/redeemVoucher"})
+@WebServlet(name = "RedeemVoucherServlet", urlPatterns = { "/redeemVoucher" })
 public class RedeemVoucherServlet extends HttpServlet {
 
     @Override
@@ -54,7 +54,9 @@ public class RedeemVoucherServlet extends HttpServlet {
 
             VoucherDAO dao = new VoucherDAO();
             dao.redeemVoucher(customerID, rewardType, pointsCost);
+            cus.setPointsBalance(cus.getPointsBalance() - pointsCost);
 
+            session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
             session.setAttribute("successMessage", "Đổi Voucher thành công!");
             response.sendRedirect(request.getContextPath() + "/account/dashboard");
             return;
@@ -63,14 +65,14 @@ public class RedeemVoucherServlet extends HttpServlet {
             Logger.getLogger(RedeemVoucherServlet.class.getName()).log(Level.SEVERE, null, e);
 
             session.setAttribute("errorMessage", "Số điểm đổi Voucher không hợp lệ!");
-            response.sendRedirect(request.getContextPath() + "/account/dashboard");
+            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
             return;
 
         } catch (Exception e) {
             Logger.getLogger(RedeemVoucherServlet.class.getName()).log(Level.SEVERE, null, e);
 
-            session.setAttribute("errorMessage", "Không đủ điểm hoặc không thể đổi Voucher!");
-            response.sendRedirect(request.getContextPath() + "/account/dashboard");
+            session.setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
             return;
         }
     }

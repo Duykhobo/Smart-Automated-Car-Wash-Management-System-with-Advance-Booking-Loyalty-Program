@@ -126,7 +126,7 @@
 
                                             <!-- Membership Card -->
                                             <section aria-labelledby="membership-card-title"
-                                                class="relative w-full max-w-md rounded-2xl overflow-hidden bg-gradient-to-br from-bg-primary to-[#0a1128] border border-border-glass shadow-2xl p-6 group">
+                                                class="relative w-full max-w-md mx-auto rounded-2xl overflow-hidden bg-gradient-to-br from-bg-primary to-[#0a1128] border border-border-glass shadow-2xl p-6 group">
 
                                                 <!-- Gradient Overlay -->
                                                 <div
@@ -216,7 +216,7 @@
 
                                             <!-- Upcoming Appointments -->
                                             <section aria-labelledby="upcoming-appointments-title"
-                                                class="flex flex-col gap-4 max-w-2xl">
+                                                class="flex flex-col gap-4 max-w-2xl mx-auto w-full">
                                                 <div class="flex justify-between items-center">
                                                     <h2 id="upcoming-appointments-title"
                                                         class="text-white font-display font-semibold text-lg md:text-xl">

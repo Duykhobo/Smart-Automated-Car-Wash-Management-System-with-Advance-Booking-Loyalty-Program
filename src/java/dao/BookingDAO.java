@@ -138,22 +138,11 @@ public class BookingDAO {
             cn = DBContext.getConnection();
             cn.setAutoCommit(false); // Begin transaction
 
-            // 1. Update Booking
-            String updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
-            try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
-                st1.setInt(1, vehicleId);
-                st1.setInt(2, serviceId);
-                st1.setDate(3, newDate);
-                st1.setTime(4, newTime);
-                st1.setDouble(5, originalPrice);
-                st1.setDouble(6, discountAmount);
-                st1.setDouble(7, finalPrice);
-                st1.setInt(8, bookingId);
-                st1.executeUpdate();
-            }
+            boolean dateChanged = !oldDate.toString().equals(newDate.toString()) || !oldTime.toString().equals(newTime.toString());
+            String targetStatus = null;
 
-            // If date/time changed, update capacity
-            if (!oldDate.toString().equals(newDate.toString()) || !oldTime.toString().equals(newTime.toString())) {
+            // If date/time changed, update capacity and determine new status
+            if (dateChanged) {
                 // Decrease old capacity
                 String decSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] - 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME) AND [CurrentBooked] > 0";
                 try (PreparedStatement st2 = cn.prepareStatement(decSql)) {
@@ -162,39 +151,69 @@ public class BookingDAO {
                     st2.executeUpdate();
                 }
 
-                // Increase new capacity (insert if not exists)
+                // Check new capacity
                 String checkSql = "SELECT SlotID, CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
                 boolean exists = false;
+                int current = 0;
+                int max = 3;
                 try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
                     stCheck.setDate(1, newDate);
                     stCheck.setTime(2, newTime);
                     try (ResultSet rs = stCheck.executeQuery()) {
                         if (rs.next()) {
                             exists = true;
-                            int current = rs.getInt("CurrentBooked");
-                            int max = rs.getInt("MaxCapacity");
-                            if (current >= max) {
-                                throw new Exception("Slot is full");
-                            }
+                            current = rs.getInt("CurrentBooked");
+                            max = rs.getInt("MaxCapacity");
                         }
                     }
                 }
 
-                if (exists) {
-                    String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
-                    try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
-                        st3.setDate(1, newDate);
-                        st3.setTime(2, newTime);
-                        st3.executeUpdate();
-                    }
+                if (current >= max) {
+                    // Slot is full -> automatically put to Waitlist instead of throwing Exception
+                    targetStatus = "Waitlisted";
                 } else {
-                    String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
-                    try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
-                        st4.setDate(1, newDate);
-                        st4.setTime(2, newTime);
-                        st4.executeUpdate();
+                    targetStatus = "Pending";
+                    if (exists) {
+                        String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+                        try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
+                            st3.setDate(1, newDate);
+                            st3.setTime(2, newTime);
+                            st3.executeUpdate();
+                        }
+                    } else {
+                        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
+                        try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
+                            st4.setDate(1, newDate);
+                            st4.setTime(2, newTime);
+                            st4.executeUpdate();
+                        }
                     }
                 }
+            }
+
+            // 1. Update Booking
+            String updateBookingSql;
+            if (targetStatus != null) {
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+            } else {
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+            }
+
+            try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
+                st1.setInt(1, vehicleId);
+                st1.setInt(2, serviceId);
+                st1.setDate(3, newDate);
+                st1.setTime(4, newTime);
+                st1.setDouble(5, originalPrice);
+                st1.setDouble(6, discountAmount);
+                st1.setDouble(7, finalPrice);
+                if (targetStatus != null) {
+                    st1.setString(8, targetStatus);
+                    st1.setInt(9, bookingId);
+                } else {
+                    st1.setInt(8, bookingId);
+                }
+                st1.executeUpdate();
             }
 
             cn.commit();

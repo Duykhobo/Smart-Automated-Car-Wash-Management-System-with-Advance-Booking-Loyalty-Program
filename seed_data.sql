@@ -1,5 +1,5 @@
 -- =======================================================================
--- FILE: SeedData.sql
+-- FILE: seed_data.sql
 -- MÔ TẢ: Thêm dữ liệu mẫu (Seed Data) cho hệ thống AutoWash Pro để Demo
 -- =======================================================================
 USE SmartCarWash;
@@ -87,12 +87,17 @@ SELECT TOP 1 @VID_BOOKING = VehicleID FROM Vehicles WHERE CustomerID = @CID_BOOK
 
 IF @CID_BOOKING IS NOT NULL AND @VID_BOOKING IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Bookings WHERE CustomerID = @CID_BOOKING)
 BEGIN
+    DECLARE @Tomorrow DATE = CAST(GETDATE() + 1 AS DATE);
+    DECLARE @Yesterday DATE = CAST(GETDATE() - 1 AS DATE);
+    DECLARE @YesterdayTime1 DATETIME = DATEADD(minute, 5, GETDATE()-1);
+    DECLARE @YesterdayTime2 DATETIME = DATEADD(minute, 35, GETDATE()-1);
+
     -- Một lịch hẹn sắp tới (Pending)
     EXEC sp_CreateBookingTransaction 
         @CustomerID = @CID_BOOKING, 
         @ServiceID = 2, 
         @VehicleID = @VID_BOOKING, 
-        @BookingDate = CAST(GETDATE() + 1 AS DATE), 
+        @BookingDate = @Tomorrow, 
         @ScheduledTime = '10:00:00', 
         @OriginalPrice = 250000.00, 
         @DiscountAmount = 0, 
@@ -100,14 +105,14 @@ BEGIN
 
     -- Một lịch sử đã hoàn thành (Completed) ngày hôm qua
     INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status)
-    VALUES (@CID_BOOKING, 1, @VID_BOOKING, CAST(GETDATE() - 1 AS DATE), '14:30:00', 100000.00, 0, 100000.00, 'Completed');
+    VALUES (@CID_BOOKING, 1, @VID_BOOKING, @Yesterday, '14:30:00', 100000.00, 0, 100000.00, 'Completed');
     
     DECLARE @COMPLETED_BOOKING_ID INT = SCOPE_IDENTITY();
     
     -- Thêm WashRecord cho lịch sử đã hoàn thành
     INSERT INTO WashRecords (BookingID, ActualStartTime, ActualEndTime, LPRConfidenceScore, OperatorNotes)
-    VALUES (@COMPLETED_BOOKING_ID, DATEADD(minute, 5, GETDATE()-1), DATEADD(minute, 35, GETDATE()-1), 99.5, N'Xe sạch, không trầy xước.');
+    VALUES (@COMPLETED_BOOKING_ID, @YesterdayTime1, @YesterdayTime2, 99.5, N'Xe sạch, không trầy xước.');
 END
 GO
 
-PRINT 'Thêm dữ liệu mẫu thành công!';
+PRINT N'Thêm dữ liệu mẫu thành công!';

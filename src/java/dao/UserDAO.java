@@ -100,7 +100,13 @@ public class UserDAO {
         return false;
     }
 
-    // Hàm Đăng Nhập
+    /**
+     * @deprecated Hàm này hiện tại KHÔNG CÒN SỬ DỤNG VÀ KHÔNG HOẠT ĐỘNG
+     * do hệ thống đã chuyển sang dùng Mật khẩu Hash có Salt ngẫu nhiên (BCrypt/PBKDF2).
+     * Không thể dùng câu query `WHERE PasswordHash = ?` để so sánh trong DB.
+     * Vui lòng dùng hàm `getUserByUsername` kết hợp với `HashUtil.verifyPassword` bên tầng Controller.
+     */
+    @Deprecated
     public User login(String username, String passwordHash) {
         String sql = "SELECT * FROM Users WHERE [Username] = ? AND [PasswordHash] = ?";
         try ( Connection conn = DBContext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {

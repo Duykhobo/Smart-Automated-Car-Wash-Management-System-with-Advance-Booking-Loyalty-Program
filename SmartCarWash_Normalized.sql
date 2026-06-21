@@ -274,11 +274,15 @@ BEGIN
             SET @MaxCapacity = @DefaultMaxCapacity;
         END
 
+        DECLARE @BookingStatus VARCHAR(20) = 'Pending';
+        
         IF @CurrentBooked >= @MaxCapacity
         BEGIN
-            RAISERROR('Khung giờ này đã đầy, vui lòng chọn giờ khác.', 16, 1);
-            ROLLBACK TRANSACTION;
-            RETURN;
+            SET @BookingStatus = 'Waitlisted';
+        END
+        ELSE
+        BEGIN
+            UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked + 1 WHERE SlotID = @SlotID;
         END
 
         IF @VoucherID IS NOT NULL
@@ -293,14 +297,12 @@ BEGIN
             END
         END
 
-        UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked + 1 WHERE SlotID = @SlotID;
-
         DECLARE @TierID INT;
         SELECT @TierID = TierID FROM Customers WHERE CustomerID = @CustomerID;
         DECLARE @PriorityScore INT = dbo.fn_CalculatePriorityScore(@TierID, @ScheduledTime);
 
         INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, VoucherID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status, PriorityScore)
-        VALUES (@CustomerID, @ServiceID, @VehicleID, @VoucherID, @BookingDate, @ScheduledTime, @OriginalPrice, @DiscountAmount, @FinalPrice, 'Pending', @PriorityScore);
+        VALUES (@CustomerID, @ServiceID, @VehicleID, @VoucherID, @BookingDate, @ScheduledTime, @OriginalPrice, @DiscountAmount, @FinalPrice, @BookingStatus, @PriorityScore);
 
         COMMIT TRANSACTION;
     END TRY
@@ -502,4 +504,51 @@ BEGIN
         DROP TABLE #CustomerAgg;
     END
 END
+GO
+
+-- ==============================================================
+-- TRIGGER: TỰ ĐỘNG BỐC NGƯỜI TỪ WAITLIST LÊN KHI CÓ NGƯỜI HỦY
+-- ==============================================================
+IF OBJECT_ID('dbo.trg_AutoPromoteWaitlist') IS NOT NULL DROP TRIGGER dbo.trg_AutoPromoteWaitlist;
+GO
+CREATE TRIGGER trg_AutoPromoteWaitlist
+ON Bookings
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    IF UPDATE(Status)
+    BEGIN
+        DECLARE @BookingDate DATE, @ScheduledTime TIME, @OldStatus VARCHAR(20), @NewStatus VARCHAR(20);
+        
+        SELECT @OldStatus = d.Status, @NewStatus = i.Status, 
+               @BookingDate = i.BookingDate, @ScheduledTime = i.ScheduledTime
+        FROM deleted d INNER JOIN inserted i ON d.BookingID = i.BookingID;
+
+        IF @OldStatus = 'Pending' AND @NewStatus = 'Cancelled'
+        BEGIN
+            DECLARE @LuckyBookingID INT;
+            
+            SELECT TOP 1 @LuckyBookingID = b.BookingID
+            FROM Bookings b
+            JOIN Customers c ON b.CustomerID = c.CustomerID
+            JOIN MemberTiers t ON c.TierID = t.TierID
+            WHERE b.Status = 'Waitlisted' 
+              AND b.BookingDate = @BookingDate AND b.ScheduledTime = @ScheduledTime
+            ORDER BY t.PriorityRank DESC, b.CreatedAt ASC;
+
+            IF @LuckyBookingID IS NOT NULL
+            BEGIN
+                UPDATE Bookings SET Status = 'Pending', UpdatedAt = GETDATE() WHERE BookingID = @LuckyBookingID;
+            END
+            ELSE
+            BEGIN
+                UPDATE BookingSlotCapacity 
+                SET CurrentBooked = CurrentBooked - 1 
+                WHERE SlotDate = @BookingDate AND TimeSlot = @ScheduledTime;
+            END
+        END
+    END
+END;
 GO

@@ -101,6 +101,12 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
+        if (!ValidationUtil.isValidPassword(rawPassword)) {
+            request.setAttribute("errorMessage", "Mật khẩu không hợp lệ! (Phải từ 6 đến 50 ký tự)");
+            forwardWithError(request, response, fullName, phone, licensePlate);
+            return;
+        }
+
         UserService userService = new UserService();
         int result = userService.processRegistration(fullName, phone, licensePlate, rawPassword);
 

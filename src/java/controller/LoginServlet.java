@@ -53,6 +53,10 @@ public class LoginServlet extends HttpServlet {
             String redirectUrl = (String) session.getAttribute("redirectUrl");
             if (redirectUrl != null) {
                 session.removeAttribute("redirectUrl");
+                // Anti Open-Redirect: Check if the URL starts with context path
+                if (!redirectUrl.startsWith(request.getContextPath() + "/") && !redirectUrl.equals(request.getContextPath())) {
+                    redirectUrl = null; // Invalid redirect, fallback to default
+                }
             }
 
             if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(user.getRole())) {
@@ -62,6 +66,9 @@ public class LoginServlet extends HttpServlet {
                 dto.Customer cus = userDAO.getCustomerByUserId(user.getUserId());
                 if (cus != null) {
                     session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
+                } else {
+                    // Fallback to prevent NullPointerException in JSP
+                    session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, new dto.Customer());
                 }
                 response.sendRedirect(redirectUrl != null ? redirectUrl : request.getContextPath() + "/account/dashboard");
             }

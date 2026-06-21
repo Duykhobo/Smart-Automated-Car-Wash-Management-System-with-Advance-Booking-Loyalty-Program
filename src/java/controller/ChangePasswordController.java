@@ -79,7 +79,7 @@ public class ChangePasswordController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            response.sendRedirect("/auth/login");
+            response.sendRedirect(request.getContextPath() + "/auth/login");
             return;
         }
         String currentpassword = request.getParameter("txtCurrentPassword");

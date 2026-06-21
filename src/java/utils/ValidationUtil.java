@@ -71,13 +71,13 @@ public class ValidationUtil {
     }
 
     /**
-     * Kiểm tra mật khẩu hợp lệ (tối thiểu 6 ký tự, không chứa khoảng trắng hai đầu)
+     * Kiểm tra mật khẩu hợp lệ (tối thiểu 8 ký tự, không chứa khoảng trắng hai đầu)
      */
     public static boolean isValidPassword(String password) {
         if (password == null || password.trim().isEmpty()) {
             return false;
         }
-        if (password.length() < 6 || password.length() > 50) {
+        if (password.length() < 8 || password.length() > 50) {
             return false;
         }
         // Có thể thêm regex phức tạp hơn ở đây nếu cần thiết

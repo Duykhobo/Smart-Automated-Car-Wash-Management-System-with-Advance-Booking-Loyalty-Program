@@ -123,29 +123,46 @@ public class PageController extends HttpServlet {
                     dto.Customer customer = cusDAO.getCustomerByAccountId(sessionUser.getUserId());
 
                     if (customer != null) {
-                        int points = customer.getPointsBalance();
-                        String tier = customer.getTierStatus() != null ? customer.getTierStatus().toUpperCase() : "MEMBER";
-                        String nextTier = "SILVER";
-                        int targetPoints = 500;
-
-                        if ("SILVER".equals(tier)) {
-                            nextTier = "GOLD";
-                            targetPoints = 1500;
-                        } else if ("GOLD".equals(tier)) {
-                            nextTier = "PLATINUM";
-                            targetPoints = 3000;
-                        } else if ("PLATINUM".equals(tier)) {
-                            nextTier = "MAX";
-                            targetPoints = points; // Already at max
+                        dao.MemberTierDAO tierDAO = new dao.MemberTierDAO();
+                        java.util.List<dto.MemberTier> tiers = tierDAO.getAllTiers();
+                        
+                        dto.MemberTier currentTier = null;
+                        dto.MemberTier nextTierObj = null;
+                        
+                        String tierStatus = customer.getTierStatus() != null ? customer.getTierStatus().trim() : "MEMBER";
+                        for (int i = 0; i < tiers.size(); i++) {
+                            if (tiers.get(i).getTierName().equalsIgnoreCase(tierStatus)) {
+                                currentTier = tiers.get(i);
+                                if (i < tiers.size() - 1) {
+                                    nextTierObj = tiers.get(i + 1);
+                                }
+                                break;
+                            }
+                        }
+                        
+                        String nextTierName = "MAX";
+                        double targetSpend = 0;
+                        double spendNeeded = 0;
+                        int progressPercent = 100;
+                        
+                        if (nextTierObj != null) {
+                            nextTierName = nextTierObj.getTierName();
+                            targetSpend = nextTierObj.getMinSpend();
+                            spendNeeded = Math.max(0, targetSpend - customer.getTotalSpend());
+                            
+                            double currentMinSpend = currentTier != null ? currentTier.getMinSpend() : 0;
+                            double spendRange = targetSpend - currentMinSpend;
+                            double currentProgress = customer.getTotalSpend() - currentMinSpend;
+                            double p = (currentProgress / spendRange) * 100;
+                            if (p > 100) p = 100;
+                            if (p < 0) p = 0;
+                            progressPercent = (int) p;
                         }
 
-                        int pointsNeeded = Math.max(0, targetPoints - points);
-                        int progressPercent = (targetPoints > 0) ? (int) Math.min(100, ((double) points / targetPoints) * 100) : 100;
-
                         request.setAttribute("customer", customer);
-                        request.setAttribute("nextTier", nextTier);
-                        request.setAttribute("targetPoints", targetPoints);
-                        request.setAttribute("pointsNeeded", pointsNeeded);
+                        request.setAttribute("nextTier", nextTierName);
+                        request.setAttribute("targetSpend", targetSpend);
+                        request.setAttribute("spendNeeded", spendNeeded);
                         request.setAttribute("progressPercent", progressPercent);
                     }
                 }

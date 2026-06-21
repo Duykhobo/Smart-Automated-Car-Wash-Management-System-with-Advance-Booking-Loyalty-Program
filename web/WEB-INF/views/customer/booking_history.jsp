@@ -35,21 +35,7 @@
         <script src="https://unpkg.com/lucide@latest"></script>
 
         <script>
-            function rebookMock(serviceName) {
-                // Show loading state on button or a generic loading toast
-                const toast = document.getElementById('successToast');
-                if (toast) {
-                    toast.querySelector('span.font-bold').innerText = "Đang tải cấu hình...";
-                    toast.querySelector('span.text-sm').innerText = `Tự động chọn xe và gói ${serviceName}`;
-                    toast.classList.remove('translate-y-full', 'opacity-0');
-                    toast.classList.add('translate-y-0', 'opacity-100');
 
-                    setTimeout(() => {
-                        // Simulate redirect to booking page with parameters
-                        window.location.href = "${pageContext.request.contextPath}/bookings?rebook=true";
-                    }, 1500);
-                }
-            }
 
             function switchTab(tabId) {
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -302,9 +288,9 @@
                                             <c:if test="${booking.status == 'Completed'}">
                                                 <button class="text-text-muted text-sm hover:text-white transition-colors">Đánh giá</button>
                                             </c:if>
-                                            <button onclick="rebookMock('Dịch Vụ Rửa Xe')" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
+                                            <a href="${pageContext.request.contextPath}/bookings?serviceId=${booking.serviceId}&vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
                                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i> Đặt lại
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </article>

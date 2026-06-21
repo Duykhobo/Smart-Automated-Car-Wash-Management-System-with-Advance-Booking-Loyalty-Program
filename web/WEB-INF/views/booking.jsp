@@ -132,7 +132,7 @@
                             <c:choose>
                                 <c:when test="${not empty vehicles}">
                                     <c:forEach var="v" items="${vehicles}">
-                                        <div class="vehicle-option px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors flex items-center justify-between group" data-value="${v.vehicleId}" data-text="${v.licensePlate} <c:if test="${not empty v.brand}">- ${v.brand}</c:if>" ${v.isDefault ? 'data-default="true"' : ''}>
+                                        <div class="vehicle-option px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors flex items-center justify-between group" data-value="${v.vehicleId}" data-text="${v.licensePlate} <c:if test="${not empty v.brand}">- ${v.brand}</c:if>" ${(not empty param.vehicleId and param.vehicleId eq v.vehicleId) or (empty param.vehicleId and v.isDefault) ? 'data-default="true"' : ''}>
                                             <span class="text-gray-300 group-hover:text-white font-medium transition-colors">${v.licensePlate} <c:if test="${not empty v.brand}"><span class="text-text-muted text-sm ml-1 font-normal">- ${v.brand}</span></c:if></span>
                                             <i data-lucide="check" class="w-4 h-4 text-[#00d4ff] opacity-0 transition-opacity check-icon"></i>
                                         </div>
@@ -157,7 +157,7 @@
                         <c:when test="${not empty services}">
                             <c:forEach var="service" items="${services}" varStatus="status">
                                 <label class="block relative cursor-pointer group">
-                                    <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${status.first ? 'checked' : ''}>
+                                    <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${(not empty param.serviceId and param.serviceId eq service.serviceId) or (empty param.serviceId and status.first) ? 'checked' : ''}>
                                     <div class="glass-panel p-5 min-h-[100px] rounded-2xl border-2 border-transparent peer-checked:border-[#00d4ff] peer-checked:bg-[#00d4ff]/5 transition-all flex flex-col justify-between gap-3 hover:-translate-y-1">
                                         <div class="flex items-start justify-between">
                                             <h3 class="font-display font-bold text-base md:text-lg text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>

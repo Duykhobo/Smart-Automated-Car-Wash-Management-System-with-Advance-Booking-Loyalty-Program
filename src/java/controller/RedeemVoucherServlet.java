@@ -19,7 +19,7 @@ public class RedeemVoucherServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/account/dashboard");
+        response.sendRedirect(request.getContextPath() + "/customer/loyalty");
     }
 
     @Override
@@ -58,7 +58,7 @@ public class RedeemVoucherServlet extends HttpServlet {
 
             session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
             session.setAttribute("successMessage", "Đổi Voucher thành công!");
-            response.sendRedirect(request.getContextPath() + "/account/dashboard");
+            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
             return;
 
         } catch (NumberFormatException e) {

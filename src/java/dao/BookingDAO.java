@@ -78,7 +78,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getUpcomingBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress', 'Waitlisted') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -437,7 +437,7 @@ public class BookingDAO {
         // sau đó so sánh xem nó có cũ hơn (Thời gian hiện tại - 15 phút) hay không.
         String sql = "UPDATE Bookings " +
                      "SET Status = 'Cancelled', UpdatedAt = GETDATE() " +
-                     "WHERE Status = 'Pending' " +
+                     "WHERE Status IN ('Pending', 'Waitlisted') " +
                      "AND CAST(CONCAT(BookingDate, ' ', ScheduledTime) AS DATETIME) <= DATEADD(MINUTE, -15, GETDATE())";
                      
         try (Connection conn = DBContext.getConnection();

@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <form id="bookingForm" action="${pageContext.request.contextPath}/customer/booking_history" method="POST" class="space-y-8">
+            <form id="bookingForm" action="${pageContext.request.contextPath}/checkout" method="POST" class="space-y-8">
             
             <!-- Select Car -->
             <section class="space-y-4">
@@ -239,7 +239,7 @@
                 <span class="text-xs md:text-sm text-text-muted font-medium uppercase tracking-wider">Tổng Thanh Toán (Tại quầy)</span>
                 <span id="totalPriceDisplay" class="text-xl md:text-2xl font-display font-bold text-[#00d4ff]">0 <span class="text-sm text-text-muted font-sans font-normal">đ</span></span>
             </div>
-            <button type="button" onclick="submitBookingMock()" class="btn-glow bg-[#00d4ff] hover:bg-white text-black font-bold px-8 h-12 md:h-14 rounded-xl transition-all text-sm md:text-base flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.3)]">
+            <button type="submit" form="bookingForm" id="submitBookingBtn" class="btn-glow bg-[#00d4ff] hover:bg-white text-black font-bold px-8 h-12 md:h-14 rounded-xl transition-all text-sm md:text-base flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.3)]">
                 XÁC NHẬN ĐẶT LỊCH
             </button>
         </div>
@@ -395,18 +395,34 @@
         }
     });
 
-    function submitBookingMock() {
-        // Change button text and disable to simulate loading
-        const btn = document.querySelector('button[onclick="submitBookingMock()"]');
-        btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin mr-2"></i> Đang xử lý...';
-        btn.disabled = true;
-        lucide.createIcons();
+        // Remove submitBookingMock and add real form validation & loading state
+        const bookingForm = document.getElementById('bookingForm');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', function(e) {
+                const selectedTime = document.querySelector('input[name="time"]:checked');
+                const vehicleId = document.getElementById('vehicleIdInput').value;
+                
+                if (!vehicleId) {
+                    e.preventDefault();
+                    alert("Vui lòng chọn hoặc thêm phương tiện trước khi đặt lịch.");
+                    return;
+                }
+                
+                if (!selectedTime) {
+                    e.preventDefault();
+                    alert("Vui lòng chọn một khung giờ để đặt lịch.");
+                    return;
+                }
 
-        // Simulate network request
-        setTimeout(() => {
-            window.location.href = "${pageContext.request.contextPath}/customer/booking_history?success=true";
-        }, 1000);
-    }
+                // Show loading state
+                const btn = document.getElementById('submitBookingBtn');
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin mr-2"></i> Đang xử lý...';
+                    btn.disabled = true;
+                    lucide.createIcons();
+                }
+            });
+        }
 </script>
 </body>
 

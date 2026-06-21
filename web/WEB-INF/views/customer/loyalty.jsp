@@ -191,7 +191,11 @@
                             </div>
                             <div class="flex items-center justify-between mt-4">
                                 <span class="text-sm font-bold text-amber-400">500 AWP</span>
-                                <button class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
+                                <form action="${pageContext.request.contextPath}/redeemVoucher" method="POST" class="m-0">
+                                    <input type="hidden" name="rewardType" value="Voucher Giảm 10%">
+                                    <input type="hidden" name="pointsCost" value="500">
+                                    <button type="submit" class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -209,7 +213,11 @@
                             </div>
                             <div class="flex items-center justify-between mt-4">
                                 <span class="text-sm font-bold text-amber-400">1,200 AWP</span>
-                                <button class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
+                                <form action="${pageContext.request.contextPath}/redeemVoucher" method="POST" class="m-0">
+                                    <input type="hidden" name="rewardType" value="Voucher Free Xịt Gầm">
+                                    <input type="hidden" name="pointsCost" value="1200">
+                                    <button type="submit" class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
+                                </form>
                             </div>
                         </div>
                     </div>

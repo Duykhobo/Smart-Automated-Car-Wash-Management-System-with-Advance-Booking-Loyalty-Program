@@ -252,6 +252,9 @@
                 if (password !== confirmPassword) {
                     errors.push("Xác nhận mật khẩu không khớp.");
                 }
+                if (!form.terms.checked) {
+                    errors.push("Bạn phải đồng ý với Điều khoản dịch vụ và Chính sách bảo mật.");
+                }
 
                 if (errors.length > 0) {
                     clientErrorText.innerHTML = errors.join('<br>');

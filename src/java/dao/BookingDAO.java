@@ -520,7 +520,7 @@ public class BookingDAO {
         String sql = "UPDATE Bookings " +
                      "SET Status = 'Cancelled', UpdatedAt = GETDATE() " +
                      "WHERE Status IN ('Pending', 'Waitlisted') " +
-                     "AND CAST(CONCAT(BookingDate, ' ', ScheduledTime) AS DATETIME) <= DATEADD(MINUTE, -15, GETDATE())";
+                     "AND CAST(CONCAT(BookingDate, ' ', ScheduledTime) AS DATETIME2) <= DATEADD(MINUTE, -15, GETDATE())";
                      
         try (Connection conn = DBContext.getConnection();
              PreparedStatement st = conn.prepareStatement(sql)) {

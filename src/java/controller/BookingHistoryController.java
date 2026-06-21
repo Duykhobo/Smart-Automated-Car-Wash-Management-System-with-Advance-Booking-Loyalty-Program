@@ -257,6 +257,25 @@ public class BookingHistoryController extends HttpServlet {
                 } catch (Exception ex) {}
                 response.sendRedirect(request.getContextPath() + "/customer/booking_history?msg=UpdateError&err=" + errMsg);
             }
+        } else if ("cancel".equals(action)) {
+            try {
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                BookingDAO bookDao = new BookingDAO();
+                CustomerDAO cusDao = new CustomerDAO();
+                Customer cus = cusDao.getCustomerByAccountId(user.getUserId());
+                
+                boolean success = bookDao.cancelBookingTransaction(bookingId, cus.getCustomerId());
+                if (success) {
+                    request.getSession().setAttribute("successMessage", "Hủy lịch thành công!");
+                    response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+                } else {
+                    request.getSession().setAttribute("errorMessage", "Hủy lịch thất bại. Bạn chỉ có thể hủy các lịch đang chờ xử lý.");
+                    response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+                }
+            } catch (Exception e) {
+                request.getSession().setAttribute("errorMessage", "Lỗi hệ thống khi hủy lịch.");
+                response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+            }
         } else {
             response.sendRedirect(request.getContextPath() + "/customer/booking_history");
         }

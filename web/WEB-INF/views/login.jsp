@@ -158,7 +158,8 @@
         <script>
             lucide.createIcons();
         </script>
-    </body>
+        <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+</body>
 </html>
 
 

@@ -520,5 +520,6 @@
             }
         });
     </script>
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 </html>

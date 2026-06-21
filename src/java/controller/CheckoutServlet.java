@@ -244,7 +244,7 @@ public class CheckoutServlet extends HttpServlet {
             }
         } else {
             request.getSession().setAttribute("successMessage", message);
-            response.sendRedirect(request.getContextPath() + "/account/dashboard");
+            response.sendRedirect(request.getContextPath() + "/customer/booking_history");
         }
     }
 

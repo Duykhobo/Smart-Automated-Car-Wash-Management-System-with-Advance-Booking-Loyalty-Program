@@ -241,6 +241,84 @@ public class BookingDAO {
         return success;
     }
 
+    /**
+     * Hủy một lịch đặt và trả lại sức chứa (Slot)
+     * Chỉ được phép hủy nếu trạng thái là Pending hoặc Waitlisted.
+     * 
+     * @param bookingId ID lịch đặt
+     * @param customerId ID khách hàng (để verify quyền)
+     * @return true nếu hủy thành công
+     */
+    public boolean cancelBookingTransaction(int bookingId, int customerId) {
+        boolean success = false;
+        String queryBooking = "SELECT BookingDate, ScheduledTime, Status FROM Bookings WHERE BookingID = ? AND CustomerID = ?";
+        String updateStatus = "UPDATE Bookings SET Status = 'Cancelled', UpdatedAt = GETDATE() WHERE BookingID = ?";
+        String decreaseCapacity = "UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked - 1 "
+                + "WHERE SlotDate = ? AND TimeSlot = CAST(? AS TIME) AND CurrentBooked > 0";
+
+        Connection cn = null;
+        try {
+            cn = DBContext.getConnection();
+            cn.setAutoCommit(false);
+            
+            try (PreparedStatement pstGet = cn.prepareStatement(queryBooking)) {
+                pstGet.setInt(1, bookingId);
+                pstGet.setInt(2, customerId);
+                try (ResultSet rs = pstGet.executeQuery()) {
+                    if (rs.next()) {
+                        String status = rs.getString("Status");
+                        if (!"Pending".equalsIgnoreCase(status) && !"Waitlisted".equalsIgnoreCase(status)) {
+                            return false; // Chỉ cho phép hủy Pending hoặc Waitlisted
+                        }
+                        Date bDate = rs.getDate("BookingDate");
+                        Time bTime = rs.getTime("ScheduledTime");
+                        
+                        // Update Status sang Cancelled
+                        try (PreparedStatement pstUpdate = cn.prepareStatement(updateStatus)) {
+                            pstUpdate.setInt(1, bookingId);
+                            int row = pstUpdate.executeUpdate();
+                            if (row == 0) {
+                                cn.rollback();
+                                return false;
+                            }
+                        }
+                        
+                        // Nếu là Pending thì mới chiếm slot -> phải giải phóng slot
+                        if ("Pending".equalsIgnoreCase(status)) {
+                            try (PreparedStatement pstCap = cn.prepareStatement(decreaseCapacity)) {
+                                pstCap.setDate(1, bDate);
+                                pstCap.setTime(2, bTime);
+                                pstCap.executeUpdate();
+                            }
+                        }
+                        
+                        cn.commit();
+                        success = true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Rollback cancelBooking failed", ex);
+                }
+            }
+            LOGGER.log(Level.SEVERE, "Error in cancelBookingTransaction", e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.setAutoCommit(true);
+                    cn.close();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Close connection failed", ex);
+                }
+            }
+        }
+        return success;
+    }
+
     public dto.Booking getBookingById(int bookingId) throws SQLException {
         Booking booking = null;
         String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";

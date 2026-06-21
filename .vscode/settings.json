@@ -11,5 +11,7 @@
     "web/WEB-INF/lib/slf4j-api-1.7.36.jar",
     "web/WEB-INF/lib/slf4j-simple-1.7.36.jar",
     "web/WEB-INF/lib/sqljdbc4.jar"
-  ]
+  ],
+  "snyk.advanced.organization": "3c7afdf4-b817-4340-a362-f9722b27517e",
+  "snyk.advanced.autoSelectOrganization": true
 }

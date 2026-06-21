@@ -18,6 +18,7 @@ import dto.Voucher;
 import utils.DBContext;
 
 public class BookingDAO {
+
     private static final Logger LOGGER = Logger.getLogger(BookingDAO.class.getName());
 
     /**
@@ -82,7 +83,7 @@ public class BookingDAO {
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
-            try (java.sql.ResultSet rs = st.executeQuery()) {
+            try ( java.sql.ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     list.add(new dto.Booking(
                             rs.getInt("BookingID"),

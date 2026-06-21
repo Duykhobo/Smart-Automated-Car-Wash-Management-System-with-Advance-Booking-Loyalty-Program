@@ -404,13 +404,13 @@
                 
                 if (!vehicleId) {
                     e.preventDefault();
-                    alert("Vui lòng chọn hoặc thêm phương tiện trước khi đặt lịch.");
+                    showJSToast('error', "Vui lòng chọn hoặc thêm phương tiện trước khi đặt lịch.");
                     return;
                 }
                 
                 if (!selectedTime) {
                     e.preventDefault();
-                    alert("Vui lòng chọn một khung giờ để đặt lịch.");
+                    showJSToast('error', "Vui lòng chọn một khung giờ để đặt lịch.");
                     return;
                 }
 

@@ -15,6 +15,8 @@ public class Service {
     private Double basePrice;
     private boolean isActive;
 
+    private java.sql.Timestamp inactiveFromDate;
+
     public Service() {
     }
 
@@ -25,11 +27,12 @@ public class Service {
         this.isActive = true; // default
     }
 
-    public Service(int serviceId, String name, Double basePrice, boolean isActive) {
+    public Service(int serviceId, String name, Double basePrice, boolean isActive, java.sql.Timestamp inactiveFromDate) {
         this.serviceId = serviceId;
         this.name = name;
         this.basePrice = basePrice;
         this.isActive = isActive;
+        this.inactiveFromDate = inactiveFromDate;
     }
 
     public void setServiceId(int serviceId) {
@@ -62,6 +65,14 @@ public class Service {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public java.sql.Timestamp getInactiveFromDate() {
+        return inactiveFromDate;
+    }
+
+    public void setInactiveFromDate(java.sql.Timestamp inactiveFromDate) {
+        this.inactiveFromDate = inactiveFromDate;
     }
 
 }

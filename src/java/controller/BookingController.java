@@ -24,9 +24,20 @@ import dto.Service;
 import dto.User;
 import utils.AppConstants;
 
+/**
+ * Controller xử lý luồng nghiệp vụ Đặt Lịch (Booking).
+ * - Phương thức GET: Lấy thông tin cấu hình, danh sách xe, dịch vụ, và hiển thị giao diện booking.jsp.
+ * - Phương thức POST: Nhận dữ liệu đặt lịch từ form, kiểm tra tính hợp lệ (Validation) về mặt thời gian,
+ *   tính toán giá tiền và lưu thông tin vào cơ sở dữ liệu.
+ */
 @WebServlet(name = "BookingController", urlPatterns = { "/BookingController" })
 public class BookingController extends HttpServlet {
 
+    /**
+     * Xử lý yêu cầu HTTP GET.
+     * Chuẩn bị tất cả dữ liệu (Xe, Dịch vụ, Hạng thành viên, Cấu hình thời gian) để render màn hình Đặt Lịch.
+     * Dữ liệu thời gian được lấy động từ SystemConfig thông qua SystemConfigDAO.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -55,39 +66,17 @@ public class BookingController extends HttpServlet {
                 // Determine Tier Name and Max Booking Days
                 String tierStatus = customer.getTierStatus();
                 String cleanTier = (tierStatus != null) ? tierStatus.trim() : "";
-                String tierName = "Member";
-                int maxBookingDays = 7;
-                String badgeClass = "badge-member";
-                String bannerBorder = "border-slate-500";
-                String bannerBg = "bg-slate-500/20";
-                String bannerIcon = "text-slate-500";
-                String bannerText = "text-slate-400";
+                
+                dao.MemberTierDAO tierDao = new dao.MemberTierDAO();
+                dto.MemberTier memberTier = tierDao.getTierByName(cleanTier);
 
-                if ("SILVER".equalsIgnoreCase(cleanTier)) {
-                    tierName = "Silver";
-                    maxBookingDays = 10;
-                    badgeClass = "badge-silver";
-                    bannerBorder = "border-slate-400";
-                    bannerBg = "bg-slate-400/20";
-                    bannerIcon = "text-slate-400";
-                    bannerText = "text-slate-300";
-                } else if ("GOLD".equalsIgnoreCase(cleanTier)) {
-                    tierName = "Gold";
-                    maxBookingDays = 12;
-                    badgeClass = "badge-gold";
-                    bannerBorder = "border-amber-500";
-                    bannerBg = "bg-amber-500/20";
-                    bannerIcon = "text-amber-500";
-                    bannerText = "text-amber-400";
-                } else if ("PLATINUM".equalsIgnoreCase(cleanTier)) {
-                    tierName = "Platinum";
-                    maxBookingDays = 14;
-                    badgeClass = "badge-platinum";
-                    bannerBorder = "border-[#00d4ff]";
-                    bannerBg = "bg-[#00d4ff]/20";
-                    bannerIcon = "text-[#00d4ff]";
-                    bannerText = "text-cyan-400";
-                }
+                String tierName = memberTier != null ? memberTier.getTierName() : "Member";
+                int maxBookingDays = memberTier != null ? memberTier.getMaxBookingDays() : 7;
+                String badgeClass = memberTier != null ? memberTier.getBadgeClass() : "badge-member";
+                String bannerBorder = memberTier != null ? memberTier.getBannerBorder() : "border-slate-500";
+                String bannerBg = memberTier != null ? memberTier.getBannerBg() : "bg-slate-500/20";
+                String bannerIcon = memberTier != null ? memberTier.getBannerIcon() : "text-slate-500";
+                String bannerText = memberTier != null ? memberTier.getBannerText() : "text-slate-400";
 
                 request.setAttribute("tierName", tierName);
                 request.setAttribute("maxBookingDays", maxBookingDays);
@@ -104,9 +93,15 @@ public class BookingController extends HttpServlet {
                     dynamicDays.add(today.plusDays(i));
                 }
                 request.setAttribute("dynamicDays", dynamicDays);
-                // Generate time slots (08:00 to 17:00)
+                
+                // Fetch System Config for Opening/Closing hours
+                dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+                int openingHour = configDao.getOpeningHour();
+                int closingHour = configDao.getClosingHour();
+
+                // Generate time slots
                 List<String> timeSlots = new ArrayList<>();
-                for (int i = 8; i <= 17; i++) {
+                for (int i = openingHour; i <= closingHour; i++) {
                     timeSlots.add(String.format("%02d:00", i));
                 }
                 request.setAttribute("timeSlots", timeSlots);
@@ -121,6 +116,11 @@ public class BookingController extends HttpServlet {
         }
     }
 
+    /**
+     * Xử lý yêu cầu HTTP POST.
+     * Nhận submit từ form Đặt Lịch, kiểm tra các ràng buộc về thời gian di chuyển (Travel Time),
+     * tính toán thành tiền và thực hiện Insert vào DB thông qua Transaction.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -148,6 +148,21 @@ public class BookingController extends HttpServlet {
 
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
             Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr + ":00"));
+
+            // ==========================================
+            // VALIDATION: TRAVEL TIME (Thời gian di chuyển)
+            // Lấy thời gian yêu cầu đặt trước từ cấu hình, so sánh với khoảng cách từ hiện tại đến lúc hẹn.
+            // ==========================================
+            dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+            int minAdvanceBookingMinutes = configDao.getMinAdvanceBookingMinutes();
+
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.LocalDateTime scheduledDateTime = java.time.LocalDateTime.of(bookingDate.toLocalDate(), scheduledTime.toLocalTime());
+            
+            // Nếu Hiện tại + Thời gian di chuyển tối thiểu vượt quá Thời gian hẹn -> Chặn
+            if (scheduledDateTime.isBefore(now.plusMinutes(minAdvanceBookingMinutes))) {
+                throw new Exception("Vui lòng đặt lịch trước giờ đến ít nhất " + minAdvanceBookingMinutes + " phút để chúng tôi chuẩn bị.");
+            }
 
             ServiceDAO serviceDAO = new ServiceDAO();
             List<Service> services = serviceDAO.getAllActiveServices();

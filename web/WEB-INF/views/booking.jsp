@@ -165,9 +165,17 @@
                                                 <div class="radio-inner w-2.5 h-2.5 rounded-full bg-[#00d4ff] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                             </div>
                                         </div>
-                                        <div class="font-bold text-[#00d4ff] text-lg md:text-xl">
-                                            <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/> đ
+                                        <div class="flex items-end justify-between mt-auto">
+                                            <div class="font-bold text-[#00d4ff] text-lg md:text-xl">
+                                                <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/> đ
+                                            </div>
                                         </div>
+                                        <c:if test="${not empty service.inactiveFromDate}">
+                                            <div class="text-xs text-amber-500 bg-amber-500/10 p-2 rounded-lg mt-2 flex items-start gap-1.5 border border-amber-500/20">
+                                                <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                                                <span>Dịch vụ này sẽ ngưng hoạt động từ <fmt:formatDate value="${service.inactiveFromDate}" pattern="dd/MM/yyyy HH:mm" /></span>
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </label>
                             </c:forEach>
@@ -213,9 +221,11 @@
                 <div id="timeSlotsContainer" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
                     <!-- Javascript will populate this -->
                 </div>
-                <div class="flex items-center gap-2 mt-2">
-                    <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
-                    <span class="text-xs text-text-muted">Slot Ưu Tiên (Dành riêng cho hạng Silver trở lên)</span>
+                <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-text-muted">
+                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bg-bg-primary border border-border-glass opacity-50"></div><span>Đã qua / Đã đầy</span></div>
+                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bg-[#00d4ff]/20 border border-[#00d4ff]"></div><span>Đang chọn</span></div>
+                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bg-amber-500/20 border border-amber-500"></div><span>Sắp hết chỗ</span></div>
+                    <div class="flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i><span>Slot ưu tiên</span></div>
                 </div>
             </section>
 
@@ -264,29 +274,40 @@
                 const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
                 data.forEach((slot, index) => {
-                    const [hour, min] = slot.time.split(':').map(Number);
-                    const slotMinutes = hour * 60 + min;
-                    
-                    let isPast = isToday && (slotMinutes < currentMinutes);
+                    let isPast = slot.isPast;
                     let isFull = slot.currentBooked >= slot.maxCapacity;
-                    let isFastFilling = !isFull && slot.currentBooked >= slot.maxCapacity - 1 && slot.maxCapacity > 1;
+                    let isFastFilling = slot.nearlyFull;
                     
                     // Mock priority slot for 09:00 and 15:00
                     let isPriority = (slot.time === '09:00' || slot.time === '15:00');
 
                     let disabled = isPast || isFull;
                     
+                    let bgClass = disabled ? 'bg-bg-primary' : 'hover:border-[#00d4ff]/50';
+                    let borderClass = disabled ? 'border-border-glass' : 'border-border-glass';
+                    let textClass = disabled ? 'text-gray-500' : 'text-gray-300';
+                    
+                    if (!disabled && isFastFilling) {
+                        bgClass = 'bg-amber-500/10 hover:border-amber-500/50 peer-checked:bg-amber-500/20';
+                        borderClass = 'border-amber-500/30 peer-checked:border-amber-500';
+                        textClass = 'text-amber-500 peer-checked:text-amber-400';
+                    } else if (!disabled) {
+                        bgClass += ' peer-checked:bg-[#00d4ff]/20';
+                        borderClass += ' peer-checked:border-[#00d4ff]';
+                        textClass += ' peer-checked:text-[#00d4ff]';
+                    }
+
                     let html = `
                         <label class="transition-transform group relative \${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}">
                             <input type="radio" name="time" class="peer sr-only" value="\${slot.time}" \${disabled ? 'disabled' : ''}>
-                            <div class="h-12 rounded-xl glass-panel border border-border-glass \${disabled ? 'bg-bg-primary' : 'peer-checked:bg-[#00d4ff]/20 peer-checked:border-[#00d4ff] peer-checked:text-[#00d4ff] hover:border-[#00d4ff]/50'} flex items-center justify-center transition-all \${isPriority ? 'priority-slot' : ''}">
-                                <span class="font-bold text-sm \${disabled ? 'text-gray-500' : 'text-gray-300 peer-checked:text-[#00d4ff]'} flex items-center gap-1.5">
+                            <div class="h-12 rounded-xl glass-panel border \${borderClass} \${bgClass} flex items-center justify-center transition-all \${isPriority ? 'priority-slot' : ''}">
+                                <span class="font-bold text-sm \${textClass} flex items-center gap-1.5">
                                     \${isPriority ? '<i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>' : ''}
                                     \${disabled ? (isFull ? '<i data-lucide="lock" class="w-3.5 h-3.5"></i>' : '<i data-lucide="clock" class="w-3.5 h-3.5"></i>') : ''}
                                     <span class="\${disabled && !isFull ? 'line-through' : ''}">\${slot.time}</span>
                                 </span>
                             </div>
-                            \${isFastFilling ? '<span class="absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>' : ''}
+                            \${isFastFilling && !disabled ? '<span class="absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>' : ''}
                         </label>
                     `;
                     container.insertAdjacentHTML('beforeend', html);
@@ -423,6 +444,15 @@
                 }
             });
         }
+        
+        // Reset button state when navigating back from history (bfcache)
+        window.addEventListener('pageshow', function(event) {
+            const btn = document.getElementById('submitBookingBtn');
+            if (btn && btn.disabled) {
+                btn.innerHTML = 'XÁC NHẬN ĐẶT LỊCH';
+                btn.disabled = false;
+            }
+        });
 </script>
     <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />

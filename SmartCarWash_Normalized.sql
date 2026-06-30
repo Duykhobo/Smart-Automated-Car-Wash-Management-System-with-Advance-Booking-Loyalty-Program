@@ -27,19 +27,34 @@ IF OBJECT_ID('dbo.Services', 'U') IS NOT NULL DROP TABLE dbo.Services;
 IF OBJECT_ID('dbo.Customers', 'U') IS NOT NULL DROP TABLE dbo.Customers;
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE dbo.Users;
 IF OBJECT_ID('dbo.MemberTiers', 'U') IS NOT NULL DROP TABLE dbo.MemberTiers;
+IF OBJECT_ID('dbo.SystemConfig', 'U') IS NOT NULL DROP TABLE dbo.SystemConfig;
 GO
 
 -- =======================================================================
 -- 2. TẠO CÁC BẢNG DỮ LIỆU
 -- =======================================================================
--- 0. BẢNG MEMBER_TIERS (Bảng từ điển hạng thành viên để khử hard-code)
+-- 0. BẢNG SYSTEM_CONFIG (Cấu hình hệ thống)
+CREATE TABLE SystemConfig (
+    ConfigKey VARCHAR(50) PRIMARY KEY,
+    ConfigValue VARCHAR(255) NOT NULL,
+    Description NVARCHAR(255) NULL
+);
+GO
+
+-- 0.5. BẢNG MEMBER_TIERS (Bảng từ điển hạng thành viên để khử hard-code)
 CREATE TABLE MemberTiers (
     TierID INT IDENTITY(1,1) PRIMARY KEY,
     TierName VARCHAR(50) UNIQUE NOT NULL,
     MinWashes INT NOT NULL DEFAULT 0,
     MinSpend DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     PointsModifier DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    PriorityRank INT NOT NULL DEFAULT 1
+    PriorityRank INT NOT NULL DEFAULT 1,
+    MaxBookingDays INT NOT NULL DEFAULT 7,
+    BadgeClass VARCHAR(50) NULL,
+    BannerBorder VARCHAR(50) NULL,
+    BannerBg VARCHAR(50) NULL,
+    BannerIcon VARCHAR(50) NULL,
+    BannerText VARCHAR(50) NULL
 );
 GO
 
@@ -97,6 +112,7 @@ CREATE TABLE Services (
     Name NVARCHAR(100) NOT NULL,
     BasePrice DECIMAL(10,2) NOT NULL,
     IsActive BIT DEFAULT 1,
+    InactiveFromDate DATETIME NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
 );
@@ -194,11 +210,11 @@ GO
 -- =======================================================================
 -- 3. INSERT DỮ LIỆU TỪ ĐIỂN MẶC ĐỊNH
 -- =======================================================================
-INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, PriorityRank) VALUES 
-('Member', 0, 0, 0.00, 1),
-('Silver', 5, 2000000, 0.10, 2),
-('Gold', 15, 6000000, 0.30, 3),
-('Platinum', 30, 15000000, 0.50, 4);
+INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, PriorityRank, MaxBookingDays, BadgeClass, BannerBorder, BannerBg, BannerIcon, BannerText) VALUES 
+('Member', 0, 0, 0.00, 1, 7, 'badge-member', 'border-slate-500', 'bg-slate-500/20', 'text-slate-500', 'text-slate-400'),
+('Silver', 5, 2000000, 0.10, 2, 10, 'badge-silver', 'border-slate-400', 'bg-slate-400/20', 'text-slate-400', 'text-slate-300'),
+('Gold', 15, 6000000, 0.30, 3, 12, 'badge-gold', 'border-amber-500', 'bg-amber-500/20', 'text-amber-500', 'text-amber-400'),
+('Platinum', 30, 15000000, 0.50, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
 GO
 
 -- =======================================================================

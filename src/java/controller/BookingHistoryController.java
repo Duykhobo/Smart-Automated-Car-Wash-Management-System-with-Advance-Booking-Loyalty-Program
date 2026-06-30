@@ -23,8 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 import utils.AppConstants;
 
 /**
- *
- * @author thien
+ * Controller xử lý Quản lý Lịch Sử Đặt Lịch (Booking History).
+ * - Phương thức GET: Lấy danh sách lịch sử (sắp tới và đã qua) hoặc load giao diện Chỉnh sửa lịch hẹn.
+ * - Phương thức POST: Xử lý 2 luồng thao tác từ người dùng là Dời Lịch (update) và Hủy Lịch (cancel).
+ *   Kèm theo các logic xác thực thời gian chuẩn xác lấy từ SystemConfig.
  */
 @WebServlet(name = "BookingHistoryController", urlPatterns = {"/BookingHistoryController"})
 public class BookingHistoryController extends HttpServlet {
@@ -46,12 +48,9 @@ public class BookingHistoryController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * Xử lý HTTP GET method.
+     * - Nếu tham số action = "edit": Chuyển hướng người dùng sang giao diện Chỉnh sửa với thông số và config đã được truyền sẵn.
+     * - Ngược lại: Hiển thị danh sách Lịch sắp tới và Lịch sử.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -81,39 +80,18 @@ public class BookingHistoryController extends HttpServlet {
 
                         // Determine Tier Name and Max Booking Days
                         String tierStatus = cus.getTierStatus();
-                        String tierName = "Member";
-                        int maxBookingDays = 7;
-                        String badgeClass = "badge-member";
-                        String bannerBorder = "border-slate-500";
-                        String bannerBg = "bg-slate-500/20";
-                        String bannerIcon = "text-slate-500";
-                        String bannerText = "text-slate-400";
+                        String cleanTier = (tierStatus != null) ? tierStatus.trim() : "";
                         
-                        if ("SILVER".equalsIgnoreCase(tierStatus)) {
-                            tierName = "Silver";
-                            maxBookingDays = 10;
-                            badgeClass = "badge-silver";
-                            bannerBorder = "border-slate-400";
-                            bannerBg = "bg-slate-400/20";
-                            bannerIcon = "text-slate-400";
-                            bannerText = "text-slate-300";
-                        } else if ("GOLD".equalsIgnoreCase(tierStatus)) {
-                            tierName = "Gold";
-                            maxBookingDays = 12;
-                            badgeClass = "badge-gold";
-                            bannerBorder = "border-amber-500";
-                            bannerBg = "bg-amber-500/20";
-                            bannerIcon = "text-amber-500";
-                            bannerText = "text-amber-400";
-                        } else if ("PLATINUM".equalsIgnoreCase(tierStatus)) {
-                            tierName = "Platinum";
-                            maxBookingDays = 14;
-                            badgeClass = "badge-platinum";
-                            bannerBorder = "border-[#00d4ff]";
-                            bannerBg = "bg-[#00d4ff]/20";
-                            bannerIcon = "text-[#00d4ff]";
-                            bannerText = "text-cyan-400";
-                        }
+                        dao.MemberTierDAO tierDao = new dao.MemberTierDAO();
+                        dto.MemberTier memberTier = tierDao.getTierByName(cleanTier);
+
+                        String tierName = memberTier != null ? memberTier.getTierName() : "Member";
+                        int maxBookingDays = memberTier != null ? memberTier.getMaxBookingDays() : 7;
+                        String badgeClass = memberTier != null ? memberTier.getBadgeClass() : "badge-member";
+                        String bannerBorder = memberTier != null ? memberTier.getBannerBorder() : "border-slate-500";
+                        String bannerBg = memberTier != null ? memberTier.getBannerBg() : "bg-slate-500/20";
+                        String bannerIcon = memberTier != null ? memberTier.getBannerIcon() : "text-slate-500";
+                        String bannerText = memberTier != null ? memberTier.getBannerText() : "text-slate-400";
                         
                         request.setAttribute("tierName", tierName);
                         request.setAttribute("maxBookingDays", maxBookingDays);
@@ -131,9 +109,14 @@ public class BookingHistoryController extends HttpServlet {
                         }
                         request.setAttribute("dynamicDays", dynamicDays);
 
-                        // Generate time slots (08:00 to 17:00)
+                        // Fetch System Config for Opening/Closing hours
+                        dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+                        int openingHour = configDao.getOpeningHour();
+                        int closingHour = configDao.getClosingHour();
+
+                        // Generate time slots
                         List<String> timeSlots = new ArrayList<>();
-                        for (int i = 8; i <= 17; i++) {
+                        for (int i = openingHour; i <= closingHour; i++) {
                             timeSlots.add(String.format("%02d:00", i));
                         }
                         request.setAttribute("timeSlots", timeSlots);
@@ -164,6 +147,10 @@ public class BookingHistoryController extends HttpServlet {
         }
     }
 
+    /**
+     * Xử lý HTTP POST method (Dành cho việc Dời Lịch hoặc Hủy Lịch).
+     * @param request: Yêu cầu chứa `action` ("update" hoặc "cancel").
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -191,13 +178,19 @@ public class BookingHistoryController extends HttpServlet {
                 java.sql.Date newDate = java.sql.Date.valueOf(dateStr);
                 java.sql.Time newTime = java.sql.Time.valueOf(timeStr + ":00");
 
-                // Server-side validation: Check if selected time is in the past
+                // ==========================================
+                // VALIDATION: CHECK TRAVEL TIME FOR UPDATE
+                // Đảm bảo thời gian lịch dời không quá sát hiện tại.
+                // ==========================================
+                dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+                int minAdvanceBookingMinutes = configDao.getMinAdvanceBookingMinutes();
+
                 java.time.LocalDateTime now = java.time.LocalDateTime.now();
-                java.time.LocalDate newLocalDate = newDate.toLocalDate();
-                java.time.LocalTime newLocalTime = newTime.toLocalTime();
-                if (newLocalDate.isBefore(now.toLocalDate()) || 
-                   (newLocalDate.isEqual(now.toLocalDate()) && newLocalTime.isBefore(now.toLocalTime()))) {
-                    throw new Exception("Không thể cập nhật lịch hẹn vào khung giờ đã trôi qua!");
+                java.time.LocalDateTime scheduledDateTime = java.time.LocalDateTime.of(newDate.toLocalDate(), newTime.toLocalTime());
+                
+                // Nếu dời lịch quá gấp -> Chặn
+                if (scheduledDateTime.isBefore(now.plusMinutes(minAdvanceBookingMinutes))) {
+                    throw new Exception("Vui lòng dời lịch trước giờ đến ít nhất " + minAdvanceBookingMinutes + " phút để chúng tôi chuẩn bị.");
                 }
 
                 BookingDAO bookDao = new BookingDAO();
@@ -263,6 +256,27 @@ public class BookingHistoryController extends HttpServlet {
                 BookingDAO bookDao = new BookingDAO();
                 CustomerDAO cusDao = new CustomerDAO();
                 Customer cus = cusDao.getCustomerByAccountId(user.getUserId());
+                
+                // ==========================================
+                // VALIDATION: CHECK CANCELLATION TIME
+                // Không cho phép hủy lịch khi giờ hủy nằm quá gần giờ hẹn thực tế.
+                // ==========================================
+                dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+                int minCancellationMinutes = configDao.getMinCancellationMinutes();
+
+                Booking oldBooking = bookDao.getBookingById(bookingId);
+                if (oldBooking != null) {
+                    java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                    // Do bookingDate và scheduledTime là Timestamp, nên gọi toLocalDateTime() trước.
+                    java.time.LocalDateTime scheduledDateTime = java.time.LocalDateTime.of(oldBooking.getBookingDate().toLocalDateTime().toLocalDate(), oldBooking.getScheduledTime().toLocalDateTime().toLocalTime());
+                    
+                    // Nếu thời điểm "hiện tại + thời gian chuẩn bị hủy" đã đi qua mốc Lịch hẹn -> Chặn hủy
+                    if (now.plusMinutes(minCancellationMinutes).isAfter(scheduledDateTime)) {
+                        request.getSession().setAttribute("errorMessage", "Không thể hủy lịch trình quá sát giờ. (Ít nhất " + minCancellationMinutes + " phút trước lịch hẹn).");
+                        response.sendRedirect(request.getContextPath() + "/customer/booking_history");
+                        return;
+                    }
+                }
                 
                 boolean success = bookDao.cancelBookingTransaction(bookingId, cus.getCustomerId());
                 if (success) {

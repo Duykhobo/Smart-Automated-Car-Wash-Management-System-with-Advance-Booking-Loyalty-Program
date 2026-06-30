@@ -29,9 +29,7 @@ import dto.User;
 @WebServlet(name = "SlotApiServlet", urlPatterns = {"/api/slots"})
 public class SlotApiServlet extends HttpServlet {
 
-    private static final LocalTime OPEN_TIME = LocalTime.of(8, 0);
-    private static final LocalTime CLOSE_TIME = LocalTime.of(18, 0);
-    private static final int SLOT_DURATION_MINS = 30;
+    private static final int SLOT_DURATION_MINS = 60;
     private static final int DEFAULT_MAX_CAPACITY = 3;
 
     @Override
@@ -59,9 +57,11 @@ public class SlotApiServlet extends HttpServlet {
         try {
             Date bookingDate = Date.valueOf(dateParam);
             BookingDAO bookingDAO = new BookingDAO();
+            
+            // Lấy dữ liệu công suất đã được đặt cho từng khung giờ trong ngày
             List<BookingSlotCapacity> dbSlots = bookingDAO.getSlotsByDate(bookingDate);
             
-            // Map DB slots by time for fast lookup
+            // Map DB slots by time để tra cứu O(1)
             Map<String, BookingSlotCapacity> dbSlotMap = new HashMap<>();
             for (BookingSlotCapacity slot : dbSlots) {
                 // Time from DB: HH:mm:ss
@@ -69,15 +69,32 @@ public class SlotApiServlet extends HttpServlet {
                 dbSlotMap.put(timeStr, slot);
             }
 
+            dao.SystemConfigDAO configDao = new dao.SystemConfigDAO();
+            int openingHour = configDao.getOpeningHour();
+            int closingHour = configDao.getClosingHour();
+            int minAdvanceBookingMinutes = configDao.getMinAdvanceBookingMinutes();
+
+            LocalTime openTime = LocalTime.of(openingHour, 0);
+            LocalTime closeTime = LocalTime.of(closingHour, 0);
+
             List<Map<String, Object>> responseSlots = new ArrayList<>();
-            LocalTime currentTime = OPEN_TIME;
+            LocalTime currentTime = openTime;
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
-            while (!currentTime.isAfter(CLOSE_TIME.minusMinutes(SLOT_DURATION_MINS))) {
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.LocalDate requestedDate = bookingDate.toLocalDate();
+
+            while (!currentTime.isAfter(closeTime)) {
                 String timeStr = currentTime.format(formatter);
+                java.time.LocalDateTime slotDateTime = java.time.LocalDateTime.of(requestedDate, currentTime);
+                
+                // Xác định xem slot đã quá hạn cho phép đặt chưa
+                boolean isPast = slotDateTime.isBefore(now.plusMinutes(minAdvanceBookingMinutes));
+
                 Map<String, Object> slotData = new HashMap<>();
                 slotData.put("time", timeStr);
                 
+                // Nạp thông số Booked/Capacity
                 if (dbSlotMap.containsKey(timeStr)) {
                     BookingSlotCapacity dbSlot = dbSlotMap.get(timeStr);
                     slotData.put("currentBooked", dbSlot.getCurrentBooked());
@@ -86,9 +103,19 @@ public class SlotApiServlet extends HttpServlet {
                     slotData.put("currentBooked", 0);
                     slotData.put("maxCapacity", DEFAULT_MAX_CAPACITY);
                 }
+
+                slotData.put("isPast", isPast);
+                
+                int currentBooked = (int) slotData.get("currentBooked");
+                int maxCapacity = (int) slotData.get("maxCapacity");
+                
+                // Cờ nearlyFull: true nếu chỉ còn đúng 1 chỗ trống
+                boolean nearlyFull = (maxCapacity - currentBooked) == 1;
+                slotData.put("nearlyFull", nearlyFull);
                 
                 responseSlots.add(slotData);
-                currentTime = currentTime.plusMinutes(SLOT_DURATION_MINS);
+                // Advance by 60 mins (Mỗi slot cách nhau 1 tiếng)
+                currentTime = currentTime.plusMinutes(60);
             }
 
             StringBuilder jsonBuilder = new StringBuilder("[");
@@ -97,7 +124,9 @@ public class SlotApiServlet extends HttpServlet {
                 jsonBuilder.append("{")
                            .append("\"time\":\"").append(slotDataMap.get("time")).append("\",")
                            .append("\"currentBooked\":").append(slotDataMap.get("currentBooked")).append(",")
-                           .append("\"maxCapacity\":").append(slotDataMap.get("maxCapacity"))
+                           .append("\"maxCapacity\":").append(slotDataMap.get("maxCapacity")).append(",")
+                           .append("\"isPast\":").append(slotDataMap.get("isPast")).append(",")
+                           .append("\"nearlyFull\":").append(slotDataMap.get("nearlyFull"))
                            .append("}");
                 if (i < responseSlots.size() - 1) {
                     jsonBuilder.append(",");

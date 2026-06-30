@@ -130,6 +130,27 @@ public class BookingDAO {
         return success;
     }
 
+    /**
+     * Cập nhật thông tin Lịch Hẹn (Dời lịch).
+     * Hàm này thực thi Transaction:
+     * 1. Giảm số slot đã đặt ở giờ cũ.
+     * 2. Kiểm tra sức chứa ở giờ mới. Nếu còn trống -> Tăng slot ở giờ mới và cập nhật trạng thái Pending.
+     *    Nếu hết chỗ -> Chuyển trạng thái thành Waitlisted.
+     * 3. Lưu giá tiền và thời gian mới vào bảng Bookings.
+     *
+     * @param bookingId ID của lịch hẹn cần dời
+     * @param vehicleId Xe sử dụng
+     * @param serviceId Dịch vụ sử dụng
+     * @param oldDate Ngày cũ
+     * @param oldTime Giờ cũ
+     * @param newDate Ngày mới khách muốn dời
+     * @param newTime Giờ mới khách muốn dời
+     * @param originalPrice Giá gốc dịch vụ mới
+     * @param discountAmount Số tiền được giảm giá
+     * @param finalPrice Tổng tiền cuối cùng
+     * @return true nếu thành công
+     * @throws Exception nếu có lỗi CSDL
+     */
     public boolean updateBookingTransaction(int bookingId, int vehicleId, int serviceId, 
                                             Date oldDate, Time oldTime, 
                                             Date newDate, Time newTime, 
@@ -532,5 +553,29 @@ public class BookingDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Lỗi Background Job khi quét lịch hẹn quá hạn", e);
         }
+    }
+
+    /**
+     * Kiểm tra xem một chiếc xe (Vehicle) có đang vướng lịch hẹn nào chưa hoàn thành hay không.
+     * Hàm này được gọi khi khách hàng muốn xóa xe. Nếu có lịch Pending, Confirmed, InProgress hoặc Waitlisted, sẽ chặn xóa.
+     * 
+     * @param vehicleId ID của xe cần kiểm tra
+     * @return true nếu xe đang có lịch hẹn chờ xử lý, false nếu an toàn để xóa.
+     */
+    public boolean hasActiveBookings(int vehicleId) {
+        boolean hasActive = false;
+        String sql = "SELECT TOP 1 1 FROM Bookings WHERE VehicleID = ? AND Status IN ('Pending', 'Confirmed', 'InProgress', 'Waitlisted')";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, vehicleId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    hasActive = true;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking active bookings for vehicle", e);
+        }
+        return hasActive;
     }
 }

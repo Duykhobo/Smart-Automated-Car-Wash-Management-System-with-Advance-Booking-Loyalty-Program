@@ -15,9 +15,18 @@ import utils.DBContext;
 public class ServiceDAO {
     private static final Logger LOGGER = Logger.getLogger(ServiceDAO.class.getName());
 
+    /**
+     * Lấy danh sách tất cả các Dịch Vụ đang hoạt động để hiển thị cho Khách hàng lựa chọn.
+     * Logic mở rộng: Ngoài việc kiểm tra IsActive = 1, hệ thống còn kiểm tra trường InactiveFromDate.
+     * Nếu InactiveFromDate tồn tại và lớn hơn Thời gian hiện tại, dịch vụ này vẫn hiển thị (để khách đã lỡ đặt vẫn thấy thông tin).
+     * Tuy nhiên, UI sẽ cảnh báo dịch vụ này sắp ngừng hoạt động.
+     *
+     * @return Danh sách Dịch vụ (Service)
+     * @throws SQLException nếu truy vấn CSDL lỗi
+     */
     public List<Service> getAllActiveServices() throws SQLException {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT [ServiceID], [Name], [BasePrice] FROM [Services] WHERE [IsActive] = 1 ORDER BY [BasePrice] ASC";
+        String sql = "SELECT [ServiceID], [Name], [BasePrice], [InactiveFromDate] FROM [Services] WHERE [IsActive] = 1 AND ([InactiveFromDate] IS NULL OR [InactiveFromDate] > GETDATE()) ORDER BY [BasePrice] ASC";
 
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql);
@@ -27,7 +36,8 @@ public class ServiceDAO {
                 int id = rs.getInt("ServiceID");
                 String name = rs.getString("Name");
                 double price = rs.getDouble("BasePrice");
-                services.add(new Service(id, name, price));
+                java.sql.Timestamp inactiveFrom = rs.getTimestamp("InactiveFromDate");
+                services.add(new Service(id, name, price, true, inactiveFrom));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching active services", e);

@@ -116,3 +116,14 @@ END
 GO
 
 PRINT N'Thêm dữ liệu mẫu thành công!';
+
+-- 6. THÊM SYSTEM CONFIG (CẤU HÌNH HỆ THỐNG)
+IF NOT EXISTS (SELECT 1 FROM SystemConfig)
+BEGIN
+    INSERT INTO SystemConfig (ConfigKey, ConfigValue, Description) VALUES
+    ('MinAdvanceBookingMinutes', '60', N'Thời gian đặt trước tối thiểu (phút)'),
+    ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
+    ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
+    ('ClosingHour', '17', N'Giờ đóng cửa (0-23)');
+END
+GO

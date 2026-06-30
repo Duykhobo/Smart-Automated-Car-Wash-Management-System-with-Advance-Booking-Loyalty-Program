@@ -19,6 +19,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import utils.ValidationUtil;
+/**
+ * Controller xử lý các tác vụ Quản lý Xe (Thêm, Sửa, Xóa, Thiết lập mặc định).
+ * - Phương thức GET: Hiển thị danh sách xe của khách hàng.
+ * - Phương thức POST: Xử lý theo action. Đặc biệt có validate chặn Xóa xe khi xe đang kẹt lịch hẹn.
+ */
 @WebServlet(name = "VehicleController", urlPatterns = { "/vehicles", "/vehicles/action" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
         maxFileSize = 1024 * 1024 * 10, // 10MB
@@ -168,6 +173,20 @@ public class VehicleController extends HttpServlet {
 
                 case "delete": {
                     int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+                    
+                    // ==========================================
+                    // VALIDATION: CHECK ACTIVE BOOKINGS
+                    // Không cho phép xóa xe nếu xe này đang được sử dụng trong một lịch hẹn (Pending/Confirmed).
+                    // Việc này tránh tạo ra các "orphan booking" (lịch hẹn không có xe).
+                    // ==========================================
+                    dao.BookingDAO bookingDAO = new dao.BookingDAO();
+                    if (bookingDAO.hasActiveBookings(vehicleId)) {
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Không thể xóa xe này vì đang có lịch hẹn chưa hoàn thành. Vui lòng hoàn thành hoặc hủy lịch hẹn trước.");
+                        response.sendRedirect(request.getContextPath() + "/vehicles");
+                        return;
+                    }
+
+                    // Nếu thỏa điều kiện, tiến hành xóa mềm (đổi status = INACTIVE)
                     boolean success = carDAO.softDeleteCar(vehicleId, customerId);
                     if (success) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_SUCCESS, "Xóa xe thành công!");

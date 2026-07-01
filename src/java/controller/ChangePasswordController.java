@@ -55,13 +55,13 @@ public class ChangePasswordController extends HttpServlet {
             throws ServletException, IOException {
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         } else {
             CustomerDAO c = new CustomerDAO();
             Customer customer = c.getCustomerByAccountId(user.getUserId());
 
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/changePassword.jsp").forward(request, response);
         }
     }
 

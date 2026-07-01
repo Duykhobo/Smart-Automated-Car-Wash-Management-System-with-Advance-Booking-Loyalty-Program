@@ -38,9 +38,9 @@ public class BookingDAO {
      * @param finalPrice Giá cuối cùng phải trả
      * @return true nếu gọi Transaction thành công (Không phân biệt Pending hay Waitlisted)
      */
-    public boolean createBookingTransaction(int customerId, int serviceId, int vehicleId, Integer voucherId,
+    public boolean createBookingTransaction(int customerId, String serviceIds, int vehicleId, Integer voucherId,
             Date bookingDate, Time scheduledTime,
-            double originalPrice, double discountAmount, double finalPrice) throws Exception {
+            double originalPrice, double discountAmount, double finalPrice, int totalDurationMinutes) throws Exception {
         boolean success = false;
         String sql = "{CALL sp_CreateBookingTransaction(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
@@ -48,7 +48,7 @@ public class BookingDAO {
                 CallableStatement cs = cn.prepareCall(sql)) {
 
             cs.setInt(1, customerId);
-            cs.setInt(2, serviceId);
+            cs.setString(2, serviceIds);
             cs.setInt(3, vehicleId);
 
             if (voucherId != null) {
@@ -62,7 +62,7 @@ public class BookingDAO {
             cs.setDouble(7, originalPrice);
             cs.setDouble(8, discountAmount);
             cs.setDouble(9, finalPrice);
-            cs.setInt(10, 3); // DefaultMaxCapacity
+            cs.setInt(10, totalDurationMinutes); // TotalDurationMinutes
 
             cs.execute();
             success = true;
@@ -79,7 +79,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getUpcomingBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress', 'Waitlisted') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'In Progress', 'Waitlisted') AND b.BookingDate >= CAST(GETDATE() AS DATE) ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -88,7 +88,7 @@ public class BookingDAO {
                     list.add(new dto.Booking(
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
-                            rs.getInt("ServiceID"),
+                            rs.getString("ServiceNames"),
                             rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),
@@ -151,7 +151,7 @@ public class BookingDAO {
      * @return true nếu thành công
      * @throws Exception nếu có lỗi CSDL
      */
-    public boolean updateBookingTransaction(int bookingId, int vehicleId, int serviceId, 
+    public boolean updateBookingTransaction(int bookingId, int vehicleId, 
                                             Date oldDate, Time oldTime, 
                                             Date newDate, Time newTime, 
                                             double originalPrice, double discountAmount, double finalPrice) throws Exception {
@@ -217,24 +217,23 @@ public class BookingDAO {
             // 1. Update Booking
             String updateBookingSql;
             if (targetStatus != null) {
-                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
             } else {
-                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [ServiceID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
             }
 
             try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
                 st1.setInt(1, vehicleId);
-                st1.setInt(2, serviceId);
-                st1.setDate(3, newDate);
-                st1.setString(4, newTime.toString());
-                st1.setDouble(5, originalPrice);
-                st1.setDouble(6, discountAmount);
-                st1.setDouble(7, finalPrice);
+                st1.setDate(2, newDate);
+                st1.setString(3, newTime.toString());
+                st1.setDouble(4, originalPrice);
+                st1.setDouble(5, discountAmount);
+                st1.setDouble(6, finalPrice);
                 if (targetStatus != null) {
-                    st1.setString(8, targetStatus);
-                    st1.setInt(9, bookingId);
-                } else {
+                    st1.setString(7, targetStatus);
                     st1.setInt(8, bookingId);
+                } else {
+                    st1.setInt(7, bookingId);
                 }
                 st1.executeUpdate();
             }
@@ -344,7 +343,7 @@ public class BookingDAO {
 
     public dto.Booking getBookingById(int bookingId) throws SQLException {
         Booking booking = null;
-        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
+        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, bookingId);
@@ -353,7 +352,7 @@ public class BookingDAO {
                     booking = new dto.Booking(
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
-                            rs.getInt("ServiceID"),
+                            rs.getString("ServiceNames"),
                             rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),
@@ -428,7 +427,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getHistoryBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "SELECT b.*, v.LicensePlate FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show') ORDER BY b.BookingDate DESC, b.ScheduledTime DESC";
+        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show') ORDER BY b.BookingDate DESC, b.ScheduledTime DESC";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -437,7 +436,7 @@ public class BookingDAO {
                     list.add(new dto.Booking(
                             rs.getInt("BookingID"),
                             rs.getInt("CustomerID"),
-                            rs.getInt("ServiceID"),
+                            rs.getString("ServiceNames"),
                             rs.getInt("VehicleID"),
                             rs.getObject("VoucherID") != null ? rs.getInt("VoucherID") : null,
                             rs.getString("LicensePlate"),

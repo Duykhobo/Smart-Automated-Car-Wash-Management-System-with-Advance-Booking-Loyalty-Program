@@ -18,6 +18,7 @@ GO
 -- =======================================================================
 IF OBJECT_ID('dbo.PointLedger', 'U') IS NOT NULL DROP TABLE dbo.PointLedger;
 IF OBJECT_ID('dbo.WashRecords', 'U') IS NOT NULL DROP TABLE dbo.WashRecords;
+IF OBJECT_ID('dbo.BookingDetails', 'U') IS NOT NULL DROP TABLE dbo.BookingDetails;
 IF OBJECT_ID('dbo.Bookings', 'U') IS NOT NULL DROP TABLE dbo.Bookings;
 IF OBJECT_ID('dbo.Vouchers', 'U') IS NOT NULL DROP TABLE dbo.Vouchers;
 IF OBJECT_ID('dbo.Vehicles', 'U') IS NOT NULL DROP TABLE dbo.Vehicles;
@@ -111,6 +112,7 @@ CREATE TABLE Services (
     ServiceID INT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(100) NOT NULL,
     BasePrice DECIMAL(10,2) NOT NULL,
+    DurationMinutes INT DEFAULT 30,
     IsActive BIT DEFAULT 1,
     InactiveFromDate DATETIME NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
@@ -161,7 +163,6 @@ CREATE TABLE Vouchers (
 CREATE TABLE Bookings (
     BookingID INT IDENTITY(1,1) PRIMARY KEY,
     CustomerID INT NOT NULL,
-    ServiceID INT NOT NULL,
     VehicleID INT NOT NULL, 
     VoucherID INT NULL, 
     BookingDate DATE NOT NULL,
@@ -174,9 +175,19 @@ CREATE TABLE Bookings (
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Bookings_Customers FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
-    CONSTRAINT FK_Bookings_Services FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID),
     CONSTRAINT FK_Bookings_Vehicles FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID),
     CONSTRAINT FK_Bookings_Vouchers FOREIGN KEY (VoucherID) REFERENCES Vouchers(VoucherID)
+);
+
+-- 8.5 BẢNG BOOKING_DETAILS (Nhiều dịch vụ)
+CREATE TABLE BookingDetails (
+    BookingID INT NOT NULL,
+    ServiceID INT NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+    DurationMinutes INT NOT NULL,
+    PRIMARY KEY (BookingID, ServiceID),
+    CONSTRAINT FK_BookingDetails_Bookings FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID),
+    CONSTRAINT FK_BookingDetails_Services FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID)
 );
 
 -- 9. BẢNG WASH_RECORDS
@@ -266,9 +277,10 @@ GO
 IF OBJECT_ID('dbo.sp_CreateBookingTransaction') IS NOT NULL DROP PROCEDURE dbo.sp_CreateBookingTransaction;
 GO
 CREATE PROCEDURE dbo.sp_CreateBookingTransaction
-    @CustomerID INT, @ServiceID INT, @VehicleID INT, @VoucherID INT = NULL, 
+    @CustomerID INT, @ServiceIDs VARCHAR(255), @VehicleID INT, @VoucherID INT = NULL, 
     @BookingDate DATE, @ScheduledTime TIME, @OriginalPrice DECIMAL(10,2),
     @DiscountAmount DECIMAL(10,2), @FinalPrice DECIMAL(10,2),
+    @TotalDurationMinutes INT,
     @DefaultMaxCapacity INT = 3 
 AS
 BEGIN
@@ -317,8 +329,17 @@ BEGIN
         SELECT @TierID = TierID FROM Customers WHERE CustomerID = @CustomerID;
         DECLARE @PriorityScore INT = dbo.fn_CalculatePriorityScore(@TierID, @ScheduledTime);
 
-        INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, VoucherID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status, PriorityScore)
-        VALUES (@CustomerID, @ServiceID, @VehicleID, @VoucherID, @BookingDate, @ScheduledTime, @OriginalPrice, @DiscountAmount, @FinalPrice, @BookingStatus, @PriorityScore);
+        INSERT INTO Bookings (CustomerID, VehicleID, VoucherID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status, PriorityScore)
+        VALUES (@CustomerID, @VehicleID, @VoucherID, @BookingDate, @ScheduledTime, @OriginalPrice, @DiscountAmount, @FinalPrice, @BookingStatus, @PriorityScore);
+
+        DECLARE @BookingID INT = SCOPE_IDENTITY();
+
+        -- Insert Multiple Services
+        INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
+        SELECT @BookingID, CAST(value AS INT), 
+               (SELECT BasePrice FROM Services WHERE ServiceID = CAST(value AS INT)),
+               (SELECT ISNULL(DurationMinutes, 30) FROM Services WHERE ServiceID = CAST(value AS INT))
+        FROM STRING_SPLIT(@ServiceIDs, ',');
 
         COMMIT TRANSACTION;
     END TRY

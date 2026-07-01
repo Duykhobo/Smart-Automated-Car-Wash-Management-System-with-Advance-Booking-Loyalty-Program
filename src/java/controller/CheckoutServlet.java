@@ -53,15 +53,12 @@ public class CheckoutServlet extends HttpServlet {
 
             // 3. Nhận các tham số đặt lịch từ Frontend
             String vehicleIdStr = request.getParameter("vehicleId");
-            String serviceIdStr = request.getParameter("serviceId");
-            if (serviceIdStr == null) {
-                serviceIdStr = request.getParameter("service"); // Dự phòng trường hợp thẻ select tên là "service"
-            }
+            String[] serviceIdsArr = request.getParameterValues("services");
             String dateStr = request.getParameter("date");
             String timeStr = request.getParameter("time");
             String voucherCode = request.getParameter("voucherCode");
 
-            if (vehicleIdStr == null || serviceIdStr == null || dateStr == null || timeStr == null) {
+            if (vehicleIdStr == null || serviceIdsArr == null || serviceIdsArr.length == 0 || dateStr == null || timeStr == null) {
                 sendErrorResponse(request, response, "Thông tin đặt lịch không đầy đủ. Vui lòng kiểm tra lại.");
                 return;
             }
@@ -70,7 +67,7 @@ public class CheckoutServlet extends HttpServlet {
             }
             Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr));
             int vehicleId = Integer.parseInt(vehicleIdStr);
-            int serviceId = Integer.parseInt(serviceIdStr);
+            String serviceIds = String.join(",", serviceIdsArr);
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
 
             // Lấy ngày khách hàng muốn đặt
@@ -112,13 +109,17 @@ public class CheckoutServlet extends HttpServlet {
 
             // 4. Lấy thông tin gói dịch vụ từ DB để xác định giá gốc
             ServiceDAO serviceDAO = new ServiceDAO();
-            Service selectedService = serviceDAO.getServiceById(serviceId);
-            if (selectedService == null) {
-                sendErrorResponse(request, response, "Dịch vụ đã chọn không hợp lệ.");
-                return;
+            double originalPrice = 0;
+            int totalDurationMinutes = 0;
+            for (String sidStr : serviceIdsArr) {
+                Service selectedService = serviceDAO.getServiceById(Integer.parseInt(sidStr));
+                if (selectedService == null) {
+                    sendErrorResponse(request, response, "Một trong các dịch vụ đã chọn không hợp lệ.");
+                    return;
+                }
+                originalPrice += selectedService.getBasePrice();
+                totalDurationMinutes += selectedService.getDurationMinutes();
             }
-
-            double originalPrice = selectedService.getBasePrice();
             double discountAmount = 0.0;
             Integer voucherId = null;
             BookingDAO bookingDAO = new BookingDAO();
@@ -163,14 +164,15 @@ public class CheckoutServlet extends HttpServlet {
             // 6. Thực thi Booking Transaction
             boolean success = bookingDAO.createBookingTransaction(
                     customer.getCustomerId(),
-                    serviceId,
+                    serviceIds,
                     vehicleId,
                     voucherId,
                     bookingDate,
                     scheduledTime,
                     originalPrice,
                     discountAmount,
-                    finalPrice);
+                    finalPrice,
+                    totalDurationMinutes);
 
             if (success) {
                 // Sửa lỗi Race Condition: Lấy trực tiếp trạng thái thật của Booking vừa được tạo ra

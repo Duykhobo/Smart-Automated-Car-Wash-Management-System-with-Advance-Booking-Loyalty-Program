@@ -6,69 +6,12 @@
 <html lang="vi">
 
     <head>
-        <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet">
-        <style>
-            body,
-            .font-sans {
-                font-family: 'Inter', sans-serif !important;
-            }
-
-            .font-display {
-                font-family: 'Be Vietnam Pro', sans-serif !important;
-            }
-        </style>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-        <meta charset="utf-8" />
-        <title>Auto Wash Pro - Lịch Sử Rửa Xe</title>
-
-        <!-- Global CSS & Tailwind Config -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-        <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        <!-- Icons (Lucide) -->
-        <script src="https://unpkg.com/lucide@latest"></script>
-
-        <script>
-
-
-            function switchTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.tab-btn').forEach(el => {
-                    el.classList.remove('border-[#00d4ff]', 'text-white');
-                    el.classList.add('border-transparent', 'text-text-muted');
-                });
-
-                document.getElementById(tabId).classList.remove('hidden');
-                document.getElementById('btn-' + tabId).classList.add('border-[#00d4ff]', 'text-white');
-                document.getElementById('btn-' + tabId).classList.remove('border-transparent', 'text-text-muted');
-            }
-
-            // Function to show Toast Notification
-            function showToast(message) {
-                // Handled globally now
-            }
-
-            document.addEventListener("DOMContentLoaded", () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('success')) {
-                    // Handled globally if passed in session
-                }
-            });
-        </script>
-        <style>
+    <title>Auto Wash Pro - Lịch Sử Rửa Xe</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    <style>
             /* Glassmorphism Toast */
         </style>
-        <c:if test="${param.msg == 'UpdateError'}">
-        <script>
-            showJSToast('error', 'Cập nhật thất bại. Lỗi: ${param.err}');
-        </script>
-    </c:if>
+
 </head>
 
     <body
@@ -159,10 +102,6 @@
                             Đã Hoàn Thành
                         </button>
                     </div>
-                    <!-- SEED DEMO DATA BUTTON -->
-                    <a href="${pageContext.request.contextPath}/customer/seed_demo" class="px-4 py-2 bg-purple-500/20 text-purple-400 border border-purple-500/50 rounded-lg text-sm font-semibold hover:bg-purple-500 hover:text-white transition-colors flex items-center gap-2 self-start sm:self-auto mb-2 sm:mb-0">
-                        <i data-lucide="database" class="w-4 h-4"></i> Tạo Dữ Liệu Mẫu
-                    </a>
                 </div>
 
                 <!-- Tab 1: Upcoming Bookings -->
@@ -288,7 +227,7 @@
                                             <c:if test="${booking.status == 'Completed'}">
                                                 <button class="text-text-muted text-sm hover:text-white transition-colors">Đánh giá</button>
                                             </c:if>
-                                            <a href="${pageContext.request.contextPath}/bookings?serviceId=${booking.serviceId}&vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
+                                            <a href="${pageContext.request.contextPath}/bookings?vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
                                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i> Đặt lại
                                             </a>
                                         </div>
@@ -321,6 +260,29 @@
 
         <script>
             lucide.createIcons();
+
+            function switchTab(tabId) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(function(el) {
+                    el.classList.add('hidden');
+                });
+                
+                // Show the selected tab
+                document.getElementById(tabId).classList.remove('hidden');
+                
+                // Reset all buttons styling
+                document.querySelectorAll('.tab-btn').forEach(function(el) {
+                    el.classList.remove('text-white', 'border-[#00d4ff]');
+                    el.classList.add('text-text-muted', 'border-transparent');
+                });
+                
+                // Set active styling for the clicked button
+                var activeBtn = document.getElementById('btn-' + tabId);
+                if(activeBtn) {
+                    activeBtn.classList.remove('text-text-muted', 'border-transparent');
+                    activeBtn.classList.add('text-white', 'border-[#00d4ff]');
+                }
+            }
         </script>
         <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />

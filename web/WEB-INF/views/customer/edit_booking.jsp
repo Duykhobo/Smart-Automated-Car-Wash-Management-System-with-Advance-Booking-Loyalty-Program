@@ -5,31 +5,9 @@
 <!DOCTYPE html>
 <html lang="vi">
     <head>
-        <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <style>
-            body, .font-sans {
-                font-family: 'Inter', sans-serif !important;
-            }
-            .font-display {
-                font-family: 'Be Vietnam Pro', sans-serif !important;
-            }
-        </style>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-        <meta charset="utf-8" />
-        <title>Auto Wash Pro - Đặt Lịch Dịch Vụ</title>
-
-        <!-- Global CSS & Tailwind Config -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-        <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        <!-- Icons (Lucide) -->
-        <script src="https://unpkg.com/lucide@latest"></script>
-
-        <style>
+    <title>Auto Wash Pro - Đặt Lịch Dịch Vụ</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    <style>
             /* Sửa lỗi Tailwind peer-checked không ăn cho thẻ con */
             input[name="service"]:checked + div h3 {
                 color: #ffffff !important;
@@ -53,7 +31,7 @@
             }
         </style>
 
-    </head>
+</head>
     <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
 
         <!-- Desktop Sidebar -->
@@ -177,7 +155,7 @@
                                 <c:when test="${not empty services}">
                                     <c:forEach var="service" items="${services}" varStatus="status">
                                         <label class="block relative cursor-pointer group">
-                                            <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${service.serviceId == bookingInfo.serviceId ? 'checked' : ''}>
+                                            <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${fn:contains(bookingInfo.serviceNames, service.name) ? 'checked' : ''}>
                                             <div class="glass-panel p-5 min-h-[100px] rounded-2xl border-2 border-transparent peer-checked:border-[#00d4ff] peer-checked:bg-[#00d4ff]/5 transition-all flex flex-col justify-between gap-3 hover:-translate-y-1">
                                                 <div class="flex items-start justify-between">
                                                     <h3 class="font-display font-bold text-base md:text-lg text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>

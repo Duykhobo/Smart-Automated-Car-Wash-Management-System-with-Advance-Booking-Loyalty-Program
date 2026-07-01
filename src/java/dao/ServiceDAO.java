@@ -26,7 +26,7 @@ public class ServiceDAO {
      */
     public List<Service> getAllActiveServices() throws SQLException {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT [ServiceID], [Name], [BasePrice], [InactiveFromDate] FROM [Services] WHERE [IsActive] = 1 AND ([InactiveFromDate] IS NULL OR [InactiveFromDate] > GETDATE()) ORDER BY [BasePrice] ASC";
+        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes], [InactiveFromDate] FROM [Services] WHERE [IsActive] = 1 AND ([InactiveFromDate] IS NULL OR [InactiveFromDate] > GETDATE()) ORDER BY [BasePrice] ASC";
 
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql);
@@ -36,8 +36,9 @@ public class ServiceDAO {
                 int id = rs.getInt("ServiceID");
                 String name = rs.getString("Name");
                 double price = rs.getDouble("BasePrice");
+                int duration = rs.getInt("DurationMinutes");
                 java.sql.Timestamp inactiveFrom = rs.getTimestamp("InactiveFromDate");
-                services.add(new Service(id, name, price, true, inactiveFrom));
+                services.add(new Service(id, name, price, duration, true, inactiveFrom));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching active services", e);
@@ -50,7 +51,7 @@ public class ServiceDAO {
     }
 
     public Service getServiceById(int id) throws SQLException {
-        String sql = "SELECT [ServiceID], [Name], [BasePrice] FROM [Services] WHERE [ServiceID] = ?";
+        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes] FROM [Services] WHERE [ServiceID] = ?";
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql)) {
 
@@ -59,7 +60,8 @@ public class ServiceDAO {
                 if (rs.next()) {
                     String name = rs.getString("Name");
                     double price = rs.getDouble("BasePrice");
-                    return new Service(id, name, price);
+                    int duration = rs.getInt("DurationMinutes");
+                    return new Service(id, name, price, duration);
                 }
             }
         } catch (SQLException e) {

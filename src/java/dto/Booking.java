@@ -10,7 +10,7 @@ public class Booking {
 
     private int bookingId;
     private int customerId;
-    private int serviceId;
+    private String serviceNames;
     private int vehicleId;
     private Integer voucherId;
     private String licensePlate;
@@ -25,10 +25,10 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(int bookingId, int customerId, int serviceId, int vehicleId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
+    public Booking(int bookingId, int customerId, String serviceNames, int vehicleId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
         this.bookingId = bookingId;
         this.customerId = customerId;
-        this.serviceId = serviceId;
+        this.serviceNames = serviceNames;
         this.vehicleId = vehicleId;
         this.voucherId = voucherId;
         this.licensePlate = licensePlate;
@@ -49,8 +49,8 @@ public class Booking {
         return customerId;
     }
 
-    public int getServiceId() {
-        return serviceId;
+    public String getServiceNames() {
+        return serviceNames;
     }
 
     public int getVehicleId() {
@@ -101,8 +101,8 @@ public class Booking {
         this.customerId = customerId;
     }
 
-    public void setServiceId(int serviceId) {
-        this.serviceId = serviceId;
+    public void setServiceNames(String serviceNames) {
+        this.serviceNames = serviceNames;
     }
 
     public void setVehicleId(int vehicleId) {

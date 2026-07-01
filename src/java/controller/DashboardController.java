@@ -56,7 +56,7 @@ public class DashboardController extends HttpServlet {
         processRequest(request, response);
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;
         }
         CustomerDAO cusDAO = new CustomerDAO();
@@ -124,7 +124,7 @@ public class DashboardController extends HttpServlet {
                 request.setAttribute("tierProgressPercent", 100);
             }
         }
-        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/customer/dashboard.jsp").forward(request, response);
     }
 
     /**

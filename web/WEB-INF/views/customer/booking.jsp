@@ -4,31 +4,13 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  body, .font-sans { font-family: 'Inter', sans-serif !important; }
-  .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
-</style>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-<meta charset="utf-8" />
-<title>Auto Wash Pro - Đặt Lịch Dịch Vụ</title>
-
-<!-- Global CSS & Tailwind Config -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-<script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Icons (Lucide) -->
-<script src="https://unpkg.com/lucide@latest"></script>
-
-<style>
+    <title>Auto Wash Pro - Đặt Lịch Dịch Vụ</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    <style>
     /* Sửa lỗi Tailwind peer-checked không ăn cho thẻ con */
-    input[name="service"]:checked + div h3 { color: #ffffff !important; }
-    input[name="service"]:checked + div .radio-outer { border-color: #00d4ff !important; }
-    input[name="service"]:checked + div .radio-inner { opacity: 1 !important; }
+    input[name="services"]:checked + div h3 { color: #ffffff !important; }
+    input[name="services"]:checked + div .radio-outer { border-color: #00d4ff !important; }
+    input[name="services"]:checked + div .radio-inner { opacity: 1 !important; }
     
     input[name="date"]:checked + div span:first-child { color: rgba(0, 0, 0, 0.7) !important; }
     input[name="date"]:checked + div span:last-child { color: black !important; }
@@ -157,7 +139,7 @@
                         <c:when test="${not empty services}">
                             <c:forEach var="service" items="${services}" varStatus="status">
                                 <label class="block relative cursor-pointer group">
-                                    <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${(not empty param.serviceId and param.serviceId eq service.serviceId) or (empty param.serviceId and status.first) ? 'checked' : ''}>
+                                    <input type="checkbox" name="services" value="${service.serviceId}" data-price="${service.basePrice}" data-duration="${service.durationMinutes}" class="peer sr-only" ${(not empty param.serviceId and param.serviceId eq service.serviceId) or (empty param.serviceId and status.first) ? 'checked' : ''}>
                                     <div class="glass-panel p-5 min-h-[100px] rounded-2xl border-2 border-transparent peer-checked:border-[#00d4ff] peer-checked:bg-[#00d4ff]/5 transition-all flex flex-col justify-between gap-3 hover:-translate-y-1">
                                         <div class="flex items-start justify-between">
                                             <h3 class="font-display font-bold text-base md:text-lg text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>
@@ -326,20 +308,25 @@
             fetchSlots(checkedDate.value);
         }
 
-        // Setup price update logic
-        const serviceRadios = document.querySelectorAll('input[name="service"]');
+        // Setup price and duration update logic
+        const serviceCheckboxes = document.querySelectorAll('input[name="services"]');
         const priceDisplay = document.getElementById('totalPriceDisplay');
 
         function updatePrice() {
-            const selectedService = document.querySelector('input[name="service"]:checked');
-            if (selectedService) {
-                const price = parseInt(selectedService.getAttribute('data-price')) || 0;
-                priceDisplay.innerHTML = new Intl.NumberFormat('vi-VN').format(price) + ' <span class="text-sm text-text-muted font-sans font-normal">đ</span>';
+            const selectedServices = document.querySelectorAll('input[name="services"]:checked');
+            let totalPrice = 0;
+            let totalDuration = 0;
+            selectedServices.forEach(selected => {
+                totalPrice += parseInt(selected.getAttribute('data-price')) || 0;
+                totalDuration += parseInt(selected.getAttribute('data-duration')) || 0;
+            });
+            if (priceDisplay) {
+                priceDisplay.innerHTML = new Intl.NumberFormat('vi-VN').format(totalPrice) + ' <span class="text-sm text-text-muted font-sans font-normal">đ</span>';
             }
         }
 
-        serviceRadios.forEach(radio => {
-            radio.addEventListener('change', updatePrice);
+        serviceCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updatePrice);
         });
 
         // Initialize price on load

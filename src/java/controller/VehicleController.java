@@ -54,7 +54,7 @@ public class VehicleController extends HttpServlet {
             List<Cars> listCars = carDAO.getAllCars(customerId);
 
             request.setAttribute("LISTCARS", listCars);
-            request.getRequestDispatcher("/WEB-INF/views/manage_cars.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/customer/manage_cars.jsp").forward(request, response);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error retrieving car list", e);
             request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Lỗi: " + e.toString());

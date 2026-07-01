@@ -47,7 +47,7 @@ public class PageController extends HttpServlet {
                 view = "/ChangePasswordController";
                 break;
             case "/account/payment-methods":
-                view = "/WEB-INF/views/payment_methods.jsp";
+                view = "/WEB-INF/views/customer/payment_methods.jsp";
                 break;
             case "/customer/booking_history":
                 view = "/BookingHistoryController";

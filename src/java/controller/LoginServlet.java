@@ -20,7 +20,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
         if (ValidationUtil.isAnyEmpty(phone, password)) {
             request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
             request.setAttribute("phone", phone);
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;
         }
 
@@ -76,7 +76,7 @@ public class LoginServlet extends HttpServlet {
         } else {
             request.setAttribute("errorMessage", "Số điện thoại hoặc mật khẩu không chính xác!");
             request.setAttribute("phone", phone);
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         }
 
     }

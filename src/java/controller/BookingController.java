@@ -51,12 +51,12 @@ public class BookingController extends HttpServlet {
                 }
             }
 
-            request.getRequestDispatcher("/WEB-INF/views/booking.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/customer/booking.jsp").forward(request, response);
 
         } catch (Exception ex) {
             ex.printStackTrace();
             request.setAttribute("errorMessage", "Đã xảy ra lỗi khi tải dữ liệu đặt lịch.");
-            request.getRequestDispatcher("/WEB-INF/views/booking.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/customer/booking.jsp").forward(request, response);
         }
     }
 

@@ -31,11 +31,11 @@ public class CustomerProfileServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         } else {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/customer/profile.jsp").forward(request, response);
         }
     }
 
@@ -45,7 +45,7 @@ public class CustomerProfileServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;
         }
 

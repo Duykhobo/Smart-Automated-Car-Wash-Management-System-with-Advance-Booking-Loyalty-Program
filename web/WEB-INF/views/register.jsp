@@ -3,48 +3,17 @@
 <!DOCTYPE html>
 <html lang="vi" style="color-scheme: dark;">
     <head>
-        <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <style>
-            body, .font-sans {
-                font-family: 'Inter', sans-serif !important;
-            }
-            .font-display {
-                font-family: 'Be Vietnam Pro', sans-serif !important;
-            }
-            
-            /* Force dark background for autofilled inputs */
-            input:-webkit-autofill,
-            input:-webkit-autofill:hover, 
-            input:-webkit-autofill:focus, 
-            input:-webkit-autofill:active {
-                -webkit-box-shadow: 0 0 0 30px #0a1128 inset !important;
-                -webkit-text-fill-color: white !important;
-                transition: background-color 5000s ease-in-out 0s !important;
-                color: white !important;
-            }
-        </style>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta charset="UTF-8" />
-        <title>Auto Wash Pro - Đăng Ký</title>
-        <!-- Global CSS & Tailwind Config -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-        <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        <!-- Icons (Lucide) -->
-        <script src="https://unpkg.com/lucide@latest"></script>
-
-        <style>
+    <title>Auto Wash Pro - Đăng Ký</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    <style>
             /* Ẩn icon con mắt mặc định của trình duyệt Edge/IE */
             input[type="password"]::-ms-reveal,
             input[type="password"]::-ms-clear {
                 display: none;
             }
         </style>
-    </head>
+
+</head>
     <body class="bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black min-h-screen flex">
 
         <!-- Desktop Left Column (Brand) -->

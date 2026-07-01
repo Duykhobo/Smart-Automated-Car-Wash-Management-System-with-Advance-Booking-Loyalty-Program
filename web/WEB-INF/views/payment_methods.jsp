@@ -5,42 +5,9 @@
 <html lang="vi">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <meta charset="utf-8" />
     <title>Phương thức thanh toán - Auto Wash Pro</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body, .font-sans { font-family: 'Inter', sans-serif !important; }
-      .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
-      
-      /* Credit Card UI */
-      .credit-card {
-          background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.18);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      }
-      .credit-card-glow {
-          position: absolute;
-          width: 150px;
-          height: 150px;
-          background: radial-gradient(circle, rgba(0,212,255,0.4) 0%, rgba(0,0,0,0) 70%);
-          border-radius: 50%;
-          top: -50px;
-          right: -50px;
-          pointer-events: none;
-      }
-    </style>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     
-    <!-- Global CSS & Tailwind -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=5" />
-    <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=5"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">

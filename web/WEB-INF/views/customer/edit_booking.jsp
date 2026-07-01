@@ -155,7 +155,7 @@
                                 <c:when test="${not empty services}">
                                     <c:forEach var="service" items="${services}" varStatus="status">
                                         <label class="block relative cursor-pointer group">
-                                            <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${service.serviceId == bookingInfo.serviceId ? 'checked' : ''}>
+                                            <input type="radio" name="service" value="${service.serviceId}" data-price="${service.basePrice}" class="peer sr-only" ${fn:contains(bookingInfo.serviceNames, service.name) ? 'checked' : ''}>
                                             <div class="glass-panel p-5 min-h-[100px] rounded-2xl border-2 border-transparent peer-checked:border-[#00d4ff] peer-checked:bg-[#00d4ff]/5 transition-all flex flex-col justify-between gap-3 hover:-translate-y-1">
                                                 <div class="flex items-start justify-between">
                                                     <h3 class="font-display font-bold text-base md:text-lg text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>

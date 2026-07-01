@@ -227,7 +227,7 @@ public class BookingHistoryController extends HttpServlet {
                     if (finalPrice < 0) finalPrice = 0;
 
                     boolean success = bookDao.updateBookingTransaction(
-                            bookingId, vehicleId, serviceId,
+                            bookingId, vehicleId,
                             new java.sql.Date(oldBooking.getBookingDate().getTime()), 
                             new java.sql.Time(oldBooking.getScheduledTime().getTime()),
                             newDate, newTime,

@@ -102,10 +102,6 @@
                             Đã Hoàn Thành
                         </button>
                     </div>
-                    <!-- SEED DEMO DATA BUTTON -->
-                    <a href="${pageContext.request.contextPath}/customer/seed_demo" class="px-4 py-2 bg-purple-500/20 text-purple-400 border border-purple-500/50 rounded-lg text-sm font-semibold hover:bg-purple-500 hover:text-white transition-colors flex items-center gap-2 self-start sm:self-auto mb-2 sm:mb-0">
-                        <i data-lucide="database" class="w-4 h-4"></i> Tạo Dữ Liệu Mẫu
-                    </a>
                 </div>
 
                 <!-- Tab 1: Upcoming Bookings -->
@@ -231,7 +227,7 @@
                                             <c:if test="${booking.status == 'Completed'}">
                                                 <button class="text-text-muted text-sm hover:text-white transition-colors">Đánh giá</button>
                                             </c:if>
-                                            <a href="${pageContext.request.contextPath}/bookings?serviceId=${booking.serviceId}&vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
+                                            <a href="${pageContext.request.contextPath}/bookings?vehicleId=${booking.vehicleId}" class="px-4 py-2 rounded-lg bg-[#00d4ff]/10 hover:bg-[#00d4ff] text-[#00d4ff] hover:text-black text-sm font-semibold transition-colors border border-[#00d4ff]/30 flex items-center gap-1.5">
                                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i> Đặt lại
                                             </a>
                                         </div>
@@ -264,6 +260,29 @@
 
         <script>
             lucide.createIcons();
+
+            function switchTab(tabId) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(function(el) {
+                    el.classList.add('hidden');
+                });
+                
+                // Show the selected tab
+                document.getElementById(tabId).classList.remove('hidden');
+                
+                // Reset all buttons styling
+                document.querySelectorAll('.tab-btn').forEach(function(el) {
+                    el.classList.remove('text-white', 'border-[#00d4ff]');
+                    el.classList.add('text-text-muted', 'border-transparent');
+                });
+                
+                // Set active styling for the clicked button
+                var activeBtn = document.getElementById('btn-' + tabId);
+                if(activeBtn) {
+                    activeBtn.classList.remove('text-text-muted', 'border-transparent');
+                    activeBtn.classList.add('text-white', 'border-[#00d4ff]');
+                }
+            }
         </script>
         <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />

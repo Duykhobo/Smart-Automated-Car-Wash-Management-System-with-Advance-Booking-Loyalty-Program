@@ -8,11 +8,11 @@ GO
 -- 1. THÊM SERVICES (DỊCH VỤ RỬA XE)
 IF NOT EXISTS (SELECT 1 FROM Services)
 BEGIN
-    INSERT INTO Services (Name, BasePrice, IsActive) VALUES 
-    (N'Rửa Bọt Tuyết Tiêu Chuẩn', 100000.00, 1),
-    (N'Rửa Xe Cao Cấp + Phủ Ceramic', 250000.00, 1),
-    (N'Vệ Sinh Nội Thất Toàn Diện', 350000.00, 1),
-    (N'Tẩy Ố Kính + Đánh Bóng Sơn', 500000.00, 1);
+    INSERT INTO Services (Name, BasePrice, DurationMinutes, IsActive) VALUES 
+    (N'Rửa Bọt Tuyết Tiêu Chuẩn', 100000.00, 30, 1),
+    (N'Rửa Xe Cao Cấp + Phủ Ceramic', 250000.00, 60, 1),
+    (N'Vệ Sinh Nội Thất Toàn Diện', 350000.00, 90, 1),
+    (N'Tẩy Ố Kính + Đánh Bóng Sơn', 500000.00, 120, 1);
 END
 GO
 
@@ -95,19 +95,23 @@ BEGIN
     -- Một lịch hẹn sắp tới (Pending)
     EXEC sp_CreateBookingTransaction 
         @CustomerID = @CID_BOOKING, 
-        @ServiceID = 2, 
+        @ServiceIDs = '2', 
         @VehicleID = @VID_BOOKING, 
         @BookingDate = @Tomorrow, 
         @ScheduledTime = '10:00:00', 
         @OriginalPrice = 250000.00, 
         @DiscountAmount = 0, 
-        @FinalPrice = 250000.00;
+        @FinalPrice = 250000.00,
+        @TotalDurationMinutes = 60;
 
     -- Một lịch sử đã hoàn thành (Completed) ngày hôm qua
-    INSERT INTO Bookings (CustomerID, ServiceID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status)
-    VALUES (@CID_BOOKING, 1, @VID_BOOKING, @Yesterday, '14:30:00', 100000.00, 0, 100000.00, 'Completed');
+    INSERT INTO Bookings (CustomerID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status)
+    VALUES (@CID_BOOKING, @VID_BOOKING, @Yesterday, '14:30:00', 100000.00, 0, 100000.00, 'Completed');
     
     DECLARE @COMPLETED_BOOKING_ID INT = SCOPE_IDENTITY();
+    
+    INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
+    VALUES (@COMPLETED_BOOKING_ID, 1, 100000.00, 30);
     
     -- Thêm WashRecord cho lịch sử đã hoàn thành
     INSERT INTO WashRecords (BookingID, ActualStartTime, ActualEndTime, LPRConfidenceScore, OperatorNotes)

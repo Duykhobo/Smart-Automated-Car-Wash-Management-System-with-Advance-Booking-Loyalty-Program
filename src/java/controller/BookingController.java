@@ -80,7 +80,7 @@ public class BookingController extends HttpServlet {
             }
 
             int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
-            int serviceId = Integer.parseInt(request.getParameter("service"));
+            String[] serviceIds = request.getParameterValues("services");
             String dateStr = request.getParameter("date");
             String timeStr = request.getParameter("time");
 
@@ -90,21 +90,29 @@ public class BookingController extends HttpServlet {
             // Validation travel time
             bookingService.validateTravelTime(bookingDate, scheduledTime);
 
-            Service selectedService = bookingService.getServiceById(serviceId);
+            java.util.List<Service> selectedServices = bookingService.getServicesByIds(serviceIds);
+            double originalPrice = 0;
+            int totalDurationMinutes = 0;
+            for (Service s : selectedServices) {
+                originalPrice += s.getBasePrice();
+                totalDurationMinutes += s.getDurationMinutes();
+            }
+            String serviceIdsStr = String.join(",", serviceIds);
             
-            double originalPrice = selectedService.getBasePrice();
+            // originalPrice calculated above
             double discountAmount = 0; 
             double finalPrice = originalPrice - discountAmount;
 
             boolean success = bookingService.createBooking(
                     customer.getCustomerId(),
-                    serviceId,
+                    serviceIdsStr,
                     vehicleId,
                     bookingDate,
                     scheduledTime,
                     originalPrice,
                     discountAmount,
-                    finalPrice);
+                    finalPrice,
+                    totalDurationMinutes);
 
             if (success) {
                 request.getSession().setAttribute("successMessage", "Đặt lịch thành công!");

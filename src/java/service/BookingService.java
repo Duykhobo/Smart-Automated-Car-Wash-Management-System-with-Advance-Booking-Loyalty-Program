@@ -85,26 +85,36 @@ public class BookingService {
         }
     }
 
-    public Service getServiceById(int serviceId) throws Exception {
-        List<Service> services = serviceDao.getAllActiveServices();
-        for (Service s : services) {
-            if (s.getServiceId() == serviceId) {
-                return s;
+    public List<Service> getServicesByIds(String[] serviceIds) throws Exception {
+        List<Service> allServices = serviceDao.getAllActiveServices();
+        List<Service> selected = new ArrayList<>();
+        if (serviceIds == null || serviceIds.length == 0) throw new Exception("Vui lòng chọn ít nhất 1 dịch vụ.");
+        for (String idStr : serviceIds) {
+            int sid = Integer.parseInt(idStr);
+            boolean found = false;
+            for (Service s : allServices) {
+                if (s.getServiceId() == sid) {
+                    selected.add(s);
+                    found = true;
+                    break;
+                }
             }
+            if (!found) throw new Exception("Dịch vụ không hợp lệ.");
         }
-        throw new Exception("Dịch vụ không hợp lệ.");
+        return selected;
     }
 
-    public boolean createBooking(int customerId, int serviceId, int vehicleId, Date bookingDate, Time scheduledTime, double originalPrice, double discountAmount, double finalPrice) throws Exception {
+    public boolean createBooking(int customerId, String serviceIds, int vehicleId, Date bookingDate, Time scheduledTime, double originalPrice, double discountAmount, double finalPrice, int totalDurationMinutes) throws Exception {
         return bookingDao.createBookingTransaction(
                 customerId,
-                serviceId,
+                serviceIds,
                 vehicleId,
                 null, // voucherId is null from BookingController currently
                 bookingDate,
                 scheduledTime,
                 originalPrice,
                 discountAmount,
-                finalPrice);
+                finalPrice,
+                totalDurationMinutes);
     }
 }

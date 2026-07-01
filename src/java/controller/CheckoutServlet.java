@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.BookingDAO;
+import dao.CarDao;
 import dao.CustomerDAO;
 import dao.ServiceDAO;
+import dao.SystemConfigDAO;
+import dto.Cars;
 import dto.Customer;
 import dto.Service;
 import dto.User;
@@ -107,19 +110,43 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
+            // Lấy thông tin xe để biết kích cỡ
+            CarDao carDao = new CarDao();
+            Cars selectedCar = carDao.getCarById(vehicleId);
+            if (selectedCar == null || selectedCar.getCustomerId() != customer.getCustomerId()) {
+                sendErrorResponse(request, response, "Xe đã chọn không hợp lệ.");
+                return;
+            }
+            String vehicleSize = selectedCar.getVehicleSize();
+            if (vehicleSize == null || vehicleSize.isEmpty()) {
+                vehicleSize = "SEDAN";
+            }
+
             // 4. Lấy thông tin gói dịch vụ từ DB để xác định giá gốc
             ServiceDAO serviceDAO = new ServiceDAO();
             double originalPrice = 0;
             int totalDurationMinutes = 0;
             for (String sidStr : serviceIdsArr) {
-                Service selectedService = serviceDAO.getServiceById(Integer.parseInt(sidStr));
+                int sId = Integer.parseInt(sidStr);
+                Service selectedService = serviceDAO.getServiceById(sId);
                 if (selectedService == null) {
                     sendErrorResponse(request, response, "Một trong các dịch vụ đã chọn không hợp lệ.");
                     return;
                 }
-                originalPrice += selectedService.getBasePrice();
+                originalPrice += serviceDAO.getServicePrice(sId, vehicleSize);
                 totalDurationMinutes += selectedService.getDurationMinutes();
             }
+
+            // Kiểm tra lố giờ đóng cửa
+            SystemConfigDAO configDAO = new SystemConfigDAO();
+            int closingHour = configDAO.getClosingHour();
+            java.time.LocalTime endTime = scheduledTime.toLocalTime().plusMinutes(totalDurationMinutes);
+            java.time.LocalTime closingTime = java.time.LocalTime.of(closingHour, 0);
+            if (endTime.isAfter(closingTime)) {
+                sendErrorResponse(request, response, "Tổng thời gian làm dịch vụ (" + totalDurationMinutes + " phút) vượt quá giờ đóng cửa (" + closingHour + ":00). Vui lòng chọn giờ sớm hơn.");
+                return;
+            }
+
             double discountAmount = 0.0;
             Integer voucherId = null;
             BookingDAO bookingDAO = new BookingDAO();

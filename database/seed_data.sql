@@ -9,10 +9,25 @@ GO
 IF NOT EXISTS (SELECT 1 FROM Services)
 BEGIN
     INSERT INTO Services (Name, BasePrice, DurationMinutes, IsActive) VALUES 
-    (N'Rửa Bọt Tuyết Tiêu Chuẩn', 100000.00, 30, 1),
-    (N'Rửa Xe Cao Cấp + Phủ Ceramic', 250000.00, 60, 1),
-    (N'Vệ Sinh Nội Thất Toàn Diện', 350000.00, 90, 1),
-    (N'Tẩy Ố Kính + Đánh Bóng Sơn', 500000.00, 120, 1);
+    (N'Rửa xe ngoài (demi)', 70000.00, 30, 1),
+    (N'Rửa xe tiêu chuẩn', 100000.00, 45, 1),
+    (N'Rửa xe cao cấp (Wax bóng)', 200000.00, 60, 1),
+    (N'Vệ sinh nội thất', 350000.00, 90, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM ServicePrices)
+BEGIN
+    -- Dịch vụ 1: Rửa xe ngoài
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (1, 'SEDAN', 70000), (1, 'SUV', 80000), (1, 'XLARGE', 90000);
+    
+    -- Dịch vụ 2: Rửa xe tiêu chuẩn
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (2, 'SEDAN', 100000), (2, 'SUV', 110000), (2, 'XLARGE', 120000);
+    
+    -- Dịch vụ 3: Rửa xe cao cấp
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (3, 'SEDAN', 200000), (3, 'SUV', 250000), (3, 'XLARGE', 300000);
+    
+    -- Dịch vụ 4: Vệ sinh nội thất (Giả định giá)
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (4, 'SEDAN', 350000), (4, 'SUV', 400000), (4, 'XLARGE', 450000);
 END
 GO
 
@@ -28,7 +43,20 @@ BEGIN
     INSERT INTO Users (Username, PasswordHash, Role) 
     VALUES ('manager', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'MANAGER');
 END
+-- 1.5. THÊM VEHICLE TYPES
+IF NOT EXISTS (SELECT 1 FROM VehicleTypes)
+BEGIN
+    INSERT INTO VehicleTypes (TypeName, VehicleSize) VALUES 
+    (N'Sedan (4 chỗ)', 'SEDAN'),
+    (N'Hatchback', 'SEDAN'),
+    (N'SUV (7 chỗ)', 'SUV'),
+    (N'CUV (5-7 chỗ)', 'SUV'),
+    (N'Bán tải', 'XLARGE'),
+    (N'MPV', 'XLARGE');
+END
+GO
 
+-- 2. THÊM USERS VÀ CUSTOMERS (KÈM VEHICLES)
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_silver')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Role) 
@@ -39,8 +67,8 @@ BEGIN
     VALUES (@UID1, N'Khách Hàng Silver', '0901111111', 'silver@gmail.com', 2, 250, 2500000, 6);
     
     DECLARE @CID1 INT = SCOPE_IDENTITY();
-    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleType, Color, IsDefault)
-    VALUES (@CID1, '51G-111.11', 'Toyota', 'Vios', 'Sedan', 'White', 1);
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID1, '51G-111.11', 'Toyota', 'Vios', 1, 'White', 1);
 END
 
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_gold')
@@ -53,8 +81,23 @@ BEGIN
     VALUES (@UID2, N'Khách Hàng Gold', '0902222222', 'gold@gmail.com', 3, 1000, 7000000, 16);
     
     DECLARE @CID2 INT = SCOPE_IDENTITY();
-    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleType, Color, IsDefault)
-    VALUES (@CID2, '51H-222.22', 'Mazda', 'CX-5', 'SUV', 'Red', 1);
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID2, '51H-222.22', 'Mazda', 'CX-5', 3, 'Red', 1);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_platinum')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Role) 
+    VALUES ('customer_platinum', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'CUSTOMER');
+    DECLARE @UID3 INT = SCOPE_IDENTITY();
+    
+    INSERT INTO Customers (UserID, FullName, Phone, Email, TierID, PointsBalance, TotalSpend, TotalWashes)
+    VALUES (@UID3, N'Khách Hàng Platinum', '0903333333', 'platinum@gmail.com', 4, 15000, 15000000, 35);
+    
+    DECLARE @CID3 INT = SCOPE_IDENTITY();
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID3, '51I-333.33', 'Ford', 'Ranger', 5, 'Black', 1);
 END
 GO
 
@@ -128,6 +171,6 @@ BEGIN
     ('MinAdvanceBookingMinutes', '60', N'Thời gian đặt trước tối thiểu (phút)'),
     ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
     ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
-    ('ClosingHour', '17', N'Giờ đóng cửa (0-23)');
+    ('ClosingHour', '22', N'Giờ đóng cửa (0-23)');
 END
 GO

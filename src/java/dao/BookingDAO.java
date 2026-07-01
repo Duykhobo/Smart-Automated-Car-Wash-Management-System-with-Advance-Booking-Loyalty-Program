@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -273,7 +274,10 @@ public class BookingDAO {
      */
     public boolean cancelBookingTransaction(int bookingId, int customerId) {
         boolean success = false;
-        String queryBooking = "SELECT BookingDate, ScheduledTime, Status FROM Bookings WHERE BookingID = ? AND CustomerID = ?";
+        String queryBooking = "SELECT b.BookingDate, b.ScheduledTime, b.Status, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration "
+                + "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID "
+                + "WHERE b.BookingID = ? AND b.CustomerID = ? "
+                + "GROUP BY b.BookingDate, b.ScheduledTime, b.Status";
         String updateStatus = "UPDATE Bookings SET Status = 'Cancelled', UpdatedAt = GETDATE() WHERE BookingID = ?";
         String decreaseCapacity = "UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked - 1 "
                 + "WHERE SlotDate = ? AND TimeSlot = CAST(? AS TIME) AND CurrentBooked > 0";
@@ -305,12 +309,19 @@ public class BookingDAO {
                             }
                         }
                         
-                        // Nếu là Pending thì mới chiếm slot -> phải giải phóng slot
+                        // Nếu là Pending thì mới chiếm slot -> phải giải phóng TẤT CẢ slot
                         if ("Pending".equalsIgnoreCase(status)) {
+                            int totalDuration = rs.getInt("TotalDuration");
+                            int slotsNeeded = (int) Math.ceil(totalDuration / 30.0);
+                            if (slotsNeeded < 1) slotsNeeded = 1;
+
                             try (PreparedStatement pstCap = cn.prepareStatement(decreaseCapacity)) {
-                                pstCap.setDate(1, bDate);
-                                pstCap.setString(2, bTime.toString());
-                                pstCap.executeUpdate();
+                                for (int i = 0; i < slotsNeeded; i++) {
+                                    LocalTime slotTime = bTime.toLocalTime().plusMinutes(i * 30L);
+                                    pstCap.setDate(1, bDate);
+                                    pstCap.setString(2, slotTime.toString());
+                                    pstCap.executeUpdate();
+                                }
                             }
                         }
                         

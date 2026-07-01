@@ -100,6 +100,14 @@ public class PageController extends HttpServlet {
                         request.setAttribute("targetSpend", targetSpend);
                         request.setAttribute("spendNeeded", spendNeeded);
                         request.setAttribute("progressPercent", progressPercent);
+                        
+                        try {
+                            dao.VoucherDAO voucherDAO = new dao.VoucherDAO();
+                            java.util.List<dto.Voucher> myVouchers = voucherDAO.getAvailableVouchers(customer.getCustomerId());
+                            request.setAttribute("myVouchers", myVouchers);
+                        } catch (Exception e) {
+                            request.setAttribute("myVouchers", new java.util.ArrayList<>());
+                        }
                     }
                 }
                 view = "/WEB-INF/views/customer/loyalty.jsp";

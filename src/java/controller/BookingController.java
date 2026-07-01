@@ -97,16 +97,36 @@ public class BookingController extends HttpServlet {
                 originalPrice += s.getBasePrice();
                 totalDurationMinutes += s.getDurationMinutes();
             }
+            
+            // Validate if total duration exceeds closing hour
+            bookingService.validateWorkingHours(scheduledTime, totalDurationMinutes);
+
             String serviceIdsStr = String.join(",", serviceIds);
             
-            // originalPrice calculated above
-            double discountAmount = 0; 
+            String voucherCode = request.getParameter("voucherCode");
+            Integer voucherId = null;
+            double discountAmount = 0;
+            
+            if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+                dao.BookingDAO dao = new dao.BookingDAO();
+                dto.Voucher v = dao.getActiveVoucherByCode(voucherCode.trim(), customer.getCustomerId());
+                if (v != null) {
+                    voucherId = v.getVoucherId();
+                    if ("PERCENT_10".equals(v.getRewardType())) discountAmount = originalPrice * 0.10;
+                    else if ("PERCENT_20".equals(v.getRewardType())) discountAmount = originalPrice * 0.20;
+                    else if ("FREE_WASH".equals(v.getRewardType())) discountAmount = originalPrice;
+                    else if ("UPGRADE_WAX".equals(v.getRewardType())) discountAmount = 50000; // Assume 50k for wax upgrade
+                }
+            }
+            
             double finalPrice = originalPrice - discountAmount;
+            if (finalPrice < 0) finalPrice = 0;
 
             boolean success = bookingService.createBooking(
                     customer.getCustomerId(),
                     serviceIdsStr,
                     vehicleId,
+                    voucherId,
                     bookingDate,
                     scheduledTime,
                     originalPrice,

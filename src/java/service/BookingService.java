@@ -35,9 +35,12 @@ public class BookingService {
         List<Cars> vehicles = carDao.getAllCars(customer.getCustomerId());
         data.put("vehicles", vehicles);
 
-        // Fetch services
+        // Fetch services and dynamic prices
         List<Service> services = serviceDao.getAllActiveServices();
         data.put("services", services);
+        
+        String servicePricesJson = serviceDao.getServicePricesJson();
+        data.put("servicePricesJson", servicePricesJson);
 
         // Determine Tier Name and Max Booking Days
         String tierStatus = customer.getTierStatus();
@@ -85,6 +88,19 @@ public class BookingService {
         }
     }
 
+    public void validateWorkingHours(Time scheduledTime, int totalDurationMinutes) throws Exception {
+        int closingHour = configDao.getClosingHour();
+        java.time.LocalTime startTime = scheduledTime.toLocalTime();
+        java.time.LocalTime endTime = startTime.plusMinutes(totalDurationMinutes);
+        java.time.LocalTime closingTime = java.time.LocalTime.of(closingHour, 0);
+        
+        // If endTime is before startTime, it means it crossed midnight.
+        // Or if endTime is after closing time.
+        if (endTime.isBefore(startTime) || endTime.isAfter(closingTime)) {
+            throw new Exception("Lỗi: Tổng thời gian làm dịch vụ (" + totalDurationMinutes + " phút) vượt quá giờ đóng cửa của gara (" + closingHour + ":00). Vui lòng chọn giờ sớm hơn hoặc bớt dịch vụ.");
+        }
+    }
+
     public List<Service> getServicesByIds(String[] serviceIds) throws Exception {
         List<Service> allServices = serviceDao.getAllActiveServices();
         List<Service> selected = new ArrayList<>();
@@ -104,12 +120,13 @@ public class BookingService {
         return selected;
     }
 
-    public boolean createBooking(int customerId, String serviceIds, int vehicleId, Date bookingDate, Time scheduledTime, double originalPrice, double discountAmount, double finalPrice, int totalDurationMinutes) throws Exception {
+    public boolean createBooking(int customerId, String serviceIds, int vehicleId, Integer voucherId, Date bookingDate, Time scheduledTime, double originalPrice, double discountAmount, double finalPrice, int totalDurationMinutes) throws Exception {
         return bookingDao.createBookingTransaction(
                 customerId,
                 serviceIds,
                 vehicleId,
-                null, // voucherId is null from BookingController currently
+                voucherId,
+
                 bookingDate,
                 scheduledTime,
                 originalPrice,

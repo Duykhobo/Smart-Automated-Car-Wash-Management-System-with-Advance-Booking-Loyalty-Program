@@ -74,6 +74,73 @@ public class ServiceDAO {
         return null;
     }
 
+    /**
+     * Lấy JSON Map giá động theo kích cỡ xe.
+     * Trả về định dạng: {"1": {"SEDAN": 70000.0, "SUV": 80000.0, "XLARGE": 90000.0}, "2": ...}
+     */
+    public String getServicePricesJson() throws SQLException {
+        StringBuilder json = new StringBuilder("{");
+        String sql = "SELECT [ServiceID], [VehicleSize], [Price] FROM [ServicePrices] ORDER BY [ServiceID]";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            
+            int currentServiceId = -1;
+            boolean firstService = true;
+            boolean firstSize = true;
+
+            while (rs.next()) {
+                int serviceId = rs.getInt("ServiceID");
+                String size = rs.getString("VehicleSize");
+                double price = rs.getDouble("Price");
+
+                if (serviceId != currentServiceId) {
+                    if (!firstService) {
+                        json.append("},");
+                    }
+                    json.append("\"").append(serviceId).append("\":{");
+                    currentServiceId = serviceId;
+                    firstService = false;
+                    firstSize = true;
+                }
+
+                if (!firstSize) {
+                    json.append(",");
+                }
+                json.append("\"").append(size).append("\":").append(price);
+                firstSize = false;
+            }
+            if (!firstService) {
+                json.append("}");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching service prices", e);
+            throw e;
+        }
+        json.append("}");
+        return json.toString();
+    }
+
+    public double getServicePrice(int serviceId, String vehicleSize) throws SQLException {
+        String sql = "SELECT [Price] FROM [ServicePrices] WHERE [ServiceID] = ? AND [VehicleSize] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, serviceId);
+            st.setString(2, vehicleSize);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("Price");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching service price", e);
+            throw e;
+        }
+        // Fallback to base price if not found in ServicePrices
+        Service s = getServiceById(serviceId);
+        return (s != null) ? s.getBasePrice() : 0.0;
+    }
+
     public boolean insertService(Service service) throws SQLException {
         boolean success = false;
         String sql = "INSERT INTO [Services] ([Name], [BasePrice], [IsActive]) VALUES (?, ?, 1)";

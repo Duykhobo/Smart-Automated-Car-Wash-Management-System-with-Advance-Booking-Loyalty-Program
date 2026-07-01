@@ -16,6 +16,26 @@
     input[name="date"]:checked + div span:last-child { color: black !important; }
 
     input[name="time"]:checked + div span { color: #00d4ff !important; }
+
+    /* Custom thin scrollbar cho khung chọn ngày */
+    .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 212, 255, 0.3);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 212, 255, 0.6);
+    }
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 212, 255, 0.3) rgba(255, 255, 255, 0.05);
+    }
 </style>
 
 </head>
@@ -114,7 +134,7 @@
                             <c:choose>
                                 <c:when test="${not empty vehicles}">
                                     <c:forEach var="v" items="${vehicles}">
-                                        <div class="vehicle-option px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors flex items-center justify-between group" data-value="${v.vehicleId}" data-text="${v.licensePlate} <c:if test="${not empty v.brand}">- ${v.brand}</c:if>" ${(not empty param.vehicleId and param.vehicleId eq v.vehicleId) or (empty param.vehicleId and v.isDefault) ? 'data-default="true"' : ''}>
+                                        <div class="vehicle-option px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors flex items-center justify-between group" data-value="${v.vehicleId}" data-size="${v.vehicleSize}" data-text="${v.licensePlate} <c:if test="${not empty v.brand}">- ${v.brand}</c:if>" ${(not empty param.vehicleId and param.vehicleId eq v.vehicleId) or (empty param.vehicleId and v.isDefault) ? 'data-default="true"' : ''}>
                                             <span class="text-gray-300 group-hover:text-white font-medium transition-colors">${v.licensePlate} <c:if test="${not empty v.brand}"><span class="text-text-muted text-sm ml-1 font-normal">- ${v.brand}</span></c:if></span>
                                             <i data-lucide="check" class="w-4 h-4 text-[#00d4ff] opacity-0 transition-opacity check-icon"></i>
                                         </div>
@@ -139,17 +159,20 @@
                         <c:when test="${not empty services}">
                             <c:forEach var="service" items="${services}" varStatus="status">
                                 <label class="block relative cursor-pointer group">
-                                    <input type="checkbox" name="services" value="${service.serviceId}" data-price="${service.basePrice}" data-duration="${service.durationMinutes}" class="peer sr-only" ${(not empty param.serviceId and param.serviceId eq service.serviceId) or (empty param.serviceId and status.first) ? 'checked' : ''}>
-                                    <div class="glass-panel p-5 min-h-[100px] rounded-2xl border-2 border-transparent peer-checked:border-[#00d4ff] peer-checked:bg-[#00d4ff]/5 transition-all flex flex-col justify-between gap-3 hover:-translate-y-1">
-                                        <div class="flex items-start justify-between">
-                                            <h3 class="font-display font-bold text-base md:text-lg text-gray-300 peer-checked:text-white leading-snug">${service.name}</h3>
-                                            <div class="radio-outer w-5 h-5 rounded-full border-2 border-gray-600 peer-checked:border-[#00d4ff] flex items-center justify-center shrink-0">
-                                                <div class="radio-inner w-2.5 h-2.5 rounded-full bg-[#00d4ff] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                    <input type="checkbox" name="services" value="${service.serviceId}" data-base-price="${service.basePrice}" data-duration="${service.durationMinutes}" class="peer sr-only" ${(not empty param.serviceId and param.serviceId eq service.serviceId) or (empty param.serviceId and status.first) ? 'checked' : ''}>
+                                    <div class="glass-panel p-4 md:p-5 rounded-2xl border border-border-glass cursor-pointer hover:border-[#00d4ff]/50 transition-all flex flex-col h-full group">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h3 class="font-bold text-gray-300 text-sm md:text-base">${service.name}</h3>
+                                            <div class="radio-outer w-5 h-5 rounded border border-border-glass flex items-center justify-center shrink-0 transition-colors">
+                                                <div class="radio-inner w-3 h-3 rounded bg-[#00d4ff] opacity-0 transition-opacity"></div>
                                             </div>
                                         </div>
-                                        <div class="flex items-end justify-between mt-auto">
-                                            <div class="font-bold text-[#00d4ff] text-lg md:text-xl">
-                                                <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/> đ
+                                        <div class="mt-auto flex items-center justify-between">
+                                            <div class="text-[#00d4ff] font-semibold text-lg service-price-display" data-sid="${service.serviceId}">
+                                                <fmt:formatNumber value="${service.basePrice}" type="number" maxFractionDigits="0" /> đ
+                                            </div>
+                                            <div class="text-text-muted text-xs md:text-sm flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full">
+                                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${service.durationMinutes}p
                                             </div>
                                         </div>
                                         <c:if test="${not empty service.inactiveFromDate}">
@@ -179,7 +202,7 @@
                 </div>
                 
                 <!-- Date Horizontal Scroll -->
-                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2 snap-x">
+                <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-3">
                     <c:forEach var="date" items="${dynamicDays}" varStatus="status">
                         <!-- In a real app, next7Days list size depends on tier logic in the backend -->
                         <c:set var="dayOfWeek" value="${date.dayOfWeek.value}" />
@@ -189,7 +212,7 @@
                         </c:choose>
                         <c:set var="isWeekend" value="${dayOfWeek == 6 || dayOfWeek == 7}" />
                         
-                        <label class="cursor-pointer shrink-0 snap-start transition-transform group">
+                        <label class="cursor-pointer shrink-0 transition-transform group select-none">
                             <input type="radio" name="date" value="${date}" onchange="fetchSlots(this.value)" class="peer sr-only" ${status.first ? 'checked' : ''}>
                             <div class="w-16 h-[80px] rounded-2xl glass-panel border-2 border-transparent peer-checked:bg-[#00d4ff] peer-checked:text-black peer-checked:shadow-[0_0_15px_rgba(0,212,255,0.4)] flex flex-col items-center justify-center gap-1.5 transition-all group-hover:-translate-y-1">
                                 <span class="text-xs ${isWeekend ? 'text-red-400' : 'text-text-muted'} peer-checked:text-black/70 font-semibold uppercase">${dayName}</span>
@@ -200,7 +223,7 @@
                 </div>
 
                 <!-- Time Slots Grid (AJAX Rendered) -->
-                <div id="timeSlotsContainer" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
+                <div id="timeSlotsContainer" class="grid grid-cols-2 min-[400px]:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 mt-4 w-full">
                     <!-- Javascript will populate this -->
                 </div>
                 <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-text-muted">
@@ -215,8 +238,8 @@
             <section class="pt-6 border-t border-border-glass">
                 <h2 class="font-display font-bold text-base text-white mb-3">Mã Khuyến Mãi / Voucher</h2>
                 <div class="flex items-center justify-between p-2 pl-4 glass-panel rounded-xl focus-within:border-[#00d4ff] focus-within:shadow-[0_0_15px_rgba(0,212,255,0.2)] transition-all">
-                    <input type="text" placeholder="Nhập mã voucher..." class="bg-transparent border-none outline-none text-sm w-full text-white placeholder:text-gray-500 min-w-0">
-                    <button type="button" class="px-5 py-2.5 bg-bg-surface-hover hover:bg-white text-white hover:text-black rounded-lg font-bold text-sm transition-colors whitespace-nowrap shrink-0">Áp dụng</button>
+                    <input type="text" name="voucherCode" id="voucherCode" placeholder="Nhập mã voucher..." class="bg-transparent border-none outline-none text-sm w-full text-white placeholder:text-gray-500 min-w-0 uppercase">
+                    <button type="button" id="btnApplyVoucher" class="px-5 py-2.5 bg-bg-surface-hover hover:bg-white text-white hover:text-black rounded-lg font-bold text-sm transition-colors whitespace-nowrap shrink-0">Áp dụng</button>
                 </div>
             </section>
             
@@ -228,6 +251,7 @@
     <div class="fixed bottom-0 left-0 md:left-64 right-0 glass-panel border-t border-border-glass z-50 bg-[#070b14]/90 backdrop-blur-xl">
         <div class="max-w-3xl mx-auto px-4 md:px-8 py-4 md:py-5 flex items-center justify-between gap-4" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
             <div class="flex flex-col gap-1">
+                <span id="timeRangeDisplay" class="text-xs text-[#00d4ff] font-medium hidden">Thời gian: --:-- đến --:--</span>
                 <span class="text-xs md:text-sm text-text-muted font-medium uppercase tracking-wider">Tổng Thanh Toán (Tại quầy)</span>
                 <span id="totalPriceDisplay" class="text-xl md:text-2xl font-display font-bold text-[#00d4ff]">0 <span class="text-sm text-text-muted font-sans font-normal">đ</span></span>
             </div>
@@ -238,14 +262,25 @@
     </div>
 
 <script>
+    const servicePricesData = ${servicePricesJson};
     lucide.createIcons();
 
     function fetchSlots(dateStr) {
         const container = document.getElementById('timeSlotsContainer');
-        container.innerHTML = '<div class="col-span-3 sm:col-span-4 text-center py-6"><i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-[#00d4ff]"></i><p class="text-text-muted text-sm mt-2">Đang tìm slot trống...</p></div>';
+        container.innerHTML = '<div class="col-span-2 min-[400px]:col-span-3 sm:col-span-4 text-center py-6"><i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-[#00d4ff]"></i><p class="text-text-muted text-sm mt-2">Đang tìm slot trống...</p></div>';
         lucide.createIcons();
 
-        fetch(`${pageContext.request.contextPath}/api/slots?date=` + dateStr)
+        // Calculate total duration
+        let currentDuration = 30;
+        const selectedServices = document.querySelectorAll('input[name="services"]:checked');
+        if (selectedServices.length > 0) {
+            currentDuration = 0;
+            selectedServices.forEach(selected => {
+                currentDuration += parseInt(selected.getAttribute('data-duration')) || 0;
+            });
+        }
+
+        fetch(`${pageContext.request.contextPath}/api/slots?date=` + dateStr + '&duration=' + currentDuration)
             .then(res => res.json())
             .then(data => {
                 container.innerHTML = '';
@@ -280,7 +315,7 @@
                     }
 
                     let html = `
-                        <label class="transition-transform group relative \${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}">
+                        <label class="transition-transform group relative select-none \${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}">
                             <input type="radio" name="time" class="peer sr-only" value="\${slot.time}" \${disabled ? 'disabled' : ''}>
                             <div class="h-12 rounded-xl glass-panel border \${borderClass} \${bgClass} flex items-center justify-center transition-all \${isPriority ? 'priority-slot' : ''}">
                                 <span class="font-bold text-sm \${textClass} flex items-center gap-1.5">
@@ -312,25 +347,181 @@
         const serviceCheckboxes = document.querySelectorAll('input[name="services"]');
         const priceDisplay = document.getElementById('totalPriceDisplay');
 
+        let appliedRewardType = null;
+        
         function updatePrice() {
+            // Xác định Kích cỡ Xe hiện tại
+            let currentVehicleSize = 'SEDAN';
+            const vehicleId = document.getElementById('vehicleIdInput')?.value;
+            
+            if (vehicleId) {
+                const selectedVehicleOption = document.querySelector(`.vehicle-option[data-value="${vehicleId}"]`);
+                if (selectedVehicleOption) {
+                    currentVehicleSize = selectedVehicleOption.getAttribute('data-size') || 'SEDAN';
+                }
+            }
+
             const selectedServices = document.querySelectorAll('input[name="services"]:checked');
             let totalPrice = 0;
             let totalDuration = 0;
+            
+            // Cập nhật giá hiển thị trên UI cho từng Service Card
+            serviceCheckboxes.forEach(checkbox => {
+                let sid = checkbox.value;
+                let basePrice = parseInt(checkbox.getAttribute('data-base-price')) || 0;
+                let actualPrice = basePrice;
+                
+                if (servicePricesData && servicePricesData[sid] && servicePricesData[sid][currentVehicleSize]) {
+                    actualPrice = servicePricesData[sid][currentVehicleSize];
+                }
+                
+                // Cập nhật giá thật vào dataset để dùng tính Total
+                checkbox.setAttribute('data-actual-price', actualPrice);
+                
+                // Update UI Card
+                const priceDisplayEl = document.querySelector(`.service-price-display[data-sid="${sid}"]`);
+                if (priceDisplayEl) {
+                    priceDisplayEl.innerHTML = new Intl.NumberFormat('vi-VN').format(actualPrice) + ' đ';
+                }
+            });
+
             selectedServices.forEach(selected => {
-                totalPrice += parseInt(selected.getAttribute('data-price')) || 0;
+                totalPrice += parseInt(selected.getAttribute('data-actual-price')) || 0;
                 totalDuration += parseInt(selected.getAttribute('data-duration')) || 0;
             });
-            if (priceDisplay) {
-                priceDisplay.innerHTML = new Intl.NumberFormat('vi-VN').format(totalPrice) + ' <span class="text-sm text-text-muted font-sans font-normal">đ</span>';
+            
+            // Voucher logic
+            let discountAmount = 0;
+            if (appliedRewardType === 'DISCOUNT_10') {
+                discountAmount = totalPrice * 0.10;
+                if (discountAmount > 50000) discountAmount = 50000;
+            } else if (appliedRewardType === 'FREE_WASH') {
+                discountAmount = Math.min(totalPrice, 200000);
             }
+            
+            let finalPrice = totalPrice - discountAmount;
+            if (finalPrice < 0) finalPrice = 0;
+
+            if (priceDisplay) {
+                let displayHTML = '';
+                if (discountAmount > 0) {
+                    displayHTML += '<span class="text-sm text-text-muted line-through mr-2">' + new Intl.NumberFormat('vi-VN').format(totalPrice) + ' đ</span>';
+                }
+                displayHTML += new Intl.NumberFormat('vi-VN').format(finalPrice) + ' <span class="text-sm text-text-muted font-sans font-normal">đ</span>';
+                priceDisplay.innerHTML = displayHTML;
+            }
+            
+            window.currentGlobalDuration = totalDuration;
+            updateTimeRangeDisplay();
+        }
+
+        function updateTimeRangeDisplay() {
+            const timeRangeDisplay = document.getElementById('timeRangeDisplay');
+            if (!timeRangeDisplay) return;
+
+            const selectedTime = document.querySelector('input[name="time"]:checked');
+            const duration = window.currentGlobalDuration || 0;
+            
+            if (!selectedTime || duration === 0) {
+                timeRangeDisplay.classList.add('hidden');
+                return;
+            }
+
+            const startTime = selectedTime.value;
+            const [hours, minutes] = startTime.split(':').map(Number);
+            
+            const endDate = new Date();
+            endDate.setHours(hours);
+            endDate.setMinutes(minutes + duration);
+
+            const endHours = String(endDate.getHours()).padStart(2, '0');
+            const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+            const endTime = endHours + ':' + endMinutes;
+
+            timeRangeDisplay.innerHTML = 'Thời gian dự kiến: ' + startTime + ' - ' + endTime + ' (' + duration + ' phút)';
+            timeRangeDisplay.classList.remove('hidden');
         }
 
         serviceCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updatePrice);
+            checkbox.addEventListener('change', () => {
+                updatePrice();
+                const checkedDate = document.querySelector('input[name="date"]:checked');
+                if (checkedDate) {
+                    fetchSlots(checkedDate.value);
+                }
+            });
+        });
+
+        // Add event delegation for dynamically loaded time slots
+        document.getElementById('timeSlotsContainer').addEventListener('change', function(e) {
+            if(e.target && e.target.name === 'time') {
+                updateTimeRangeDisplay();
+            }
         });
 
         // Initialize price on load
         updatePrice();
+
+        // Voucher Apply Button Logic
+        const btnApplyVoucher = document.getElementById('btnApplyVoucher');
+        const voucherInput = document.getElementById('voucherCode');
+        
+        if (btnApplyVoucher && voucherInput) {
+            voucherInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent form submit
+                    btnApplyVoucher.click();
+                }
+            });
+
+            btnApplyVoucher.addEventListener('click', function() {
+                const code = voucherInput.value.trim();
+                if (!code) {
+                    showToast('Vui lòng nhập mã Voucher', 'error');
+                    return;
+                }
+                
+                btnApplyVoucher.disabled = true;
+                voucherInput.readOnly = true;
+                btnApplyVoucher.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>';
+                lucide.createIcons();
+                
+                fetch('${pageContext.request.contextPath}/api/apply-voucher?code=' + encodeURIComponent(code))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.valid) {
+                            showToast(data.message, 'success');
+                            appliedRewardType = data.rewardType;
+                            voucherInput.classList.add('border', 'border-green-500', 'text-green-400');
+                            updatePrice();
+                        } else {
+                            showToast(data.message, 'error');
+                            appliedRewardType = null;
+                            voucherInput.classList.remove('border-green-500', 'text-green-400');
+                            updatePrice();
+                        }
+                    })
+                    .catch(err => {
+                        showToast('Lỗi kết nối máy chủ', 'error');
+                    })
+                    .finally(() => {
+                        if (appliedRewardType) {
+                            // Keep locked if success
+                            btnApplyVoucher.disabled = true;
+                            voucherInput.readOnly = true;
+                            btnApplyVoucher.classList.replace('bg-bg-surface-hover', 'bg-green-500/20');
+                            btnApplyVoucher.classList.replace('hover:bg-white', 'text-green-400');
+                            btnApplyVoucher.innerHTML = '<i data-lucide="check" class="w-4 h-4 mr-1 inline"></i>Đã áp dụng';
+                        } else {
+                            // Unlock if failed
+                            btnApplyVoucher.disabled = false;
+                            voucherInput.readOnly = false;
+                            btnApplyVoucher.innerHTML = 'Áp dụng';
+                        }
+                        if(typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+                    });
+            });
+        }
 
         // Custom Select Logic for Vehicles
         const selectContainer = document.getElementById('vehicleSelectContainer');
@@ -386,6 +577,7 @@
                     hiddenInput.value = option.getAttribute('data-value');
                     
                     closeDropdown();
+                    updatePrice(); // Re-calc price due to car size change
                 });
                 
                 // Auto-select default

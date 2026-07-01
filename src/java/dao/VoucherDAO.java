@@ -25,4 +25,34 @@ public class VoucherDAO {
             throw new Exception(e.getMessage());
         }
     }
+
+    public java.util.List<dto.Voucher> getAvailableVouchers(int customerId) throws Exception {
+        java.util.List<dto.Voucher> list = new java.util.ArrayList<>();
+        String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status " +
+                     "FROM Vouchers " +
+                     "WHERE CustomerID = ? AND Status = 'Unused' AND ExpiryDate >= GETDATE() " +
+                     "ORDER BY ExpiryDate ASC";
+                     
+        try (Connection cn = DBContext.getConnection();
+             java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
+             
+            st.setInt(1, customerId);
+            try (java.sql.ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new dto.Voucher(
+                        rs.getInt("VoucherID"),
+                        rs.getInt("CustomerID"),
+                        rs.getString("VoucherCode"),
+                        rs.getString("RewardType"),
+                        rs.getInt("PointsCost"),
+                        rs.getTimestamp("ExpiryDate"),
+                        rs.getString("Status")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi khi lấy danh sách Voucher: " + e.getMessage());
+        }
+        return list;
+    }
 }

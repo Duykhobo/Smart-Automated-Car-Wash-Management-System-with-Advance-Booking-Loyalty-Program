@@ -180,7 +180,7 @@
                             <div class="flex items-center justify-between mt-4">
                                 <span class="text-sm font-bold text-amber-400">500 AWP</span>
                                 <form action="${pageContext.request.contextPath}/redeemVoucher" method="POST" class="m-0">
-                                    <input type="hidden" name="rewardType" value="Voucher Giảm 10%">
+                                    <input type="hidden" name="rewardType" value="DISCOUNT_10">
                                     <input type="hidden" name="pointsCost" value="500">
                                     <button type="submit" class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
                                 </form>
@@ -202,7 +202,7 @@
                             <div class="flex items-center justify-between mt-4">
                                 <span class="text-sm font-bold text-amber-400">1,200 AWP</span>
                                 <form action="${pageContext.request.contextPath}/redeemVoucher" method="POST" class="m-0">
-                                    <input type="hidden" name="rewardType" value="Voucher Free Xịt Gầm">
+                                    <input type="hidden" name="rewardType" value="FREE_WASH">
                                     <input type="hidden" name="pointsCost" value="1200">
                                     <button type="submit" class="px-4 py-1.5 bg-bg-surface hover:bg-[#00d4ff] hover:text-black text-white text-xs font-bold rounded-lg transition-colors border border-border-glass hover:border-[#00d4ff]">ĐỔI NGAY</button>
                                 </form>
@@ -211,6 +211,35 @@
                     </div>
                 </div>
             </section>
+            
+            <!-- My Vouchers Section -->
+            <c:if test="${not empty myVouchers}">
+                <section class="space-y-4 pt-4 border-t border-border-glass">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
+                        <h2 class="font-display font-bold text-xl text-white">Voucher của tôi</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <c:forEach var="v" items="${myVouchers}">
+                            <div class="glass-panel p-4 rounded-xl border border-[#00d4ff]/30 flex flex-col justify-between group hover:border-[#00d4ff] transition-all relative overflow-hidden">
+                                <div class="absolute -right-4 -top-4 w-16 h-16 bg-[#00d4ff]/10 rounded-full blur-xl group-hover:bg-[#00d4ff]/20 transition-all"></div>
+                                <div>
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="px-2.5 py-1 bg-[#00d4ff]/20 text-[#00d4ff] text-[10px] font-bold rounded-lg border border-[#00d4ff]/30">
+                                            <c:out value="${v.rewardType}" />
+                                        </span>
+                                        <span class="text-xs text-text-muted">HSD: <fmt:formatDate value="${v.expiryDate}" pattern="dd/MM/yyyy" /></span>
+                                    </div>
+                                    <h3 class="font-bold text-white text-lg tracking-wide mb-1 font-mono uppercase bg-black/40 px-3 py-2 rounded border border-border-glass text-center cursor-pointer hover:bg-black/60 transition-colors" onclick="navigator.clipboard.writeText('${v.voucherCode}'); showToast('Đã copy mã: ${v.voucherCode}', 'success');">
+                                        <c:out value="${v.voucherCode}" />
+                                    </h3>
+                                </div>
+                                <p class="text-xs text-text-muted text-center mt-2">Nhấp vào mã để Copy</p>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </section>
+            </c:if>
         </div>
     </main>
 

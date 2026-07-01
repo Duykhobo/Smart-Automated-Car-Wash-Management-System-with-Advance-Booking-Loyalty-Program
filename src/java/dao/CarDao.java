@@ -19,9 +19,10 @@ public class CarDao {
     public List<Cars> getAllCars(int custid) throws SQLException {
         List<Cars> result = new ArrayList<>();
         // Sắp xếp IsDefault lên đầu tiên
-        String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [CreatedAt], [UpdatedAt], [IsActive] "
-                   + "FROM [Vehicles] "
-                   + "WHERE [CustomerID] = ? AND [IsActive] = 1 "
+        String sql = "SELECT v.[VehicleID], v.[CustomerID], v.[LicensePlate], v.[Brand], v.[Model], v.[VehicleTypeID], v.[Color], v.[ImageURL], v.[IsDefault], v.[CreatedAt], v.[UpdatedAt], v.[IsActive], vt.[TypeName], vt.[VehicleSize] "
+                   + "FROM [Vehicles] v "
+                   + "JOIN [VehicleTypes] vt ON v.[VehicleTypeID] = vt.[VehicleTypeID] "
+                   + "WHERE v.[CustomerID] = ? AND v.[IsActive] = 1 "
                    + "ORDER BY [IsDefault] DESC, [CreatedAt] DESC";
 
         try (Connection cn = DBContext.getConnection();
@@ -35,15 +36,17 @@ public class CarDao {
                     String licensePlate = table.getString("LicensePlate");
                     String brand = table.getString("Brand");
                     String model = table.getString("Model");
-                    String vehicleType = table.getString("VehicleType");
+                    int vehicleTypeId = table.getInt("VehicleTypeID");
+                    String typeName = table.getString("TypeName");
+                    String vehicleSize = table.getString("VehicleSize");
                     String color = table.getString("Color");
                     String imageUrl = table.getString("ImageURL");
                     boolean isDefault = table.getBoolean("IsDefault");
                     Timestamp createdAt = table.getTimestamp("CreatedAt");
                     Timestamp updatedAt = table.getTimestamp("UpdatedAt");
                     boolean isActive = table.getBoolean("IsActive");
-                    
-                    Cars c = new Cars(vehicleId, cusId, licensePlate, brand, model, vehicleType, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
+
+                    Cars c = new Cars(vehicleId, cusId, licensePlate, brand, model, vehicleTypeId, typeName, vehicleSize, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
                     result.add(c);
                 }
             }
@@ -59,9 +62,10 @@ public class CarDao {
 
     public Cars getCarById(int vehicleId) throws SQLException {
         Cars car = null;
-        String sql = "SELECT [VehicleID], [CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [CreatedAt], [UpdatedAt], [IsActive] "
-                   + "FROM [Vehicles] "
-                   + "WHERE [VehicleID] = ?";
+        String sql = "SELECT v.[VehicleID], v.[CustomerID], v.[LicensePlate], v.[Brand], v.[Model], v.[VehicleTypeID], v.[Color], v.[ImageURL], v.[IsDefault], v.[CreatedAt], v.[UpdatedAt], v.[IsActive], vt.[TypeName], vt.[VehicleSize] "
+                   + "FROM [Vehicles] v "
+                   + "JOIN [VehicleTypes] vt ON v.[VehicleTypeID] = vt.[VehicleTypeID] "
+                   + "WHERE v.[VehicleID] = ?";
 
         try (Connection cn = DBContext.getConnection();
              PreparedStatement st = cn.prepareStatement(sql)) {
@@ -73,15 +77,17 @@ public class CarDao {
                     String licensePlate = table.getString("LicensePlate");
                     String brand = table.getString("Brand");
                     String model = table.getString("Model");
-                    String vehicleType = table.getString("VehicleType");
+                    int vehicleTypeId = table.getInt("VehicleTypeID");
+                    String typeName = table.getString("TypeName");
+                    String vehicleSize = table.getString("VehicleSize");
                     String color = table.getString("Color");
                     String imageUrl = table.getString("ImageURL");
                     boolean isDefault = table.getBoolean("IsDefault");
                     Timestamp createdAt = table.getTimestamp("CreatedAt");
                     Timestamp updatedAt = table.getTimestamp("UpdatedAt");
                     boolean isActive = table.getBoolean("IsActive");
-                    
-                    car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleType, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
+
+                    car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleTypeId, typeName, vehicleSize, color, imageUrl, isDefault, createdAt, updatedAt, isActive);
                 }
             }
         } catch (SQLException e) {
@@ -96,8 +102,8 @@ public class CarDao {
 
     public boolean insertCar(Cars car) throws SQLException {
         boolean success = false;
-        String sql = "INSERT INTO [Vehicles] ([CustomerID], [LicensePlate], [Brand], [Model], [VehicleType], [Color], [ImageURL], [IsDefault], [IsActive], [CreatedAt], [UpdatedAt]) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO [Vehicles] ([CustomerID], [LicensePlate], [Brand], [Model], [VehicleTypeID], [Color], [ImageURL], [IsDefault], [IsActive], [CreatedAt], [UpdatedAt]) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, GETDATE(), GETDATE())";
 
         try (Connection cn = DBContext.getConnection();
              PreparedStatement st = cn.prepareStatement(sql)) {
@@ -106,14 +112,10 @@ public class CarDao {
             st.setString(2, car.getLicensePlate());
             st.setString(3, car.getBrand());
             st.setString(4, car.getModel());
-            st.setString(5, car.getVehicleType());
+            st.setInt(5, car.getVehicleTypeId());
             st.setString(6, car.getColor());
             st.setString(7, car.getImageUrl());
             st.setBoolean(8, car.getIsDefault());
-            st.setBoolean(9, true);
-            Timestamp now = new Timestamp(System.currentTimeMillis());
-            st.setTimestamp(10, now);
-            st.setTimestamp(11, now);
                 
             int rows = st.executeUpdate();
             if (rows > 0) {
@@ -132,7 +134,7 @@ public class CarDao {
     public boolean updateCar(Cars car) throws SQLException {
         boolean success = false;
         String sql = "UPDATE [Vehicles] "
-                   + "SET [LicensePlate] = ?, [Brand] = ?, [Model] = ?, [VehicleType] = ?, [Color] = ?, [ImageURL] = ISNULL(?, [ImageURL]), [UpdatedAt] = ? "
+                   + "SET [LicensePlate] = ?, [Brand] = ?, [Model] = ?, [VehicleTypeID] = ?, [Color] = ?, [ImageURL] = ISNULL(?, [ImageURL]), [UpdatedAt] = ? "
                    + "WHERE [VehicleID] = ? AND [CustomerID] = ?";
 
         try (Connection cn = DBContext.getConnection();
@@ -141,7 +143,7 @@ public class CarDao {
             st.setString(1, car.getLicensePlate());
             st.setString(2, car.getBrand());
             st.setString(3, car.getModel());
-            st.setString(4, car.getVehicleType());
+            st.setInt(4, car.getVehicleTypeId());
             st.setString(5, car.getColor());
             st.setString(6, car.getImageUrl()); 
             st.setTimestamp(7, new Timestamp(System.currentTimeMillis()));

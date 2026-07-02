@@ -19,13 +19,17 @@ public class Booking {
     private Double originalPrice;
     private Double discountAmount;
     private Double finalPrice;
+    private String paymentMethod;
+    private String paymentStatus;
     private String status;
     private int priorityScore;
+
+    private String serviceIdsStr;
 
     public Booking() {
     }
 
-    public Booking(int bookingId, int customerId, String serviceNames, int vehicleId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String status, int priorityScore) {
+    public Booking(int bookingId, int customerId, String serviceNames, int vehicleId, Integer voucherId, String licensePlate, Timestamp bookingDate, Timestamp scheduledTime, Double originalPrice, Double discountAmount, Double finalPrice, String paymentMethod, String paymentStatus, String status, int priorityScore) {
         this.bookingId = bookingId;
         this.customerId = customerId;
         this.serviceNames = serviceNames;
@@ -37,6 +41,8 @@ public class Booking {
         this.originalPrice = originalPrice;
         this.discountAmount = discountAmount;
         this.finalPrice = finalPrice;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
         this.status = status;
         this.priorityScore = priorityScore;
     }
@@ -145,4 +151,27 @@ public class Booking {
         this.priorityScore = priorityScore;
     }
 
+    public String getServiceIdsStr() {
+        return serviceIdsStr;
+    }
+
+    public void setServiceIdsStr(String serviceIdsStr) {
+        this.serviceIdsStr = serviceIdsStr;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }

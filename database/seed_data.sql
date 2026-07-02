@@ -117,50 +117,12 @@ SELECT TOP 1 @CID_VOUCHER = CustomerID FROM Customers WHERE Phone = '0901111111'
 IF @CID_VOUCHER IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Vouchers WHERE CustomerID = @CID_VOUCHER)
 BEGIN
     INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status) VALUES
-    (@CID_VOUCHER, 'FREE-111111', 'Free Wash', 500, DATEADD(month, 1, GETDATE()), 'Unused'),
-    (@CID_VOUCHER, 'DISC-222222', 'Discount 20%', 300, DATEADD(day, 15, GETDATE()), 'Unused');
+    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 500, DATEADD(month, 1, GETDATE()), 'Unused'),
+    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 300, DATEADD(day, 15, GETDATE()), 'Unused');
 END
 GO
 
--- 5. THÊM BOOKINGS (LỊCH SỬ ĐẶT LỊCH) VÀ WASH RECORDS ĐỂ DEMO THỐNG KÊ
-DECLARE @CID_BOOKING INT;
-SELECT TOP 1 @CID_BOOKING = CustomerID FROM Customers WHERE Phone = '0902222222';
-DECLARE @VID_BOOKING INT;
-SELECT TOP 1 @VID_BOOKING = VehicleID FROM Vehicles WHERE CustomerID = @CID_BOOKING;
 
-IF @CID_BOOKING IS NOT NULL AND @VID_BOOKING IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Bookings WHERE CustomerID = @CID_BOOKING)
-BEGIN
-    DECLARE @Tomorrow DATE = CAST(GETDATE() + 1 AS DATE);
-    DECLARE @Yesterday DATE = CAST(GETDATE() - 1 AS DATE);
-    DECLARE @YesterdayTime1 DATETIME = DATEADD(minute, 5, GETDATE()-1);
-    DECLARE @YesterdayTime2 DATETIME = DATEADD(minute, 35, GETDATE()-1);
-
-    -- Một lịch hẹn sắp tới (Pending)
-    EXEC sp_CreateBookingTransaction 
-        @CustomerID = @CID_BOOKING, 
-        @ServiceIDs = '2', 
-        @VehicleID = @VID_BOOKING, 
-        @BookingDate = @Tomorrow, 
-        @ScheduledTime = '10:00:00', 
-        @OriginalPrice = 250000.00, 
-        @DiscountAmount = 0, 
-        @FinalPrice = 250000.00,
-        @TotalDurationMinutes = 60;
-
-    -- Một lịch sử đã hoàn thành (Completed) ngày hôm qua
-    INSERT INTO Bookings (CustomerID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status)
-    VALUES (@CID_BOOKING, @VID_BOOKING, @Yesterday, '14:30:00', 100000.00, 0, 100000.00, 'Completed');
-    
-    DECLARE @COMPLETED_BOOKING_ID INT = SCOPE_IDENTITY();
-    
-    INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
-    VALUES (@COMPLETED_BOOKING_ID, 1, 100000.00, 30);
-    
-    -- Thêm WashRecord cho lịch sử đã hoàn thành
-    INSERT INTO WashRecords (BookingID, ActualStartTime, ActualEndTime, LPRConfidenceScore, OperatorNotes)
-    VALUES (@COMPLETED_BOOKING_ID, @YesterdayTime1, @YesterdayTime2, 99.5, N'Xe sạch, không trầy xước.');
-END
-GO
 
 PRINT N'Thêm dữ liệu mẫu thành công!';
 
@@ -172,5 +134,15 @@ BEGIN
     ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
     ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
     ('ClosingHour', '22', N'Giờ đóng cửa (0-23)');
+END
+GO
+
+-- 7. THÊM REWARD CATALOG (QUÀ TẶNG)
+IF NOT EXISTS (SELECT 1 FROM RewardCatalog)
+BEGIN
+    INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
+    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
+    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
+    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
 END
 GO

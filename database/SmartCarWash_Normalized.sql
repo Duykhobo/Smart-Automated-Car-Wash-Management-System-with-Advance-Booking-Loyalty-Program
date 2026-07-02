@@ -31,6 +31,7 @@ IF OBJECT_ID('dbo.Customers', 'U') IS NOT NULL DROP TABLE dbo.Customers;
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE dbo.Users;
 IF OBJECT_ID('dbo.MemberTiers', 'U') IS NOT NULL DROP TABLE dbo.MemberTiers;
 IF OBJECT_ID('dbo.SystemConfig', 'U') IS NOT NULL DROP TABLE dbo.SystemConfig;
+IF OBJECT_ID('dbo.RewardCatalog', 'U') IS NOT NULL DROP TABLE dbo.RewardCatalog;
 GO
 
 -- =======================================================================
@@ -165,6 +166,20 @@ CREATE TABLE BookingSlotCapacity (
     CONSTRAINT CHK_CurrentBooked CHECK (CurrentBooked <= MaxCapacity)
 );
 
+-- 6.5. BẢNG REWARD_CATALOG (Danh mục Quà tặng)
+CREATE TABLE RewardCatalog (
+    RewardID INT IDENTITY(1,1) PRIMARY KEY,
+    RewardName NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(255) NULL,
+    PointsCost INT NOT NULL,
+    RewardType VARCHAR(30) NOT NULL,
+    ImageIcon VARCHAR(50) DEFAULT 'gift',
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE()
+);
+GO
+
 -- 7. BẢNG VOUCHERS
 CREATE TABLE Vouchers (
     VoucherID INT IDENTITY(1,1) PRIMARY KEY,
@@ -190,7 +205,9 @@ CREATE TABLE Bookings (
     OriginalPrice DECIMAL(10,2) NOT NULL,
     DiscountAmount DECIMAL(10,2) DEFAULT 0.00,
     FinalPrice DECIMAL(10,2) NOT NULL,
-    Status VARCHAR(20) DEFAULT 'Pending' CHECK (Status IN ('Pending', 'Confirmed', 'InProgress', 'Completed', 'Cancelled', 'NoShow')),
+    PaymentMethod VARCHAR(20) DEFAULT 'Cash',
+    PaymentStatus VARCHAR(20) DEFAULT 'Unpaid',
+    Status VARCHAR(20) DEFAULT 'Pending' CHECK (Status IN ('Pending', 'Confirmed', 'Waitlisted', 'InProgress', 'Completed', 'Cancelled', 'NoShow')),
     PriorityScore INT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
@@ -246,6 +263,12 @@ INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, Priority
 ('Silver', 5, 2000000, 0.10, 2, 10, 'badge-silver', 'border-slate-400', 'bg-slate-400/20', 'text-slate-400', 'text-slate-300'),
 ('Gold', 15, 6000000, 0.30, 3, 12, 'badge-gold', 'border-amber-500', 'bg-amber-500/20', 'text-amber-500', 'text-amber-400'),
 ('Platinum', 30, 15000000, 0.50, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
+GO
+
+INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
+(N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
+(N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
+(N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
 GO
 
 -- =======================================================================

@@ -23,7 +23,7 @@ import utils.ValidationUtil;
  *
  * @author thien
  */
-@WebServlet(name = "ChangePasswordController", urlPatterns = {"/ChangePasswordController"})
+@WebServlet(name = "ChangePasswordController", urlPatterns = {"/ChangePasswordController", "/account/change-password"})
 public class ChangePasswordController extends HttpServlet {
 
     /**

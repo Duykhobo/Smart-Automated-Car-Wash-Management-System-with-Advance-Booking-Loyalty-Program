@@ -38,8 +38,9 @@
             </a>
             <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="award" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Loyalty Program</span>
+                <span class="font-medium text-sm">Cửa hàng đổi quà</span>
             </a>
+
             <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Hồ sơ cá nhân</span>
@@ -155,11 +156,15 @@
                 <i data-lucide="calendar-plus" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Đặt lịch</span>
             </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
                 <i data-lucide="award" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Loyalty</span>
+                <span class="text-[10px] font-medium">Cửa hàng đổi quà</span>
             </a>
-            <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-[#00d4ff]">
+            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
+                                        <i data-lucide="award" class="w-6 h-6"></i>
+                                        <span class="text-[10px] font-medium">Đổi quà</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-[#00d4ff]">
                 <i data-lucide="user" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"></i>
                 <span class="text-[10px] font-medium">Cá nhân</span>
             </a>

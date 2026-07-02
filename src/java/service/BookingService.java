@@ -35,9 +35,41 @@ public class BookingService {
         List<Cars> vehicles = carDao.getAllCars(customer.getCustomerId());
         data.put("vehicles", vehicles);
 
+        // Determine default vehicle size for initial pricing
+        String initialVehicleSize = "SEDAN"; // Default fallback
+        if (vehicles != null && !vehicles.isEmpty()) {
+            Cars defaultCar = null;
+            for (Cars v : vehicles) {
+                if (v.getIsDefault()) {
+                    defaultCar = v;
+                    break;
+                }
+            }
+            if (defaultCar == null) defaultCar = vehicles.get(0);
+            
+            // Lấy size từ Java class. Nếu chưa có (chưa build) thì dùng Fallback name
+            if (defaultCar.getVehicleSize() != null && !defaultCar.getVehicleSize().isEmpty()) {
+                initialVehicleSize = defaultCar.getVehicleSize().trim();
+            } else if (defaultCar.getVehicleTypeName() != null) {
+                String typeName = defaultCar.getVehicleTypeName().toLowerCase();
+                if (typeName.contains("bán tải") || typeName.contains("mpv") || typeName.contains("pickup")) {
+                    initialVehicleSize = "XLARGE";
+                } else if (typeName.contains("suv") || typeName.contains("cuv")) {
+                    initialVehicleSize = "SUV";
+                }
+            }
+        }
+
         // Fetch services and dynamic prices
         List<Service> services = serviceDao.getAllActiveServices();
         data.put("services", services);
+
+        // Map initial prices for UI
+        Map<Integer, Double> initialPrices = new HashMap<>();
+        for (Service s : services) {
+            initialPrices.put(s.getServiceId(), serviceDao.getServicePrice(s.getServiceId(), initialVehicleSize));
+        }
+        data.put("initialPrices", initialPrices);
         
         String servicePricesJson = serviceDao.getServicePricesJson();
         data.put("servicePricesJson", servicePricesJson);
@@ -101,6 +133,12 @@ public class BookingService {
         }
     }
 
+    public void validateVehicleDoubleBooking(int vehicleId, Date bookingDate, Time scheduledTime, int totalDurationMinutes) throws Exception {
+        if (bookingDao.isVehicleDoubleBooked(vehicleId, bookingDate, scheduledTime, totalDurationMinutes)) {
+            throw new Exception("Lỗi: Xe của bạn đã có lịch hẹn trùng thời gian này. Vui lòng chọn giờ khác hoặc xe khác.");
+        }
+    }
+
     public List<Service> getServicesByIds(String[] serviceIds) throws Exception {
         List<Service> allServices = serviceDao.getAllActiveServices();
         List<Service> selected = new ArrayList<>();
@@ -133,5 +171,16 @@ public class BookingService {
                 discountAmount,
                 finalPrice,
                 totalDurationMinutes);
+    }
+    
+    public void validateMaxBookingDate(String tierStatus, Date bookingDate) throws Exception {
+        String cleanTier = (tierStatus != null) ? tierStatus.trim() : "";
+        MemberTier memberTier = tierDao.getTierByName(cleanTier);
+        int maxBookingDays = memberTier != null ? memberTier.getMaxBookingDays() : 7;
+        
+        java.time.LocalDate maxDate = java.time.LocalDate.now().plusDays(maxBookingDays - 1);
+        if (bookingDate.toLocalDate().isAfter(maxDate)) {
+            throw new Exception("Hạng thành viên của bạn chỉ được đặt trước tối đa " + maxBookingDays + " ngày.");
+        }
     }
 }

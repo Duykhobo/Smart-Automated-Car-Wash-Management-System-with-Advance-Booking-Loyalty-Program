@@ -98,6 +98,8 @@ public class BookingDAO {
                             rs.getDouble("OriginalPrice"),
                             rs.getDouble("DiscountAmount"),
                             rs.getDouble("FinalPrice"),
+                            rs.getString("PaymentMethod"),
+                            rs.getString("PaymentStatus"),
                             rs.getString("Status"),
                             rs.getInt("PriorityScore")));
                 }
@@ -152,7 +154,7 @@ public class BookingDAO {
      * @return true nếu thành công
      * @throws Exception nếu có lỗi CSDL
      */
-    public boolean updateBookingTransaction(int bookingId, int vehicleId, 
+    public boolean updateBookingTransaction(int bookingId, int vehicleId, String[] serviceIds,
                                             Date oldDate, Time oldTime, 
                                             Date newDate, Time newTime, 
                                             double originalPrice, double discountAmount, double finalPrice) throws Exception {
@@ -237,6 +239,28 @@ public class BookingDAO {
                     st1.setInt(7, bookingId);
                 }
                 st1.executeUpdate();
+            }
+
+            if (serviceIds != null && serviceIds.length > 0) {
+                try (PreparedStatement delSt = cn.prepareStatement("DELETE FROM [BookingDetails] WHERE [BookingID] = ?")) {
+                    delSt.setInt(1, bookingId);
+                    delSt.executeUpdate();
+                }
+                String insSql = "INSERT INTO [BookingDetails] (BookingID, ServiceID, Price, DurationMinutes) " +
+                                "SELECT ?, ServiceID, " +
+                                "ISNULL((SELECT sp.Price FROM ServicePrices sp " +
+                                "        JOIN Vehicles v ON v.VehicleID = (SELECT VehicleID FROM Bookings WHERE BookingID = ?) " +
+                                "        JOIN VehicleTypes vt ON v.VehicleTypeID = vt.VehicleTypeID " +
+                                "        WHERE sp.ServiceID = [Services].ServiceID AND sp.VehicleSize = vt.VehicleSize), BasePrice), " +
+                                "DurationMinutes FROM [Services] WHERE ServiceID = ?";
+                try (PreparedStatement insSt = cn.prepareStatement(insSql)) {
+                    for (String sid : serviceIds) {
+                        insSt.setInt(1, bookingId);
+                        insSt.setInt(2, bookingId);
+                        insSt.setInt(3, Integer.parseInt(sid));
+                        insSt.executeUpdate();
+                    }
+                }
             }
 
             cn.commit();
@@ -372,6 +396,8 @@ public class BookingDAO {
                             rs.getDouble("OriginalPrice"),
                             rs.getDouble("DiscountAmount"),
                             rs.getDouble("FinalPrice"),
+                            rs.getString("PaymentMethod"),
+                            rs.getString("PaymentStatus"),
                             rs.getString("Status"),
                             rs.getInt("PriorityScore"));
                 }
@@ -456,6 +482,8 @@ public class BookingDAO {
                             rs.getDouble("OriginalPrice"),
                             rs.getDouble("DiscountAmount"),
                             rs.getDouble("FinalPrice"),
+                            rs.getString("PaymentMethod"),
+                            rs.getString("PaymentStatus"),
                             rs.getString("Status"),
                             rs.getInt("PriorityScore")));
                 }
@@ -498,6 +526,33 @@ public class BookingDAO {
             LOGGER.log(Level.SEVERE, "Error summing total spend", e);
         }
         return total;
+    }
+
+    public boolean updatePaymentStatus(int bookingId, String status) throws SQLException {
+        boolean success = false;
+        String sql = "UPDATE [Bookings] SET [PaymentStatus] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+             
+            st.setString(1, status);
+            st.setInt(2, bookingId);
+            int rows = st.executeUpdate();
+            if (rows > 0) success = true;
+        }
+        return success;
+    }
+    
+    public boolean completeBookingTransaction(int bookingId) throws SQLException {
+        boolean success = false;
+        String sql = "UPDATE [Bookings] SET [Status] = 'Completed', [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+             
+            st.setInt(1, bookingId);
+            int rows = st.executeUpdate();
+            if (rows > 0) success = true;
+        }
+        return success;
     }
 
     public boolean isSlotAvailable(Date date, Time time) throws SQLException {
@@ -563,6 +618,123 @@ public class BookingDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Lỗi Background Job khi quét lịch hẹn quá hạn", e);
         }
+    }
+
+    public void autoPromoteWaitlist() {
+        String queryWaitlisted = "SELECT b.BookingID, b.BookingDate, b.ScheduledTime, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration " +
+                "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID " +
+                "WHERE b.Status = 'Waitlisted' AND b.BookingDate >= CAST(GETDATE() AS DATE) " +
+                "GROUP BY b.BookingID, b.BookingDate, b.ScheduledTime " +
+                "ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        
+        String checkSql = "SELECT CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+        String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
+        String updateStatus = "UPDATE Bookings SET Status = 'Pending', UpdatedAt = GETDATE() WHERE BookingID = ?";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement stFetch = cn.prepareStatement(queryWaitlisted)) {
+             
+            try (ResultSet rs = stFetch.executeQuery()) {
+                while (rs.next()) {
+                    int bookingId = rs.getInt("BookingID");
+                    Date bDate = rs.getDate("BookingDate");
+                    Time bTime = rs.getTime("ScheduledTime");
+                    int totalDuration = rs.getInt("TotalDuration");
+                    int slotsNeeded = (int) Math.ceil(totalDuration / 30.0);
+                    if (slotsNeeded < 1) slotsNeeded = 1;
+
+                    boolean canPromote = true;
+                    java.time.LocalTime bLocalTime = bTime.toLocalTime();
+                    
+                    // Check capacity
+                    for (int i = 0; i < slotsNeeded; i++) {
+                        java.time.LocalTime slotTime = bLocalTime.plusMinutes(i * 30L);
+                        try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                            stCheck.setDate(1, bDate);
+                            stCheck.setString(2, slotTime.toString());
+                            try (ResultSet rsCheck = stCheck.executeQuery()) {
+                                if (rsCheck.next()) {
+                                    int current = rsCheck.getInt("CurrentBooked");
+                                    int max = rsCheck.getInt("MaxCapacity");
+                                    if (current >= max) {
+                                        canPromote = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (canPromote) {
+                        // Promote it! Update capacities
+                        for (int i = 0; i < slotsNeeded; i++) {
+                            java.time.LocalTime slotTime = bLocalTime.plusMinutes(i * 30L);
+                            boolean exists = false;
+                            try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                                stCheck.setDate(1, bDate);
+                                stCheck.setString(2, slotTime.toString());
+                                try (ResultSet rsCheck = stCheck.executeQuery()) {
+                                    if (rsCheck.next()) exists = true;
+                                }
+                            }
+                            if (exists) {
+                                try (PreparedStatement stInc = cn.prepareStatement(incSql)) {
+                                    stInc.setDate(1, bDate);
+                                    stInc.setString(2, slotTime.toString());
+                                    stInc.executeUpdate();
+                                }
+                            } else {
+                                try (PreparedStatement stIns = cn.prepareStatement(insSql)) {
+                                    stIns.setDate(1, bDate);
+                                    stIns.setString(2, slotTime.toString());
+                                    stIns.executeUpdate();
+                                }
+                            }
+                        }
+                        
+                        try (PreparedStatement stUpd = cn.prepareStatement(updateStatus)) {
+                            stUpd.setInt(1, bookingId);
+                            stUpd.executeUpdate();
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error auto-promoting waitlist", e);
+        }
+    }
+
+    public boolean isVehicleDoubleBooked(int vehicleId, Date bookingDate, Time scheduledTime, int totalDurationMinutes) {
+        boolean isDoubleBooked = false;
+        String sql = "SELECT b.BookingID, b.ScheduledTime, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration " +
+                     "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID " +
+                     "WHERE b.VehicleID = ? AND b.BookingDate = ? AND b.Status IN ('Pending', 'Confirmed', 'Waitlisted', 'InProgress') " +
+                     "GROUP BY b.BookingID, b.ScheduledTime";
+        
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, vehicleId);
+            st.setDate(2, bookingDate);
+            try (ResultSet rs = st.executeQuery()) {
+                java.time.LocalTime reqStart = scheduledTime.toLocalTime();
+                java.time.LocalTime reqEnd = reqStart.plusMinutes(totalDurationMinutes);
+
+                while (rs.next()) {
+                    java.time.LocalTime existingStart = rs.getTime("ScheduledTime").toLocalTime();
+                    int duration = rs.getInt("TotalDuration");
+                    java.time.LocalTime existingEnd = existingStart.plusMinutes(duration);
+
+                    if (reqStart.isBefore(existingEnd) && existingStart.isBefore(reqEnd)) {
+                        isDoubleBooked = true;
+                        break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking vehicle double booking", e);
+        }
+        return isDoubleBooked;
     }
 
     /**

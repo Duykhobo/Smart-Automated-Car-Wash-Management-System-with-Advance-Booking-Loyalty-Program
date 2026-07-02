@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -53,7 +53,7 @@
                 <a href="${pageContext.request.contextPath}/customer/loyalty"
                    class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                     <i data-lucide="award" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Loyalty Program</span>
+                    <span class="font-medium text-sm">Cửa hàng đổi quà</span>
                 </a>
                 <a href="${pageContext.request.contextPath}/account/profile"
                    class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
@@ -159,7 +159,7 @@
                                             </div>
 
                                             <div class="flex gap-2 mt-auto w-full justify-between sm:justify-end">
-                                                <c:if test="${booking.status == 'Pending'}">
+                                                <c:if test="${booking.status == 'Pending' || booking.status == 'Waitlisted'}">
                                                     <a href="${pageContext.request.contextPath}/customer/booking_history?action=edit&id=${booking.bookingId}" class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30 text-sm font-semibold transition-colors text-center">
                                                         Sửa
                                                     </a>

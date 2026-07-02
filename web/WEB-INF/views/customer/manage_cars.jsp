@@ -37,8 +37,9 @@
             </a>
             <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="award" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Loyalty Program</span>
+                <span class="font-medium text-sm">Cửa hàng đổi quà</span>
             </a>
+
             <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Hồ sơ cá nhân</span>
@@ -189,7 +190,11 @@
                 <i data-lucide="car" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"></i>
                 <span class="text-[10px] font-medium">Xe của tôi</span>
             </a>
-            <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
+                                        <i data-lucide="award" class="w-6 h-6"></i>
+                                        <span class="text-[10px] font-medium">Đổi quà</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Cá nhân</span>
             </a>
@@ -450,7 +455,7 @@
                 modalVehicleId.value = '';
                 modalPlate.value = '';
                 modalModel.value = '';
-                modalType.value = 'sedan';
+                modalType.value = '1';
 
                 selectBrand.value = '';
                 inputOtherBrand.classList.add('hidden');

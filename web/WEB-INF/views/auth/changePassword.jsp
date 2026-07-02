@@ -36,7 +36,7 @@
                 <i data-lucide="car" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Quản lý xe</span>
             </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+            <a href="${pageContext.request.contextPath}/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="award" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Loyalty Program</span>
             </a>
@@ -147,7 +147,7 @@
                 <i data-lucide="calendar-plus" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Đặt lịch</span>
             </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
                 <i data-lucide="award" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Loyalty</span>
             </a>

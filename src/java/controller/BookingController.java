@@ -25,7 +25,7 @@ import utils.AppConstants;
  * - Phương thức GET: Gọi BookingService chuẩn bị dữ liệu và hiển thị giao diện booking.jsp.
  * - Phương thức POST: Nhận dữ liệu đặt lịch, gọi BookingService kiểm tra tính hợp lệ và lưu vào cơ sở dữ liệu.
  */
-@WebServlet(name = "BookingController", urlPatterns = { "/BookingController" })
+@WebServlet(name = "BookingController", urlPatterns = { "/BookingController", "/bookings" })
 public class BookingController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
@@ -87,7 +87,8 @@ public class BookingController extends HttpServlet {
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
             Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr + ":00"));
 
-            // Validation travel time
+            // Validation travel time and max booking date
+            bookingService.validateMaxBookingDate(customer.getTierStatus(), bookingDate);
             bookingService.validateTravelTime(bookingDate, scheduledTime);
 
             java.util.List<Service> selectedServices = bookingService.getServicesByIds(serviceIds);
@@ -100,6 +101,9 @@ public class BookingController extends HttpServlet {
             
             // Validate if total duration exceeds closing hour
             bookingService.validateWorkingHours(scheduledTime, totalDurationMinutes);
+
+            // Validate double booking
+            bookingService.validateVehicleDoubleBooking(vehicleId, bookingDate, scheduledTime, totalDurationMinutes);
 
             String serviceIdsStr = String.join(",", serviceIds);
             
@@ -148,3 +152,4 @@ public class BookingController extends HttpServlet {
         }
     }
 }
+

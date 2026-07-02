@@ -51,7 +51,7 @@ public class AuthFilter implements Filter {
 
             // Chưa đăng nhập -> đá về trang login với thông báo
             req.setAttribute("errorMessage", "Vui lòng đăng nhập để tiếp tục!");
-            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         }
     }
 

@@ -159,10 +159,17 @@ public class CheckoutServlet extends HttpServlet {
                 sendErrorResponse(request, response, "Tổng thời gian làm dịch vụ (" + totalDurationMinutes + " phút) vượt quá giờ đóng cửa (" + closingHour + ":00). Vui lòng chọn giờ sớm hơn.");
                 return;
             }
+            
+            BookingDAO bookingDAO = new BookingDAO();
+            
+            // Validate double booking
+            if (bookingDAO.isVehicleDoubleBooked(vehicleId, bookingDate, scheduledTime, totalDurationMinutes)) {
+                sendErrorResponse(request, response, "Lỗi: Xe của bạn đã có lịch hẹn trùng thời gian này. Vui lòng chọn giờ khác hoặc xe khác.");
+                return;
+            }
 
             double discountAmount = 0.0;
             Integer voucherId = null;
-            BookingDAO bookingDAO = new BookingDAO();
 
             // 5. Kiểm tra và áp dụng Voucher giảm giá nếu khách hàng có điền
             if (voucherCode != null && !voucherCode.trim().isEmpty()) {
@@ -188,7 +195,8 @@ public class CheckoutServlet extends HttpServlet {
                 
                 if (rewardType.startsWith("PERCENT_") || rewardType.endsWith("_PERCENT_OFF")) {
                     try {
-                        String percentStr = rewardType.replace("PERCENT_", "").replace("_PERCENT_OFF", "");
+                        // Extract digits from e.g. "10_PERCENT_OFF" or "PERCENT_10"
+                        String percentStr = rewardType.replaceAll("[^0-9.]", "");
                         double percent = Double.parseDouble(percentStr);
                         discountAmount = originalPrice * (percent / 100.0);
                     } catch (NumberFormatException e) {

@@ -141,9 +141,32 @@ public class BookingHistoryController extends HttpServlet {
             }
             cus.setTotalWashes(bookDao.getTotalWashes(cus.getCustomerId()));
             List<Booking> upcomingBookings = bookDao.getUpcomingBookings(cus.getCustomerId());
-            List<Booking> historyBookings = bookDao.getHistoryBookings(cus.getCustomerId());
+            
+            // Pagination logic for history bookings
+            int page = 1;
+            int pageSize = 5; // Display 5 items per page
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                try {
+                    page = Integer.parseInt(pageParam);
+                    if (page < 1) page = 1;
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            
+            int totalRecords = bookDao.getTotalHistoryBookings(cus.getCustomerId());
+            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
+            
+            List<Booking> historyBookings = bookDao.getHistoryBookings(cus.getCustomerId(), page, pageSize);
+            
             request.setAttribute("upcomingBookings", upcomingBookings);
             request.setAttribute("historyBookings", historyBookings);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("customer", cus);
             request.getRequestDispatcher("/WEB-INF/views/customer/booking_history.jsp").forward(request, response);
         }
@@ -233,6 +256,11 @@ public class BookingHistoryController extends HttpServlet {
                     
                     // Validate if total duration exceeds closing hour
                     bookingService.validateWorkingHours(newTime, totalDurationMinutes);
+
+                    // Validate double booking
+                    if (bookDao.isVehicleDoubleBooked(vehicleId, newDate, newTime, totalDurationMinutes, bookingId)) {
+                        throw new Exception("Lỗi: Xe của bạn đã có lịch hẹn trùng thời gian này. Vui lòng chọn giờ khác hoặc xe khác.");
+                    }
 
                     double oldOriginalPrice = oldBooking.getOriginalPrice();
                     double discountAmount = 0;

@@ -68,7 +68,7 @@ BEGIN
     
     DECLARE @CID1 INT = SCOPE_IDENTITY();
     INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
-    VALUES (@CID1, '51G-111.11', 'Toyota', 'Vios', 1, 'White', 1);
+    VALUES (@CID1, '51G-11111', 'Toyota', 'Vios', 1, 'White', 1);
 END
 
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_gold')
@@ -82,7 +82,7 @@ BEGIN
     
     DECLARE @CID2 INT = SCOPE_IDENTITY();
     INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
-    VALUES (@CID2, '51H-222.22', 'Mazda', 'CX-5', 3, 'Red', 1);
+    VALUES (@CID2, '51H-22222', 'Mazda', 'CX-5', 3, 'Red', 1);
 END
 GO
 
@@ -97,7 +97,7 @@ BEGIN
     
     DECLARE @CID3 INT = SCOPE_IDENTITY();
     INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
-    VALUES (@CID3, '51I-333.33', 'Ford', 'Ranger', 5, 'Black', 1);
+    VALUES (@CID3, '51I-33333', 'Ford', 'Ranger', 5, 'Black', 1);
 END
 GO
 

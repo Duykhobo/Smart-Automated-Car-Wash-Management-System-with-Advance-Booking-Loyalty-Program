@@ -37,8 +37,9 @@
             </a>
             <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="award" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Loyalty Program</span>
+                <span class="font-medium text-sm">Cửa hàng đổi quà</span>
             </a>
+
             <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Hồ sơ cá nhân</span>
@@ -119,7 +120,7 @@
                                             <span class="text-border-glass">•</span>
                                             <span class="text-gray-300"><c:out value="${car.color}" /></span>
                                             <span class="text-border-glass">•</span>
-                                            <span class="text-gray-300 capitalize"><c:out value="${car.vehicleType}" /></span>
+                                            <span class="text-gray-300 capitalize"><c:out value="${car.vehicleTypeName}" /></span>
                                         </div>
                                         <c:if test="${car.isDefault}">
                                             <span class="text-[10px] bg-[#00d4ff]/20 text-[#00d4ff] px-2 py-0.5 rounded uppercase font-bold border border-[#00d4ff]/30 md:hidden w-max mt-1">Mặc định</span>
@@ -143,7 +144,7 @@
                                         data-plate="<c:out value='${car.licensePlate}'/>"
                                         data-brand="<c:out value='${car.brand}'/>"
                                         data-model="<c:out value='${car.model}'/>"
-                                        data-type="<c:out value='${car.vehicleType}'/>"
+                                        data-typeid="<c:out value='${car.vehicleTypeId}'/>"
                                         data-color="<c:out value='${car.color}'/>"
                                         onclick="openCarModalFromButton(this)"
                                         class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-white hover:bg-[#00d4ff] hover:text-black border border-border-glass hover:border-[#00d4ff] transition-all"
@@ -189,7 +190,11 @@
                 <i data-lucide="car" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"></i>
                 <span class="text-[10px] font-medium">Xe của tôi</span>
             </a>
-            <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
+                                        <i data-lucide="award" class="w-6 h-6"></i>
+                                        <span class="text-[10px] font-medium">Đổi quà</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
                 <i data-lucide="user" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Cá nhân</span>
             </a>
@@ -269,11 +274,10 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium ml-1">Loại xe *</label>
-                        <select id="modalType" name="vehicleType" class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all cursor-pointer appearance-none">
-                            <option value="sedan" class="bg-[#0b0f1a]">Sedan (4 chỗ)</option>
-                            <option value="suv" class="bg-[#0b0f1a]">SUV (7 chỗ)</option>
-                            <option value="hatchback" class="bg-[#0b0f1a]">Hatchback</option>
-                            <option value="pickup" class="bg-[#0b0f1a]">Bán tải</option>
+                        <select id="modalType" name="vehicleTypeId" class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all cursor-pointer appearance-none">
+                            <c:forEach var="vType" items="${vehicleTypes}">
+                                <option value="${vType.vehicleTypeId}" class="bg-[#0b0f1a]">${vType.typeName}</option>
+                            </c:forEach>
                         </select>
                     </div>
                     <div class="space-y-1.5">
@@ -334,10 +338,10 @@
             const plate = button.getAttribute('data-plate');
             const brand = button.getAttribute('data-brand');
             const model = button.getAttribute('data-model');
-            const type = button.getAttribute('data-type');
+            const typeId = button.getAttribute('data-typeid');
             const color = button.getAttribute('data-color');
 
-            openCarModal('update', id, plate, brand, model, type, color);
+            openCarModal('update', id, plate, brand, model, typeId, color);
         }
 
         function handleBrandChange() {
@@ -384,7 +388,7 @@
             hiddenInput.value = inputOther.value.trim();
         }
 
-        function openCarModal(action, id = '', plate = '', brand = '', model = '', type = 'sedan', color = '') {
+        function openCarModal(action, id = '', plate = '', brand = '', model = '', typeId = '1', color = '') {
             modalAction.value = action;
             formError.classList.add('hidden');
 
@@ -401,7 +405,7 @@
                 modalVehicleId.value = id;
                 modalPlate.value = plate;
                 modalModel.value = model;
-                modalType.value = type;
+                modalType.value = typeId;
 
                 hiddenInputBrand.value = brand;
                 let isKnownBrand = false;
@@ -451,7 +455,7 @@
                 modalVehicleId.value = '';
                 modalPlate.value = '';
                 modalModel.value = '';
-                modalType.value = 'sedan';
+                modalType.value = '1';
 
                 selectBrand.value = '';
                 inputOtherBrand.classList.add('hidden');

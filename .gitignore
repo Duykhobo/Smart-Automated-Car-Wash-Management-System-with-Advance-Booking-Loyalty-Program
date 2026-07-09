@@ -12,6 +12,7 @@
 hs_err_pid*
 build/
 dist/
+vscode-build/
 nbproject/private/
 .metadata/
 bin/

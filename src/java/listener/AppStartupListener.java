@@ -19,7 +19,7 @@ public class AppStartupListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        LOGGER.info("=== HỆ THỐNG SMART CAR WASH ĐÃ KHỞI ĐỘNG ===");
+        LOGGER.info("=== SMART CAR WASH SYSTEM STARTED ===");
 
         // Khởi tạo bộ đếm nhịp (Scheduler) chạy ngầm với 1 luồng duy nhất
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -30,20 +30,20 @@ public class AppStartupListener implements ServletContextListener {
                 BookingDAO bookingDAO = new BookingDAO();
                 bookingDAO.autoCancelExpiredBookings();
             } catch (Exception e) {
-                LOGGER.severe("Lỗi trong luồng Background Job: " + e.getMessage());
+                LOGGER.severe("Error in Background Job thread: " + e.getMessage());
             }
         };
 
         // Bắt đầu chạy ngầm: Chờ 1 phút rồi chạy, sau đó cứ lặp lại mỗi 1 phút
         scheduler.scheduleAtFixedRate(cancelTask, 1, 1, TimeUnit.MINUTES);
-        LOGGER.info("=> Background Job [Auto-Cancel Expired Bookings] đã được kích hoạt chạy ngầm.");
+        LOGGER.info("=> Background Job [Auto-Cancel Expired Bookings] activated and running in background.");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdown();
-            LOGGER.info("=== HỆ THỐNG SMART CAR WASH TẮT: Đã dọn dẹp Background Job ===");
+            LOGGER.info("=== SMART CAR WASH SYSTEM SHUTDOWN: Background Job cleaned up ===");
         }
     }
 }

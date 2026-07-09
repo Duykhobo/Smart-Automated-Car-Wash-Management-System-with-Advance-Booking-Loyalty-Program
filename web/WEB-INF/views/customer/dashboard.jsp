@@ -55,7 +55,7 @@
                                     <a href="${pageContext.request.contextPath}/customer/loyalty"
                                         class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                                         <i data-lucide="award" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Loyalty Program</span>
+                                        <span class="font-medium text-sm">Cửa hàng đổi quà</span>
                                     </a>
                                     <a href="${pageContext.request.contextPath}/account/profile"
                                         class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
@@ -89,18 +89,6 @@
                                 </header>
 
                                 <div class="px-4 md:px-8 py-8 max-w-4xl mx-auto space-y-8">
-                                    <% String errMsg=(String)
-                                        session.getAttribute(utils.AppConstants.SESSION_MSG_ERROR); if (errMsg !=null) {
-                                        %>
-                                        <div
-                                            class="bg-error/10 border border-error/20 text-error p-4 rounded-xl flex items-center gap-3">
-                                            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-                                            <span><strong>Lá»—i:</strong>
-                                                <%= errMsg %>
-                                            </span>
-                                        </div>
-                                        <% session.removeAttribute(utils.AppConstants.SESSION_MSG_ERROR); } %>
-
                                             <!-- Membership Card -->
                                             <section aria-labelledby="membership-card-title"
                                                 class="relative w-full max-w-md mx-auto rounded-2xl overflow-hidden bg-gradient-to-br from-bg-primary to-[#0a1128] border border-border-glass shadow-2xl p-6 group">
@@ -129,10 +117,20 @@
                                                             <span
                                                                 class="text-gray-300 text-xs font-medium uppercase tracking-wider mb-1">Hạng
                                                                 Thành Viên</span>
-                                                            <span
-                                                                class="text-amber-400 font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_10px_rgba(251,191,36,0.6)] font-display">
-                                                                <c:out value="${customer.tierStatus}" />
-                                                            </span>
+                                                            <c:choose>
+                                                                <c:when test="${customer.tierStatus == 'Silver'}">
+                                                                    <span class="bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_15px_rgba(156,163,175,0.8)] font-display">Silver</span>
+                                                                </c:when>
+                                                                <c:when test="${customer.tierStatus == 'Gold'}">
+                                                                    <span class="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_20px_rgba(250,204,21,0.9)] font-display">Gold</span>
+                                                                </c:when>
+                                                                <c:when test="${customer.tierStatus == 'Platinum'}">
+                                                                    <span class="bg-gradient-to-r from-cyan-300 via-white to-purple-400 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_25px_rgba(0,212,255,0.9)] font-display animate-pulse">Platinum</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-slate-300 font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_10px_rgba(148,163,184,0.6)] font-display">Member</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </div>
                                                     </div>
 
@@ -206,8 +204,8 @@
                                                 <div class="flex flex-col gap-4">
                                                     <c:choose>
                                                         <c:when test="${not empty upcomingBooking}">
-                                                            <article class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'border-l-amber-500' : 'border-l-[#00d4ff]'} shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden">
-                                                                <div class="absolute -right-10 -top-10 w-32 h-32 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/10' : 'bg-[#00d4ff]/10'} rounded-full blur-2xl">
+                                                            <article class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'border-l-amber-500' : (fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'waitlisted' ? 'border-l-orange-500' : 'border-l-[#00d4ff]')} shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden">
+                                                                <div class="absolute -right-10 -top-10 w-32 h-32 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/10' : (fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'waitlisted' ? 'bg-orange-500/10' : 'bg-[#00d4ff]/10')} rounded-full blur-2xl">
                                                                 </div>
                                                                 <div class="flex flex-col sm:flex-row justify-between gap-4">
                                                                     <div class="space-y-3 flex-1">
@@ -302,6 +300,10 @@
                                         class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
                                         <i data-lucide="history" class="w-6 h-6"></i>
                                         <span class="text-[10px] font-medium">Lịch sử</span>
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
+                                        <i data-lucide="award" class="w-6 h-6"></i>
+                                        <span class="text-[10px] font-medium">Đổi quà</span>
                                     </a>
                                     <a href="${pageContext.request.contextPath}/account/profile"
                                         class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">

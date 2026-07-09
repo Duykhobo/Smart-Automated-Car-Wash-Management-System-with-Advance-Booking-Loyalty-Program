@@ -22,13 +22,16 @@ IF OBJECT_ID('dbo.BookingDetails', 'U') IS NOT NULL DROP TABLE dbo.BookingDetail
 IF OBJECT_ID('dbo.Bookings', 'U') IS NOT NULL DROP TABLE dbo.Bookings;
 IF OBJECT_ID('dbo.Vouchers', 'U') IS NOT NULL DROP TABLE dbo.Vouchers;
 IF OBJECT_ID('dbo.Vehicles', 'U') IS NOT NULL DROP TABLE dbo.Vehicles;
+IF OBJECT_ID('dbo.VehicleTypes', 'U') IS NOT NULL DROP TABLE dbo.VehicleTypes;
 IF OBJECT_ID('dbo.BookingSlotCapacity', 'U') IS NOT NULL DROP TABLE dbo.BookingSlotCapacity;
 IF OBJECT_ID('dbo.Promotions', 'U') IS NOT NULL DROP TABLE dbo.Promotions;
+IF OBJECT_ID('dbo.ServicePrices', 'U') IS NOT NULL DROP TABLE dbo.ServicePrices;
 IF OBJECT_ID('dbo.Services', 'U') IS NOT NULL DROP TABLE dbo.Services;
 IF OBJECT_ID('dbo.Customers', 'U') IS NOT NULL DROP TABLE dbo.Customers;
 IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE dbo.Users;
 IF OBJECT_ID('dbo.MemberTiers', 'U') IS NOT NULL DROP TABLE dbo.MemberTiers;
 IF OBJECT_ID('dbo.SystemConfig', 'U') IS NOT NULL DROP TABLE dbo.SystemConfig;
+IF OBJECT_ID('dbo.RewardCatalog', 'U') IS NOT NULL DROP TABLE dbo.RewardCatalog;
 GO
 
 -- =======================================================================
@@ -90,6 +93,14 @@ CREATE TABLE Customers (
     CONSTRAINT FK_Customers_Tiers FOREIGN KEY (TierID) REFERENCES MemberTiers(TierID)
 );
 
+-- 2.5 BẢNG VEHICLE TYPES
+CREATE TABLE VehicleTypes (
+    VehicleTypeID INT IDENTITY(1,1) PRIMARY KEY,
+    TypeName NVARCHAR(50) NOT NULL UNIQUE,
+    VehicleSize VARCHAR(20) NOT NULL -- 'SEDAN', 'SUV', 'XLARGE'
+);
+GO
+
 -- 3. BẢNG VEHICLES (Bổ sung Brand, Model)
 CREATE TABLE Vehicles (
     VehicleID INT IDENTITY(1,1) PRIMARY KEY,
@@ -97,14 +108,15 @@ CREATE TABLE Vehicles (
     LicensePlate VARCHAR(15) UNIQUE NOT NULL,
     Brand NVARCHAR(50) NULL, -- Hãng xe (Toyota, Mazda...)
     Model NVARCHAR(50) NULL, -- Dòng xe (CX-5, Vios...)
-    VehicleType NVARCHAR(50) NULL, 
+    VehicleTypeID INT NOT NULL, 
     Color NVARCHAR(50) NULL, -- Màu xe
     ImageURL VARCHAR(255) NULL,
     IsDefault BIT DEFAULT 0,
     IsActive BIT DEFAULT 1, 
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_Vehicles_Customers FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    CONSTRAINT FK_Vehicles_Customers FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    CONSTRAINT FK_Vehicles_VehicleTypes FOREIGN KEY (VehicleTypeID) REFERENCES VehicleTypes(VehicleTypeID)
 );
 
 -- 4. BẢNG SERVICES
@@ -117,6 +129,15 @@ CREATE TABLE Services (
     InactiveFromDate DATETIME NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
+);
+
+-- 4.1. BẢNG DYNAMIC SERVICE PRICES (Giá theo cỡ xe)
+CREATE TABLE ServicePrices (
+    ServiceID INT,
+    VehicleSize VARCHAR(20), -- 'SEDAN', 'SUV', 'XLARGE'
+    Price DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (ServiceID, VehicleSize),
+    CONSTRAINT FK_ServicePrices_Services FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID)
 );
 
 -- 5. BẢNG PROMOTIONS
@@ -145,6 +166,20 @@ CREATE TABLE BookingSlotCapacity (
     CONSTRAINT CHK_CurrentBooked CHECK (CurrentBooked <= MaxCapacity)
 );
 
+-- 6.5. BẢNG REWARD_CATALOG (Danh mục Quà tặng)
+CREATE TABLE RewardCatalog (
+    RewardID INT IDENTITY(1,1) PRIMARY KEY,
+    RewardName NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(255) NULL,
+    PointsCost INT NOT NULL,
+    RewardType VARCHAR(30) NOT NULL,
+    ImageIcon VARCHAR(50) DEFAULT 'gift',
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE()
+);
+GO
+
 -- 7. BẢNG VOUCHERS
 CREATE TABLE Vouchers (
     VoucherID INT IDENTITY(1,1) PRIMARY KEY,
@@ -170,7 +205,9 @@ CREATE TABLE Bookings (
     OriginalPrice DECIMAL(10,2) NOT NULL,
     DiscountAmount DECIMAL(10,2) DEFAULT 0.00,
     FinalPrice DECIMAL(10,2) NOT NULL,
-    Status VARCHAR(20) DEFAULT 'Pending' CHECK (Status IN ('Pending', 'Confirmed', 'InProgress', 'Completed', 'Cancelled', 'NoShow')),
+    PaymentMethod VARCHAR(20) DEFAULT 'Cash',
+    PaymentStatus VARCHAR(20) DEFAULT 'Unpaid',
+    Status VARCHAR(20) DEFAULT 'Pending' CHECK (Status IN ('Pending', 'Confirmed', 'Waitlisted', 'InProgress', 'Completed', 'Cancelled', 'NoShow')),
     PriorityScore INT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
@@ -228,9 +265,18 @@ INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, Priority
 ('Platinum', 30, 15000000, 0.50, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
 GO
 
+INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
+(N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
+(N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
+(N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
+GO
+
 -- =======================================================================
 -- 4. TẠO INDEX ĐỂ TỐI ƯU HÓA TRUY VẤN
 -- =======================================================================
+SET QUOTED_IDENTIFIER ON;
+GO
+
 CREATE NONCLUSTERED INDEX IX_Customers_Phone ON Customers(Phone);
 CREATE NONCLUSTERED INDEX IX_Vehicles_LicensePlate ON Vehicles(LicensePlate);
 CREATE NONCLUSTERED INDEX IX_Vehicles_CustomerID ON Vehicles(CustomerID);
@@ -287,30 +333,76 @@ BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
         BEGIN TRANSACTION;
-        DECLARE @CurrentBooked INT, @MaxCapacity INT, @SlotID INT;
-
-        SELECT @SlotID = SlotID, @CurrentBooked = CurrentBooked, @MaxCapacity = MaxCapacity
-        FROM BookingSlotCapacity WITH (UPDLOCK, ROWLOCK)
-        WHERE SlotDate = @BookingDate AND TimeSlot = @ScheduledTime;
-
-        IF @SlotID IS NULL
-        BEGIN
-            INSERT INTO BookingSlotCapacity (SlotDate, TimeSlot, MaxCapacity, CurrentBooked)
-            VALUES (@BookingDate, @ScheduledTime, @DefaultMaxCapacity, 0);
-            SET @SlotID = SCOPE_IDENTITY();
-            SET @CurrentBooked = 0;
-            SET @MaxCapacity = @DefaultMaxCapacity;
-        END
+        -- Tính toán VehicleSize để lấy giá chuẩn xác
+        DECLARE @VehicleSize VARCHAR(20) = 'SEDAN';
+        SELECT @VehicleSize = vt.VehicleSize 
+        FROM Vehicles v
+        JOIN VehicleTypes vt ON v.VehicleTypeID = vt.VehicleTypeID
+        WHERE v.VehicleID = @VehicleID;
 
         DECLARE @BookingStatus VARCHAR(20) = 'Pending';
-        
-        IF @CurrentBooked >= @MaxCapacity
+        DECLARE @SlotsNeeded INT = CEILING(@TotalDurationMinutes / 30.0);
+        IF @SlotsNeeded < 1 SET @SlotsNeeded = 1;
+
+        -- Khai báo các biến trước khi dùng
+        DECLARE @CurrentBooked INT;
+        DECLARE @MaxCapacity INT;
+        DECLARE @SlotID INT;
+
+        -- Bước 1: Kiểm tra xem tất cả các Slot liên tiếp có đủ chỗ không
+        DECLARE @i INT = 0;
+        DECLARE @CurrentSlotTime TIME;
+        DECLARE @IsWaitlisted BIT = 0;
+
+        WHILE @i < @SlotsNeeded
+        BEGIN
+            SET @CurrentSlotTime = DATEADD(minute, @i * 30, @ScheduledTime);
+            
+            SET @CurrentBooked = NULL;
+            SET @MaxCapacity = NULL;
+
+            SELECT @CurrentBooked = CurrentBooked, @MaxCapacity = MaxCapacity
+            FROM BookingSlotCapacity WITH (UPDLOCK, ROWLOCK)
+            WHERE SlotDate = @BookingDate AND TimeSlot = @CurrentSlotTime;
+
+            IF @CurrentBooked IS NOT NULL AND @CurrentBooked >= @MaxCapacity
+            BEGIN
+                SET @IsWaitlisted = 1;
+                BREAK; -- Bị đầy 1 slot là cả đơn phải Waitlist
+            END
+
+            SET @i = @i + 1;
+        END
+
+        IF @IsWaitlisted = 1
         BEGIN
             SET @BookingStatus = 'Waitlisted';
         END
         ELSE
         BEGIN
-            UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked + 1 WHERE SlotID = @SlotID;
+            -- Bước 2: Đủ chỗ thì insert/update chiếm chỗ các Slot
+            SET @i = 0;
+            WHILE @i < @SlotsNeeded
+            BEGIN
+                SET @CurrentSlotTime = DATEADD(minute, @i * 30, @ScheduledTime);
+                
+                SET @SlotID = NULL;
+                SELECT @SlotID = SlotID
+                FROM BookingSlotCapacity WITH (UPDLOCK, ROWLOCK)
+                WHERE SlotDate = @BookingDate AND TimeSlot = @CurrentSlotTime;
+
+                IF @SlotID IS NULL
+                BEGIN
+                    INSERT INTO BookingSlotCapacity (SlotDate, TimeSlot, MaxCapacity, CurrentBooked)
+                    VALUES (@BookingDate, @CurrentSlotTime, @DefaultMaxCapacity, 1);
+                END
+                ELSE
+                BEGIN
+                    UPDATE BookingSlotCapacity SET CurrentBooked = CurrentBooked + 1 WHERE SlotID = @SlotID;
+                END
+
+                SET @i = @i + 1;
+            END
         END
 
         IF @VoucherID IS NOT NULL
@@ -334,10 +426,11 @@ BEGIN
 
         DECLARE @BookingID INT = SCOPE_IDENTITY();
 
-        -- Insert Multiple Services
+        -- Insert Multiple Services (Lấy giá theo ServicePrices)
         INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
         SELECT @BookingID, CAST(value AS INT), 
-               (SELECT BasePrice FROM Services WHERE ServiceID = CAST(value AS INT)),
+               ISNULL((SELECT Price FROM ServicePrices WHERE ServiceID = CAST(value AS INT) AND VehicleSize = @VehicleSize), 
+                      (SELECT BasePrice FROM Services WHERE ServiceID = CAST(value AS INT))),
                (SELECT ISNULL(DurationMinutes, 30) FROM Services WHERE ServiceID = CAST(value AS INT))
         FROM STRING_SPLIT(@ServiceIDs, ',');
 

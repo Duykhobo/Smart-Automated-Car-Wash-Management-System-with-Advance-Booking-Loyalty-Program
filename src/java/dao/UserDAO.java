@@ -29,7 +29,7 @@ public class UserDAO {
     public boolean registerCustomer(User user, Customer cus) {
         String sqlInsertUser = "INSERT INTO Users (Username, PasswordHash, Role) VALUES (?, ?, ?)";
         String sqlInsertCustomer = "INSERT INTO Customers (UserID, FullName, Phone) VALUES (?, ?, ?)";
-        String sqlInsertVehicle = "INSERT INTO Vehicles (CustomerID, LicensePlate) VALUES (?, ?)";
+        String sqlInsertVehicle = "INSERT INTO Vehicles (CustomerID, LicensePlate, VehicleTypeID) VALUES (?, ?, 1)";
 
         Connection conn = null;
         try {

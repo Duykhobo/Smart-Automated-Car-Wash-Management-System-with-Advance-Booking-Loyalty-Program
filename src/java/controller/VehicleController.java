@@ -32,6 +32,7 @@ import utils.ValidationUtil;
 public class VehicleController extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(VehicleController.class.getName());
+    private final dao.VehicleTypeDAO vehicleTypeDAO = new dao.VehicleTypeDAO();
 
     // ---------------------------------------------------------
     // doGet: Lấy danh sách xe
@@ -52,8 +53,10 @@ public class VehicleController extends HttpServlet {
             int customerId = us.getCustomerId();
             CarDao carDAO = new CarDao();
             List<Cars> listCars = carDAO.getAllCars(customerId);
+            List<dto.VehicleType> vehicleTypes = vehicleTypeDAO.getAllVehicleTypes();
 
             request.setAttribute("LISTCARS", listCars);
+            request.setAttribute("vehicleTypes", vehicleTypes);
             request.getRequestDispatcher("/WEB-INF/views/customer/manage_cars.jsp").forward(request, response);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error retrieving car list", e);
@@ -95,11 +98,11 @@ public class VehicleController extends HttpServlet {
                     if (licensePlate != null) {
                         licensePlate = licensePlate.trim().toUpperCase(); // Bổ sung dòng này để chuẩn hóa ghi đè thành chứ in hoa//
                     }
-                    String vehicleType = request.getParameter("vehicleType");
+                    String vehicleTypeIdStr = request.getParameter("vehicleTypeId");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
-                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleType, color)) {
+                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleTypeIdStr, color)) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
                                 "Vui lòng nhập đầy đủ các trường bắt buộc!");
                         response.sendRedirect(request.getContextPath() + "/vehicles");
@@ -117,8 +120,9 @@ public class VehicleController extends HttpServlet {
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
 
                     String imageUrl = FileUploadUtil.saveFile(request, "carImage", getServletContext().getRealPath(""));
-                    Cars car = new Cars(customerId, licensePlate, brand, model, vehicleType, color, imageUrl, false,
-                            createdAt, updatedAt, true);
+                    int vehicleTypeId = Integer.parseInt(vehicleTypeIdStr);
+                    Cars car = new Cars(customerId, licensePlate, brand, model, vehicleTypeId, color, imageUrl, false,
+                            new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), true);
 
                     boolean success = carDAO.insertCar(car);
                     if (success) {
@@ -137,12 +141,12 @@ public class VehicleController extends HttpServlet {
                     if (licensePlate != null) {
                         licensePlate = licensePlate.trim().toUpperCase(); // Thêm dòng này để chuẩn hóa biển số in hoa khi sửa
                     }
-                    String vehicleType = request.getParameter("vehicleType");
+                    String vehicleTypeIdStr = request.getParameter("vehicleTypeId");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
 
-                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleType, color)) {
+                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleTypeIdStr, color)) {
                         request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
                                 "Vui lòng nhập đầy đủ các trường bắt buộc!");
                         response.sendRedirect(request.getContextPath() + "/vehicles");
@@ -157,8 +161,9 @@ public class VehicleController extends HttpServlet {
                     }
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
                     String imageUrl = FileUploadUtil.saveFile(request, "carImage", getServletContext().getRealPath(""));
-                    Cars car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleType, color, imageUrl,
-                            false, null, updatedAt, true);
+                    int vehicleTypeId = Integer.parseInt(vehicleTypeIdStr);
+                    Cars car = new Cars(vehicleId, customerId, licensePlate, brand, model, vehicleTypeId, null, null, color, imageUrl,
+                            false, null, new Timestamp(System.currentTimeMillis()), true);
 
                     boolean success = carDAO.updateCar(car);
                     if (success) {

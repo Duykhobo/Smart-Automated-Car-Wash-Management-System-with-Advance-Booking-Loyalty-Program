@@ -1,151 +1,135 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <style>
-    /* Glassmorphism Toast */
-    .glass-toast-success {
-        background: rgba(10, 20, 40, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(0, 212, 255, 0.3);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 212, 255, 0.1);
+    .toastify-glass {
+        background: rgba(10, 20, 40, 0.8) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+        font-family: 'Inter', sans-serif !important;
+        padding: 16px 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        min-width: 300px !important;
+        max-width: 450px !important;
     }
-    .glass-toast-error {
-        background: rgba(40, 10, 10, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(239, 68, 68, 0.1);
+    
+    .toastify-glass.success {
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 212, 255, 0.1) !important;
+    }
+
+    .toastify-glass.error {
+        border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .toastify-icon-container {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .toastify-glass.success .toastify-icon-container {
+        background: rgba(0, 212, 255, 0.2);
+        border: 1px solid rgba(0, 212, 255, 0.4);
+        color: #00d4ff;
+    }
+
+    .toastify-glass.error .toastify-icon-container {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #ef4444;
     }
 </style>
 
-<!-- Success Toast -->
-<c:if test="${not empty sessionScope.successMessage}">
-    <div id="globalSuccessToast" class="fixed top-24 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 transition-all duration-500 z-50 pointer-events-none">
-        <div class="glass-toast-success px-6 py-4 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-[#00d4ff]/20 flex items-center justify-center shrink-0 border border-[#00d4ff]/40">
-                <i data-lucide="check" class="w-6 h-6 text-[#00d4ff]"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-display font-bold text-white text-lg">Thành công!</span>
-                <span class="text-sm text-gray-300"><c:out value="${sessionScope.successMessage}" /></span>
-            </div>
-        </div>
-    </div>
-    <c:remove var="successMessage" scope="session" />
-</c:if>
+<script>
+    // Universal Toast Function using Toastify
+    window.showToast = function(message, type = 'success') {
+        const isSuccess = (type === 'success');
+        const iconName = isSuccess ? 'check' : 'x';
+        const titleText = isSuccess ? 'Thành công!' : 'Lỗi!';
+        const className = isSuccess ? 'toastify-glass success' : 'toastify-glass error';
 
-<!-- Error Toast -->
-<c:if test="${not empty sessionScope.errorMessage}">
-    <div id="globalErrorToast" class="fixed top-24 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 transition-all duration-500 z-50 pointer-events-none">
-        <div class="glass-toast-error px-6 py-4 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/40">
-                <i data-lucide="x" class="w-6 h-6 text-red-500"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-display font-bold text-white text-lg">Lỗi!</span>
-                <span class="text-sm text-gray-300"><c:out value="${sessionScope.errorMessage}" /></span>
-            </div>
-        </div>
-    </div>
-    <c:remove var="errorMessage" scope="session" />
-</c:if>
+        Toastify({
+            text: "",
+            duration: 4000,
+            newWindow: true,
+            close: false,
+            gravity: "top", 
+            position: "right",
+            stopOnFocus: true,
+            className: className,
+            node: (() => {
+                const div = document.createElement("div");
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.gap = '16px';
+                div.style.width = '100%';
+                
+                div.innerHTML = 
+                    '<div class="toastify-icon-container">' +
+                        '<i data-lucide="' + iconName + '" style="width: 20px; height: 20px;"></i>' +
+                    '</div>' +
+                    '<div style="display: flex; flex-direction: column;">' +
+                        '<span style="font-weight: 700; font-size: 1.125rem;">' + titleText + '</span>' +
+                        '<span style="font-size: 0.875rem; color: #d1d5db; margin-top: 2px;">' + message + '</span>' +
+                    '</div>';
+                return div;
+            })(),
+        }).showToast();
+        
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    };
+    
+    // Alias for old signatures to prevent ReferenceError across the project
+    window.showJSToast = function(type, message) {
+        window.showToast(message, type);
+    };
+</script>
 
-<!-- Error Toast from Request Scope -->
-<c:if test="${not empty requestScope.errorMessage}">
-    <div id="globalReqErrorToast" class="fixed top-24 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 transition-all duration-500 z-50 pointer-events-none">
-        <div class="glass-toast-error px-6 py-4 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/40">
-                <i data-lucide="x" class="w-6 h-6 text-red-500"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-display font-bold text-white text-lg">Lỗi!</span>
-                <span class="text-sm text-gray-300"><c:out value="${requestScope.errorMessage}" /></span>
-            </div>
-        </div>
-    </div>
-    <c:remove var="errorMessage" scope="request" />
-</c:if>
-
+<!-- Process Backend Session Toasts -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // Auto hide toasts after 4 seconds
-        const toasts = ['globalSuccessToast', 'globalErrorToast', 'globalReqErrorToast'];
-        toasts.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                setTimeout(() => {
-                    el.classList.remove('translate-y-0', 'opacity-100');
-                    el.classList.add('-translate-y-full', 'opacity-0');
-                }, 4000);
-            }
-        });
-        
-        // ensure icons are rendered
-        if(typeof lucide !== 'undefined' && lucide.createIcons) {
-            lucide.createIcons();
-        }
+        let msgs = [];
+        <c:if test="${not empty sessionScope.SUCCESS}">
+            msgs.push({msg: '<c:out value="${sessionScope.SUCCESS}" />', type: 'success'});
+            <c:remove var="SUCCESS" scope="session" />
+        </c:if>
+        <c:if test="${not empty sessionScope.successMessage}">
+            msgs.push({msg: '<c:out value="${sessionScope.successMessage}" />', type: 'success'});
+            <c:remove var="successMessage" scope="session" />
+        </c:if>
+        <c:if test="${not empty sessionScope.ERROR}">
+            msgs.push({msg: '<c:out value="${sessionScope.ERROR}" />', type: 'error'});
+            <c:remove var="ERROR" scope="session" />
+        </c:if>
+        <c:if test="${not empty sessionScope.errorMessage}">
+            msgs.push({msg: '<c:out value="${sessionScope.errorMessage}" />', type: 'error'});
+            <c:remove var="errorMessage" scope="session" />
+        </c:if>
+        <c:if test="${not empty requestScope.ERROR}">
+            msgs.push({msg: '<c:out value="${requestScope.ERROR}" />', type: 'error'});
+            <c:remove var="ERROR" scope="request" />
+        </c:if>
+        <c:if test="${not empty requestScope.errorMessage}">
+            msgs.push({msg: '<c:out value="${requestScope.errorMessage}" />', type: 'error'});
+            <c:remove var="errorMessage" scope="request" />
+        </c:if>
+
+        msgs.forEach(t => showToast(t.msg, t.type));
     });
-
-    // --- DYNAMIC JS TOAST (For Client-side validations) ---
-    function showJSToast(type, message) {
-        let container = document.getElementById('jsToastContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'jsToastContainer';
-            container.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none flex flex-col gap-2';
-            document.body.appendChild(container);
-        }
-        
-        const toastId = 'toast_' + Date.now();
-        let bgClass, iconClass, iconName, title;
-        
-        if (type === 'success') {
-            bgClass = 'glass-toast-success';
-            iconClass = 'bg-[#00d4ff]/20 border-[#00d4ff]/40 text-[#00d4ff]';
-            iconName = 'check';
-            title = 'Thành công!';
-        } else {
-            bgClass = 'glass-toast-error';
-            iconClass = 'bg-red-500/20 border-red-500/40 text-red-500';
-            iconName = 'x';
-            title = 'Lỗi!';
-        }
-
-        const toastHtml = `
-            <div id="${toastId}" class="${bgClass} px-6 py-4 rounded-2xl flex items-center gap-3 transition-all duration-500 transform -translate-y-full opacity-0 mb-2">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${iconClass}">
-                    <i data-lucide="${iconName}" class="w-6 h-6"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-display font-bold text-white text-lg">${title}</span>
-                    <span class="text-sm text-gray-300">${message}</span>
-                </div>
-            </div>
-        `;
-        
-        container.insertAdjacentHTML('beforeend', toastHtml);
-        if(typeof lucide !== 'undefined' && lucide.createIcons) {
-            lucide.createIcons();
-        }
-        
-        const toastEl = document.getElementById(toastId);
-        
-        // Trigger animation
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                toastEl.classList.remove('-translate-y-full', 'opacity-0');
-                toastEl.classList.add('translate-y-0', 'opacity-100');
-            });
-        });
-        
-        // Auto remove
-        setTimeout(() => {
-            toastEl.classList.remove('translate-y-0', 'opacity-100');
-            toastEl.classList.add('-translate-y-full', 'opacity-0');
-            setTimeout(() => {
-                if (toastEl.parentNode) toastEl.remove();
-            }, 500);
-        }, 4000);
-    }
 </script>

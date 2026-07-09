@@ -9,10 +9,25 @@ GO
 IF NOT EXISTS (SELECT 1 FROM Services)
 BEGIN
     INSERT INTO Services (Name, BasePrice, DurationMinutes, IsActive) VALUES 
-    (N'Rửa Bọt Tuyết Tiêu Chuẩn', 100000.00, 30, 1),
-    (N'Rửa Xe Cao Cấp + Phủ Ceramic', 250000.00, 60, 1),
-    (N'Vệ Sinh Nội Thất Toàn Diện', 350000.00, 90, 1),
-    (N'Tẩy Ố Kính + Đánh Bóng Sơn', 500000.00, 120, 1);
+    (N'Rửa xe ngoài (demi)', 70000.00, 30, 1),
+    (N'Rửa xe tiêu chuẩn', 100000.00, 45, 1),
+    (N'Rửa xe cao cấp (Wax bóng)', 200000.00, 60, 1),
+    (N'Vệ sinh nội thất', 350000.00, 90, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM ServicePrices)
+BEGIN
+    -- Dịch vụ 1: Rửa xe ngoài
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (1, 'SEDAN', 70000), (1, 'SUV', 80000), (1, 'XLARGE', 90000);
+    
+    -- Dịch vụ 2: Rửa xe tiêu chuẩn
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (2, 'SEDAN', 100000), (2, 'SUV', 110000), (2, 'XLARGE', 120000);
+    
+    -- Dịch vụ 3: Rửa xe cao cấp
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (3, 'SEDAN', 200000), (3, 'SUV', 250000), (3, 'XLARGE', 300000);
+    
+    -- Dịch vụ 4: Vệ sinh nội thất (Giả định giá)
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (4, 'SEDAN', 350000), (4, 'SUV', 400000), (4, 'XLARGE', 450000);
 END
 GO
 
@@ -28,7 +43,20 @@ BEGIN
     INSERT INTO Users (Username, PasswordHash, Role) 
     VALUES ('manager', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'MANAGER');
 END
+-- 1.5. THÊM VEHICLE TYPES
+IF NOT EXISTS (SELECT 1 FROM VehicleTypes)
+BEGIN
+    INSERT INTO VehicleTypes (TypeName, VehicleSize) VALUES 
+    (N'Sedan (4 chỗ)', 'SEDAN'),
+    (N'Hatchback', 'SEDAN'),
+    (N'SUV (7 chỗ)', 'SUV'),
+    (N'CUV (5-7 chỗ)', 'SUV'),
+    (N'Bán tải', 'XLARGE'),
+    (N'MPV', 'XLARGE');
+END
+GO
 
+-- 2. THÊM USERS VÀ CUSTOMERS (KÈM VEHICLES)
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_silver')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Role) 
@@ -39,8 +67,8 @@ BEGIN
     VALUES (@UID1, N'Khách Hàng Silver', '0901111111', 'silver@gmail.com', 2, 250, 2500000, 6);
     
     DECLARE @CID1 INT = SCOPE_IDENTITY();
-    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleType, Color, IsDefault)
-    VALUES (@CID1, '51G-111.11', 'Toyota', 'Vios', 'Sedan', 'White', 1);
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID1, '51G-11111', 'Toyota', 'Vios', 1, 'White', 1);
 END
 
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_gold')
@@ -53,8 +81,23 @@ BEGIN
     VALUES (@UID2, N'Khách Hàng Gold', '0902222222', 'gold@gmail.com', 3, 1000, 7000000, 16);
     
     DECLARE @CID2 INT = SCOPE_IDENTITY();
-    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleType, Color, IsDefault)
-    VALUES (@CID2, '51H-222.22', 'Mazda', 'CX-5', 'SUV', 'Red', 1);
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID2, '51H-22222', 'Mazda', 'CX-5', 3, 'Red', 1);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'customer_platinum')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Role) 
+    VALUES ('customer_platinum', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'CUSTOMER');
+    DECLARE @UID3 INT = SCOPE_IDENTITY();
+    
+    INSERT INTO Customers (UserID, FullName, Phone, Email, TierID, PointsBalance, TotalSpend, TotalWashes)
+    VALUES (@UID3, N'Khách Hàng Platinum', '0903333333', 'platinum@gmail.com', 4, 15000, 15000000, 35);
+    
+    DECLARE @CID3 INT = SCOPE_IDENTITY();
+    INSERT INTO Vehicles (CustomerID, LicensePlate, Brand, Model, VehicleTypeID, Color, IsDefault)
+    VALUES (@CID3, '51I-33333', 'Ford', 'Ranger', 5, 'Black', 1);
 END
 GO
 
@@ -74,50 +117,12 @@ SELECT TOP 1 @CID_VOUCHER = CustomerID FROM Customers WHERE Phone = '0901111111'
 IF @CID_VOUCHER IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Vouchers WHERE CustomerID = @CID_VOUCHER)
 BEGIN
     INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status) VALUES
-    (@CID_VOUCHER, 'FREE-111111', 'Free Wash', 500, DATEADD(month, 1, GETDATE()), 'Unused'),
-    (@CID_VOUCHER, 'DISC-222222', 'Discount 20%', 300, DATEADD(day, 15, GETDATE()), 'Unused');
+    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 500, DATEADD(month, 1, GETDATE()), 'Unused'),
+    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 300, DATEADD(day, 15, GETDATE()), 'Unused');
 END
 GO
 
--- 5. THÊM BOOKINGS (LỊCH SỬ ĐẶT LỊCH) VÀ WASH RECORDS ĐỂ DEMO THỐNG KÊ
-DECLARE @CID_BOOKING INT;
-SELECT TOP 1 @CID_BOOKING = CustomerID FROM Customers WHERE Phone = '0902222222';
-DECLARE @VID_BOOKING INT;
-SELECT TOP 1 @VID_BOOKING = VehicleID FROM Vehicles WHERE CustomerID = @CID_BOOKING;
 
-IF @CID_BOOKING IS NOT NULL AND @VID_BOOKING IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Bookings WHERE CustomerID = @CID_BOOKING)
-BEGIN
-    DECLARE @Tomorrow DATE = CAST(GETDATE() + 1 AS DATE);
-    DECLARE @Yesterday DATE = CAST(GETDATE() - 1 AS DATE);
-    DECLARE @YesterdayTime1 DATETIME = DATEADD(minute, 5, GETDATE()-1);
-    DECLARE @YesterdayTime2 DATETIME = DATEADD(minute, 35, GETDATE()-1);
-
-    -- Một lịch hẹn sắp tới (Pending)
-    EXEC sp_CreateBookingTransaction 
-        @CustomerID = @CID_BOOKING, 
-        @ServiceIDs = '2', 
-        @VehicleID = @VID_BOOKING, 
-        @BookingDate = @Tomorrow, 
-        @ScheduledTime = '10:00:00', 
-        @OriginalPrice = 250000.00, 
-        @DiscountAmount = 0, 
-        @FinalPrice = 250000.00,
-        @TotalDurationMinutes = 60;
-
-    -- Một lịch sử đã hoàn thành (Completed) ngày hôm qua
-    INSERT INTO Bookings (CustomerID, VehicleID, BookingDate, ScheduledTime, OriginalPrice, DiscountAmount, FinalPrice, Status)
-    VALUES (@CID_BOOKING, @VID_BOOKING, @Yesterday, '14:30:00', 100000.00, 0, 100000.00, 'Completed');
-    
-    DECLARE @COMPLETED_BOOKING_ID INT = SCOPE_IDENTITY();
-    
-    INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
-    VALUES (@COMPLETED_BOOKING_ID, 1, 100000.00, 30);
-    
-    -- Thêm WashRecord cho lịch sử đã hoàn thành
-    INSERT INTO WashRecords (BookingID, ActualStartTime, ActualEndTime, LPRConfidenceScore, OperatorNotes)
-    VALUES (@COMPLETED_BOOKING_ID, @YesterdayTime1, @YesterdayTime2, 99.5, N'Xe sạch, không trầy xước.');
-END
-GO
 
 PRINT N'Thêm dữ liệu mẫu thành công!';
 
@@ -128,6 +133,16 @@ BEGIN
     ('MinAdvanceBookingMinutes', '60', N'Thời gian đặt trước tối thiểu (phút)'),
     ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
     ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
-    ('ClosingHour', '17', N'Giờ đóng cửa (0-23)');
+    ('ClosingHour', '22', N'Giờ đóng cửa (0-23)');
+END
+GO
+
+-- 7. THÊM REWARD CATALOG (QUÀ TẶNG)
+IF NOT EXISTS (SELECT 1 FROM RewardCatalog)
+BEGIN
+    INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
+    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
+    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
+    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
 END
 GO

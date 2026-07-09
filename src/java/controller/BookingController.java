@@ -25,7 +25,7 @@ import utils.AppConstants;
  * - Phương thức GET: Gọi BookingService chuẩn bị dữ liệu và hiển thị giao diện booking.jsp.
  * - Phương thức POST: Nhận dữ liệu đặt lịch, gọi BookingService kiểm tra tính hợp lệ và lưu vào cơ sở dữ liệu.
  */
-@WebServlet(name = "BookingController", urlPatterns = { "/BookingController" })
+@WebServlet(name = "BookingController", urlPatterns = { "/BookingController", "/bookings" })
 public class BookingController extends HttpServlet {
 
     private final BookingService bookingService = new BookingService();
@@ -87,7 +87,8 @@ public class BookingController extends HttpServlet {
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
             Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr + ":00"));
 
-            // Validation travel time
+            // Validation travel time and max booking date
+            bookingService.validateMaxBookingDate(customer.getTierStatus(), bookingDate);
             bookingService.validateTravelTime(bookingDate, scheduledTime);
 
             java.util.List<Service> selectedServices = bookingService.getServicesByIds(serviceIds);
@@ -97,16 +98,39 @@ public class BookingController extends HttpServlet {
                 originalPrice += s.getBasePrice();
                 totalDurationMinutes += s.getDurationMinutes();
             }
+            
+            // Validate if total duration exceeds closing hour
+            bookingService.validateWorkingHours(scheduledTime, totalDurationMinutes);
+
+            // Validate double booking
+            bookingService.validateVehicleDoubleBooking(vehicleId, bookingDate, scheduledTime, totalDurationMinutes);
+
             String serviceIdsStr = String.join(",", serviceIds);
             
-            // originalPrice calculated above
-            double discountAmount = 0; 
+            String voucherCode = request.getParameter("voucherCode");
+            Integer voucherId = null;
+            double discountAmount = 0;
+            
+            if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+                dao.BookingDAO dao = new dao.BookingDAO();
+                dto.Voucher v = dao.getActiveVoucherByCode(voucherCode.trim(), customer.getCustomerId());
+                if (v != null) {
+                    voucherId = v.getVoucherId();
+                    if ("PERCENT_10".equals(v.getRewardType())) discountAmount = originalPrice * 0.10;
+                    else if ("PERCENT_20".equals(v.getRewardType())) discountAmount = originalPrice * 0.20;
+                    else if ("FREE_WASH".equals(v.getRewardType())) discountAmount = originalPrice;
+                    else if ("UPGRADE_WAX".equals(v.getRewardType())) discountAmount = 50000; // Assume 50k for wax upgrade
+                }
+            }
+            
             double finalPrice = originalPrice - discountAmount;
+            if (finalPrice < 0) finalPrice = 0;
 
             boolean success = bookingService.createBooking(
                     customer.getCustomerId(),
                     serviceIdsStr,
                     vehicleId,
+                    voucherId,
                     bookingDate,
                     scheduledTime,
                     originalPrice,
@@ -128,3 +152,4 @@ public class BookingController extends HttpServlet {
         }
     }
 }
+

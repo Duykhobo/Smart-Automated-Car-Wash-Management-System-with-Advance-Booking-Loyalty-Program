@@ -8,7 +8,9 @@ public class Cars {
     private String licensePlate;
     private String brand;
     private String model;
-    private String vehicleType;
+    private int vehicleTypeId;
+    private String vehicleTypeName;
+    private String vehicleSize;
     private String color;
     private String imageUrl;
     private boolean isDefault; // Đánh dấu xe mặc định
@@ -19,13 +21,15 @@ public class Cars {
     public Cars() {
     }
 
-    public Cars(int vehicleId, int customerId, String licensePlate, String brand, String model, String vehicleType, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
+    public Cars(int vehicleId, int customerId, String licensePlate, String brand, String model, int vehicleTypeId, String vehicleTypeName, String vehicleSize, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
         this.vehicleId = vehicleId;
         this.customerId = customerId;
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;
-        this.vehicleType = vehicleType;
+        this.vehicleTypeId = vehicleTypeId;
+        this.vehicleTypeName = vehicleTypeName;
+        this.vehicleSize = vehicleSize;
         this.color = color;
         this.imageUrl = imageUrl;
         this.isDefault = isDefault;
@@ -35,12 +39,12 @@ public class Cars {
     }
 
     // Constructor nay dung khi them xe moi
-    public Cars(int customerId, String licensePlate, String brand, String model, String vehicleType, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
+    public Cars(int customerId, String licensePlate, String brand, String model, int vehicleTypeId, String color, String imageUrl, boolean isDefault, Timestamp createdAt, Timestamp updatedAt, boolean isActive) {
         this.customerId = customerId;
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;
-        this.vehicleType = vehicleType;
+        this.vehicleTypeId = vehicleTypeId;
         this.color = color;
         this.imageUrl = imageUrl;
         this.isDefault = isDefault;
@@ -89,12 +93,28 @@ public class Cars {
         this.model = model;
     }
 
-    public String getVehicleType() {
-        return vehicleType;
+    public int getVehicleTypeId() {
+        return vehicleTypeId;
     }
 
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType;
+    public void setVehicleTypeId(int vehicleTypeId) {
+        this.vehicleTypeId = vehicleTypeId;
+    }
+
+    public String getVehicleTypeName() {
+        return vehicleTypeName;
+    }
+
+    public void setVehicleTypeName(String vehicleTypeName) {
+        this.vehicleTypeName = vehicleTypeName;
+    }
+
+    public String getVehicleSize() {
+        return vehicleSize;
+    }
+
+    public void setVehicleSize(String vehicleSize) {
+        this.vehicleSize = vehicleSize;
     }
 
     public String getColor() {
@@ -147,6 +167,6 @@ public class Cars {
 
     @Override
     public String toString() {
-        return "Cars{" + "vehicleId=" + vehicleId + ", customerId=" + customerId + ", licensePlate=" + licensePlate + ", brand=" + brand + ", model=" + model + ", vehicleType=" + vehicleType + ", color=" + color + ", imageUrl=" + imageUrl + ", isDefault=" + isDefault + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", isActive=" + isActive + '}';
+        return "Cars{" + "vehicleId=" + vehicleId + ", customerId=" + customerId + ", licensePlate=" + licensePlate + ", brand=" + brand + ", model=" + model + ", vehicleTypeId=" + vehicleTypeId + ", vehicleTypeName=" + vehicleTypeName + ", vehicleSize=" + vehicleSize + ", color=" + color + ", imageUrl=" + imageUrl + ", isDefault=" + isDefault + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", isActive=" + isActive + '}';
     }
 }

@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.BookingDAO;
+import dao.CarDao;
 import dao.CustomerDAO;
 import dao.ServiceDAO;
+import dao.SystemConfigDAO;
+import dto.Cars;
 import dto.Customer;
 import dto.Service;
 import dto.User;
@@ -107,22 +110,66 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
+            // Lấy thông tin xe để biết kích cỡ
+            CarDao carDao = new CarDao();
+            Cars selectedCar = carDao.getCarById(vehicleId);
+            if (selectedCar == null || selectedCar.getCustomerId() != customer.getCustomerId()) {
+                sendErrorResponse(request, response, "Xe đã chọn không hợp lệ.");
+                return;
+            }
+            String vehicleSize = selectedCar.getVehicleSize();
+            if (vehicleSize == null || vehicleSize.isEmpty()) {
+                // Thuật toán Fallback xử lý khi chưa build Java
+                String typeName = selectedCar.getVehicleTypeName();
+                if (typeName != null) {
+                    String lowerText = typeName.toLowerCase();
+                    if (lowerText.contains("bán tải") || lowerText.contains("mpv") || lowerText.contains("pickup")) {
+                        vehicleSize = "XLARGE";
+                    } else if (lowerText.contains("suv") || lowerText.contains("cuv")) {
+                        vehicleSize = "SUV";
+                    } else {
+                        vehicleSize = "SEDAN";
+                    }
+                } else {
+                    vehicleSize = "SEDAN";
+                }
+            }
+
             // 4. Lấy thông tin gói dịch vụ từ DB để xác định giá gốc
             ServiceDAO serviceDAO = new ServiceDAO();
             double originalPrice = 0;
             int totalDurationMinutes = 0;
             for (String sidStr : serviceIdsArr) {
-                Service selectedService = serviceDAO.getServiceById(Integer.parseInt(sidStr));
+                int sId = Integer.parseInt(sidStr);
+                Service selectedService = serviceDAO.getServiceById(sId);
                 if (selectedService == null) {
                     sendErrorResponse(request, response, "Một trong các dịch vụ đã chọn không hợp lệ.");
                     return;
                 }
-                originalPrice += selectedService.getBasePrice();
+                originalPrice += serviceDAO.getServicePrice(sId, vehicleSize);
                 totalDurationMinutes += selectedService.getDurationMinutes();
             }
+
+            // Kiểm tra lố giờ đóng cửa
+            SystemConfigDAO configDAO = new SystemConfigDAO();
+            int closingHour = configDAO.getClosingHour();
+            java.time.LocalTime endTime = scheduledTime.toLocalTime().plusMinutes(totalDurationMinutes);
+            java.time.LocalTime closingTime = java.time.LocalTime.of(closingHour, 0);
+            if (endTime.isAfter(closingTime)) {
+                sendErrorResponse(request, response, "Tổng thời gian làm dịch vụ (" + totalDurationMinutes + " phút) vượt quá giờ đóng cửa (" + closingHour + ":00). Vui lòng chọn giờ sớm hơn.");
+                return;
+            }
+            
+            BookingDAO bookingDAO = new BookingDAO();
+            
+            // Validate double booking
+            if (bookingDAO.isVehicleDoubleBooked(vehicleId, bookingDate, scheduledTime, totalDurationMinutes)) {
+                sendErrorResponse(request, response, "Lỗi: Xe của bạn đã có lịch hẹn trùng thời gian này. Vui lòng chọn giờ khác hoặc xe khác.");
+                return;
+            }
+
             double discountAmount = 0.0;
             Integer voucherId = null;
-            BookingDAO bookingDAO = new BookingDAO();
 
             // 5. Kiểm tra và áp dụng Voucher giảm giá nếu khách hàng có điền
             if (voucherCode != null && !voucherCode.trim().isEmpty()) {
@@ -137,21 +184,29 @@ public class CheckoutServlet extends HttpServlet {
                 voucherId = voucher.getVoucherId();
                 String rewardType = voucher.getRewardType();
 
-                // Áp dụng luật giảm giá theo đặc tả hệ thống
-                if ("DISCOUNT_10".equalsIgnoreCase(rewardType)) {
-                    // Giảm giá 10% cho lần rửa tiếp theo (tối đa 50,000 VND)
-                    discountAmount = originalPrice * 0.10;
-                    if (discountAmount > 50000) {
-                        discountAmount = 50000;
-                    }
-                } else if ("FREE_WAX".equalsIgnoreCase(rewardType)) {
-                    // Voucher phủ sáp Wax miễn phí (tối đa 150,000 VND)
-                    discountAmount = Math.min(originalPrice, 150000);
-                } else if ("FREE_WASH".equalsIgnoreCase(rewardType)) {
-                    // Voucher rửa xe gói Tiêu chuẩn miễn phí (tối đa 200,000 VND)
-                    discountAmount = Math.min(originalPrice, 200000);
-                } else {
+                // Áp dụng luật giảm giá ĐỘNG (Dynamic) từ Database
+                dao.RewardCatalogDAO rewardDAO = new dao.RewardCatalogDAO();
+                dto.RewardCatalog reward = rewardDAO.getRewardByType(rewardType);
+                
+                if (reward == null) {
                     sendErrorResponse(request, response, "Loại Voucher này hiện chưa được hỗ trợ áp dụng trên hệ thống.");
+                    return;
+                }
+                
+                if (rewardType.startsWith("PERCENT_") || rewardType.endsWith("_PERCENT_OFF")) {
+                    try {
+                        // Extract digits from e.g. "10_PERCENT_OFF" or "PERCENT_10"
+                        String percentStr = rewardType.replaceAll("[^0-9.]", "");
+                        double percent = Double.parseDouble(percentStr);
+                        discountAmount = originalPrice * (percent / 100.0);
+                    } catch (NumberFormatException e) {
+                        sendErrorResponse(request, response, "Lỗi phân tích phần trăm khuyến mãi.");
+                        return;
+                    }
+                } else if ("FREE_WASH".equalsIgnoreCase(rewardType)) {
+                    discountAmount = originalPrice; // Miễn phí hoàn toàn
+                } else {
+                    sendErrorResponse(request, response, "Định dạng khuyến mãi của Voucher không hợp lệ.");
                     return;
                 }
             }
@@ -224,7 +279,7 @@ public class CheckoutServlet extends HttpServlet {
             }
         } else {
             request.getSession().setAttribute("errorMessage", message);
-            response.sendRedirect(request.getContextPath() + "/BookingController");
+            response.sendRedirect(request.getContextPath() + "/bookings");
         }
     }
 

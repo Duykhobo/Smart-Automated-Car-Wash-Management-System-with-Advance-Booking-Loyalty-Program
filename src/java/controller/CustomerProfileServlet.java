@@ -19,7 +19,7 @@ import javax.servlet.annotation.MultipartConfig;
 import java.io.File;
 import java.nio.file.Paths;
 
-@WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet"})
+@WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet", "/account/profile"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
 public class CustomerProfileServlet extends HttpServlet {
 

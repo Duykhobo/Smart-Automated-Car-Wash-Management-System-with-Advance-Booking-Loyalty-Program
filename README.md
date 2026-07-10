@@ -69,12 +69,6 @@ Hệ thống quản lý dịch vụ rửa xe tự động cao cấp, tích hợp
 2. Chọn **Run** để khởi động máy chủ Tomcat.
 3. Truy cập ứng dụng qua đường dẫn: `http://localhost:8084/AutoWash/` *(Port có thể khác tùy máy)*.
 
-### Tài khoản Demo 
-- **Tài khoản Admin (Quản lý / POS):** 
-  - **SĐT:** `0999999999`
-  - **Mật khẩu:** `123`
-- **Tài khoản Khách hàng:** Vui lòng đăng ký mới trực tiếp trên giao diện hệ thống.
-
 ## 4. Đội Ngũ Phát Triển
 
 - **Sinh viên thực hiện:** Thanh Duy, Thiên Quân, Minh Tân, Khánh Duy (Đại học FPT)

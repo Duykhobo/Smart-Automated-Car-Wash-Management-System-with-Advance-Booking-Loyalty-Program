@@ -105,11 +105,7 @@
             <!-- Decorative Glow for Right Column -->
             <div class="absolute bottom-0 right-0 w-64 h-64 bg-[#3b82f6]/5 blur-[100px] rounded-full mix-blend-screen pointer-events-none"></div>
         </div>
-
-        <script>
-            lucide.createIcons();
-        </script>
-        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+<jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 </html>

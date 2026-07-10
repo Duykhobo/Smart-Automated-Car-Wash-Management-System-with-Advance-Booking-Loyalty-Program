@@ -271,50 +271,8 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        lucide.createIcons();
-
-        function confirmRedeem(rewardId, rewardName, pointsCost) {
-            document.getElementById('modalRewardId').value = rewardId;
-            document.getElementById('modalRewardName').textContent = rewardName;
-            document.getElementById('modalPointsCost').textContent = pointsCost;
-            
-            const modal = document.getElementById('redeemModal');
-            const content = document.getElementById('redeemModalContent');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            // Trigger reflow
-            void modal.offsetWidth;
-            
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }
-
-        function closeRedeemModal() {
-            const modal = document.getElementById('redeemModal');
-            const content = document.getElementById('redeemModalContent');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300);
-        }
-
-        function copyVoucherCode(code) {
-            navigator.clipboard.writeText(code).then(function() {
-                showToast("Đã copy mã voucher: " + code, "success");
-            }, function(err) {
-                console.error('Không thể copy text: ', err);
-                showToast("Không thể copy mã voucher.", "error");
-            });
-        }
-    </script>
+    <script charset="UTF-8" src="https://unpkg.com/lucide@latest"></script>
+    <script charset="UTF-8" src="${pageContext.request.contextPath}/js/customer/customer_loyalty.js?v=2"></script>
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 </html>

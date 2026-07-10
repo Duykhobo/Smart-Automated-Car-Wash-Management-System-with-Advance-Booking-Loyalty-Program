@@ -203,9 +203,6 @@
 
     </main>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <script charset="UTF-8" src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

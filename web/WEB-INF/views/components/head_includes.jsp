@@ -12,8 +12,9 @@
 
 <!-- Global CSS & Tailwind Config -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-<script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script charset="UTF-8" src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
+<script charset="UTF-8" src="https://cdn.tailwindcss.com"></script>
 
 <!-- Icons (Lucide) -->
-<script src="https://unpkg.com/lucide@latest"></script>
+<script charset="UTF-8" src="https://unpkg.com/lucide@latest"></script>
+<script charset="UTF-8" src="${pageContext.request.contextPath}/js/global.js?v=2"></script>

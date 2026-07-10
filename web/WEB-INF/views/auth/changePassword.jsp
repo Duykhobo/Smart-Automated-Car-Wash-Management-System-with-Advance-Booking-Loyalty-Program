@@ -158,64 +158,7 @@
         </div>
     </nav>
 
-    <script>
-        lucide.createIcons();
-
-        function togglePassword(inputId, buttonElement) {
-            const input = document.getElementById(inputId);
-            const iconEye = buttonElement.querySelector('.icon-eye');
-            const iconEyeOff = buttonElement.querySelector('.icon-eye-off');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                iconEye.classList.add('hidden');
-                iconEyeOff.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                iconEye.classList.remove('hidden');
-                iconEyeOff.classList.add('hidden');
-            }
-        }
-
-        function validatePasswordForm(event) {
-            const currentPass = document.getElementById('txtCurrentPassword').value;
-            const newPass = document.getElementById('txtNewPassword').value;
-            const confirmPass = document.getElementById('txtConfirmNewPassword').value;
-            const errorAlert = document.getElementById('clientErrorAlert');
-            const errorText = document.getElementById('clientErrorText');
-
-            if (!currentPass || !newPass || !confirmPass) {
-                errorText.textContent = "Vui lòng điền đầy đủ các trường bắt buộc.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass.length < 6) {
-                errorText.textContent = "Mật khẩu mới phải có ít nhất 6 ký tự.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass !== confirmPass) {
-                errorText.textContent = "Mật khẩu mới và mật khẩu xác nhận không khớp.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass === currentPass) {
-                errorText.textContent = "Mật khẩu mới không được giống với mật khẩu hiện tại.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            errorAlert.classList.add('hidden');
-            return true;
-        }
-    </script>
+    <script charset="UTF-8" src="${pageContext.request.contextPath}/js/auth/changePassword.js?v=2"></script>
     
     <c:remove var="errorMessage" scope="session" />
     <c:remove var="successMessage" scope="session" />

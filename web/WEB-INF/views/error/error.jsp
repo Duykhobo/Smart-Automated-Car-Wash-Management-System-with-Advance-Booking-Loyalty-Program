@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đã có lỗi xảy ra</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script charset="UTF-8" src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0b0f1a; color: white; }
     </style>

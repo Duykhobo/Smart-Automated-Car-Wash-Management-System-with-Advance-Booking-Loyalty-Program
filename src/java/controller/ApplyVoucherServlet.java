@@ -22,6 +22,7 @@ public class ApplyVoucherServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         try (PrintWriter out = response.getWriter()) {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute(AppConstants.SESSION_CUSTOMER_INFO) == null) {

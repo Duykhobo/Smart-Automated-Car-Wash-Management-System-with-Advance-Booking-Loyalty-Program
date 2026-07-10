@@ -186,6 +186,46 @@
                                                                 </div>
                                                             </c:if>
                                                         </div>
+
+                                                        <!-- Live Tracking Stepper -->
+                                                        <div class="mt-6 pt-5 border-t border-border-glass">
+                                                            <div class="flex items-center justify-between relative">
+                                                                <!-- Progress Line Background -->
+                                                                <div class="absolute left-0 top-4 w-full h-1 bg-white/10 rounded-full z-0"></div>
+                                                                
+                                                                <c:set var="status" value="${fn:toLowerCase(fn:trim(booking.status))}" />
+                                                                <c:set var="step1" value="${status == 'pending' || status == 'confirmed' || status == 'in progress' || status == 'inprogress' || status == 'completed' ? 'active' : ''}" />
+                                                                <c:set var="step2" value="${status == 'confirmed' || status == 'in progress' || status == 'inprogress' || status == 'completed' ? 'active' : ''}" />
+                                                                <c:set var="step3" value="${status == 'in progress' || status == 'inprogress' || status == 'completed' ? 'active' : ''}" />
+                                                                <c:set var="step4" value="${status == 'completed' ? 'active' : ''}" />
+
+                                                                <!-- Line fill -->
+                                                                <c:set var="lineWidth" value="0%" />
+                                                                <c:if test="${step2 == 'active'}"><c:set var="lineWidth" value="33%" /></c:if>
+                                                                <c:if test="${step3 == 'active'}"><c:set var="lineWidth" value="66%" /></c:if>
+                                                                <c:if test="${step4 == 'active'}"><c:set var="lineWidth" value="100%" /></c:if>
+                                                                
+                                                                <div class="absolute left-0 top-4 h-1 bg-[#00d4ff] rounded-full z-0 transition-all duration-1000 shadow-[0_0_10px_rgba(0,212,255,0.5)]" style="width: ${lineWidth}"></div>
+
+                                                                <!-- Steps -->
+                                                                <div class="relative z-10 flex flex-col items-center gap-2">
+                                                                    <div class="w-8 h-8 rounded-full ${step1 == 'active' ? 'bg-[#00d4ff] text-black shadow-[0_0_15px_rgba(0,212,255,0.4)]' : 'bg-slate-800 text-slate-500 border border-slate-600'} flex items-center justify-center font-bold text-sm transition-colors"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                                                                    <span class="text-[10px] uppercase font-bold tracking-wider ${step1 == 'active' ? 'text-[#00d4ff]' : 'text-slate-500'}">Chờ duyệt</span>
+                                                                </div>
+                                                                <div class="relative z-10 flex flex-col items-center gap-2">
+                                                                    <div class="w-8 h-8 rounded-full ${step2 == 'active' ? 'bg-[#00d4ff] text-black shadow-[0_0_15px_rgba(0,212,255,0.4)]' : 'bg-slate-800 text-slate-500 border border-slate-600'} flex items-center justify-center font-bold text-sm transition-colors"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+                                                                    <span class="text-[10px] uppercase font-bold tracking-wider ${step2 == 'active' ? 'text-[#00d4ff]' : 'text-slate-500'}">Tới trạm</span>
+                                                                </div>
+                                                                <div class="relative z-10 flex flex-col items-center gap-2">
+                                                                    <div class="w-8 h-8 rounded-full ${step3 == 'active' ? 'bg-[#00d4ff] text-black shadow-[0_0_15px_rgba(0,212,255,0.4)]' : 'bg-slate-800 text-slate-500 border border-slate-600'} flex items-center justify-center font-bold text-sm transition-colors ${status == 'in progress' || status == 'inprogress' ? 'animate-pulse' : ''}"><i data-lucide="spray-can" class="w-4 h-4"></i></div>
+                                                                    <span class="text-[10px] uppercase font-bold tracking-wider ${step3 == 'active' ? 'text-[#00d4ff]' : 'text-slate-500'}">Đang rửa</span>
+                                                                </div>
+                                                                <div class="relative z-10 flex flex-col items-center gap-2">
+                                                                    <div class="w-8 h-8 rounded-full ${step4 == 'active' ? 'bg-[#00d4ff] text-black shadow-[0_0_15px_rgba(0,212,255,0.4)]' : 'bg-slate-800 text-slate-500 border border-slate-600'} flex items-center justify-center font-bold text-sm transition-colors"><i data-lucide="star" class="w-4 h-4"></i></div>
+                                                                    <span class="text-[10px] uppercase font-bold tracking-wider ${step4 == 'active' ? 'text-[#00d4ff]' : 'text-slate-500'}">Xong</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     <div
@@ -196,14 +236,11 @@
                                                                 class="text-sm font-sans font-normal text-text-muted">VND</span>
                                                         </div>
 
-                                                        <!-- QR Code for Automated Check-in -->
-                                                        <div
-                                                            class="flex flex-col items-center justify-center mt-3 mb-2 p-2 bg-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${booking.bookingId}"
-                                                                alt="QR Code" class="w-16 h-16" />
-                                                            <span
-                                                                class="text-[10px] text-gray-800 font-bold mt-1 uppercase">Quét
-                                                                tại trạm</span>
+                                                        <!-- Client-side QR Code Gen -->
+                                                        <div class="flex flex-col items-center justify-center mt-3 mb-2 p-3 bg-white rounded-xl shadow-[0_0_20px_rgba(0,212,255,0.15)] border border-[#00d4ff]/30 relative overflow-hidden group">
+                                                            <div class="absolute inset-0 bg-gradient-to-tr from-[#00d4ff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                            <div class="qr-container w-20 h-20" data-code="${booking.bookingId}"></div>
+                                                            <span class="text-[10px] text-[#0891b2] font-bold mt-2 uppercase tracking-wider bg-[#00d4ff]/10 px-3 py-1 rounded-full border border-[#00d4ff]/20">Quét tại quầy</span>
                                                         </div>
 
                                                         <div
@@ -421,69 +458,12 @@
                         </div>
                     </main>
 
-                    <script>
-                        lucide.createIcons();
+                    <!-- QRCode.js Library -->
+                    <script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js?v=2"></script>
+                    <!-- Tách file JS riêng -->
+                    <script charset="UTF-8" src="${pageContext.request.contextPath}/js/customer_booking_history.js?v=2"></script>
 
-                        function switchTab(tabId) {
-                            // Hide all tabs
-                            document.querySelectorAll('.tab-content').forEach(function (el) {
-                                el.classList.add('hidden');
-                            });
-
-                            // Show the selected tab
-                            document.getElementById(tabId).classList.remove('hidden');
-
-                            // Reset all buttons styling
-                            document.querySelectorAll('.tab-btn').forEach(function (el) {
-                                el.classList.remove('text-white', 'border-[#00d4ff]');
-                                el.classList.add('text-text-muted', 'border-transparent');
-                            });
-
-                            // Set active styling for the clicked button
-                            var activeBtn = document.getElementById('btn-' + tabId);
-                            if (activeBtn) {
-                                activeBtn.classList.remove('text-text-muted', 'border-transparent');
-                                activeBtn.classList.add('text-white', 'border-[#00d4ff]');
-                            }
-                        }
-
-                        // Auto-switch to history tab if page parameter is present
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const urlParams = new URLSearchParams(window.location.search);
-                            if (urlParams.has('page')) {
-                                switchTab('tab-history');
-                            }
-                        });
-
-                        function softRefresh() {
-                            fetch(window.location.href)
-                                .then(res => res.text())
-                                .then(html => {
-                                    const parser = new DOMParser();
-                                    const doc = parser.parseFromString(html, 'text/html');
-
-                                    const tabs = ['tab-upcoming', 'tab-history'];
-                                    let hasChanges = false;
-
-                                    tabs.forEach(tabId => {
-                                        const newContent = doc.getElementById(tabId);
-                                        const curContent = document.getElementById(tabId);
-                                        if (newContent && curContent && newContent.innerHTML !== curContent.innerHTML) {
-                                            curContent.innerHTML = newContent.innerHTML;
-                                            hasChanges = true;
-                                        }
-                                    });
-
-                                    if (hasChanges) {
-                                        lucide.createIcons();
-                                    }
-                                })
-                                .catch(err => console.error('Soft refresh failed', err));
-                        }
-
-                        setInterval(softRefresh, 5000);
-                    </script>
-                    <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+                                                    <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
                     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
                 </body>
 

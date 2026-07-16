@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import dto.Booking;
 import dto.BookingSlotCapacity;
 import dto.Voucher;
+import dto.BookingDetailDTO;
 import utils.DBContext;
 
 public class BookingDAO {
@@ -80,7 +81,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getUpcomingBookings(int customerId) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames, (SELECT STRING_AGG(CAST(ServiceID AS VARCHAR), ',') FROM BookingDetails WHERE BookingID = b.BookingID) AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status = 'InProgress' THEN b.UpdatedAt ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, b.UpdatedAt FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'InProgress', 'Waitlisted') ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+        String sql = "SELECT b.*, v.LicensePlate, STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '') AS ServiceNames, STUFF((SELECT ',' + CAST(ServiceID AS VARCHAR) FROM BookingDetails WHERE BookingID = b.BookingID FOR XML PATH('')), 1, 1, '') AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status = 'InProgress' THEN b.UpdatedAt ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, b.UpdatedAt FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Pending', 'Confirmed', 'InProgress', 'Waitlisted') ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -374,7 +375,7 @@ public class BookingDAO {
 
     public dto.Booking getBookingById(int bookingId) throws SQLException {
         Booking booking = null;
-        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
+        String sql = "SELECT b.*, v.LicensePlate, STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '') AS ServiceNames FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID WHERE b.BookingID = ?";
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, bookingId);
@@ -464,13 +465,12 @@ public class BookingDAO {
 
     public List<dto.Booking> getHistoryBookings(int customerId, int page, int pageSize) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        int offset = (page - 1) * pageSize;
-        String sql = "SELECT b.*, v.LicensePlate, (SELECT STRING_AGG(s.Name, ', ') FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID) AS ServiceNames, (SELECT STRING_AGG(CAST(ServiceID AS VARCHAR), ',') FROM BookingDetails WHERE BookingID = b.BookingID) AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status IN ('Completed', 'InProgress') THEN b.ScheduledTime ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, b.UpdatedAt FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show') ORDER BY b.BookingDate DESC, b.ScheduledTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String sql = "WITH PagedBookings AS (SELECT b.*, v.LicensePlate, STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '') AS ServiceNames, STUFF((SELECT ',' + CAST(ServiceID AS VARCHAR) FROM BookingDetails WHERE BookingID = b.BookingID FOR XML PATH('')), 1, 1, '') AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status IN ('Completed', 'InProgress') THEN b.ScheduledTime ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, b.UpdatedAt, ROW_NUMBER() OVER (ORDER BY b.BookingDate DESC, b.ScheduledTime DESC) AS RowNum FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show')) SELECT * FROM PagedBookings WHERE RowNum > ? AND RowNum <= ?";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
-            st.setInt(2, offset);
-            st.setInt(3, pageSize);
+            st.setInt(2, (page - 1) * pageSize);
+            st.setInt(3, ((page - 1) * pageSize) + pageSize);
             try (java.sql.ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     dto.Booking b = new dto.Booking(
@@ -677,7 +677,7 @@ public class BookingDAO {
         String getExpired = "SELECT b.BookingID, b.BookingDate, b.ScheduledTime, b.Status, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration " +
                      "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID " +
                      "WHERE b.Status IN ('Pending', 'Waitlisted') " +
-                     "AND CAST(CONCAT(b.BookingDate, ' ', b.ScheduledTime) AS DATETIME2) <= DATEADD(MINUTE, -15, GETDATE()) " +
+                     "AND CAST(CAST(b.BookingDate AS VARCHAR) + ' ' + CAST(b.ScheduledTime AS VARCHAR) AS DATETIME2) <= DATEADD(MINUTE, -15, GETDATE()) " +
                      "GROUP BY b.BookingID, b.BookingDate, b.ScheduledTime, b.Status";
                      
         String updateStatus = "UPDATE Bookings SET Status = 'Cancelled', UpdatedAt = GETDATE() WHERE BookingID = ?";
@@ -872,5 +872,116 @@ public class BookingDAO {
             LOGGER.log(Level.SEVERE, "Error checking active bookings for vehicle", e);
         }
         return hasActive;
+    }
+
+    public List<BookingDetailDTO> getAdminBookings(String dateStr, String statusFilter, String searchKeyword, int page, int pageSize) {
+        List<BookingDetailDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "WITH PagedBookings AS ( " +
+            "SELECT b.BookingID, c.FullName, c.Phone AS PhoneNumber, v.LicensePlate, " +
+            "b.BookingDate, b.ScheduledTime, " +
+            "(SELECT STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '')) AS ServiceName, " +
+            "b.Status, " +
+            "ROW_NUMBER() OVER (ORDER BY b.BookingDate ASC, b.ScheduledTime ASC) AS RowNum " +
+            "FROM Bookings b " +
+            "JOIN Customers c ON b.CustomerID = c.CustomerID " +
+            "JOIN Vehicles v ON b.VehicleID = v.VehicleID " +
+            "WHERE 1=1 "
+        );
+
+        if (dateStr != null && !dateStr.isEmpty()) {
+            sql.append("AND b.BookingDate = ? ");
+        }
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
+            sql.append("AND b.Status = ? ");
+        }
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append("AND (c.Phone LIKE ? OR v.LicensePlate LIKE ?) ");
+        }
+        
+        sql.append(") SELECT * FROM PagedBookings WHERE RowNum > ? AND RowNum <= ?");
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql.toString())) {
+             
+            int paramIndex = 1;
+            if (dateStr != null && !dateStr.isEmpty()) {
+                st.setDate(paramIndex++, java.sql.Date.valueOf(dateStr));
+            }
+            if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
+                st.setString(paramIndex++, statusFilter);
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                String searchPattern = "%" + searchKeyword.trim() + "%";
+                st.setString(paramIndex++, searchPattern);
+                st.setString(paramIndex++, searchPattern);
+            }
+            
+            st.setInt(paramIndex++, (page - 1) * pageSize);
+            st.setInt(paramIndex++, page * pageSize);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    BookingDetailDTO dto = new BookingDetailDTO();
+                    dto.setBookingId(rs.getInt("BookingID"));
+                    dto.setCustomerName(rs.getString("FullName"));
+                    dto.setCustomerPhone(rs.getString("PhoneNumber"));
+                    dto.setVehiclePlate(rs.getString("LicensePlate"));
+                    dto.setBookingDate(rs.getTimestamp("BookingDate"));
+                    dto.setScheduledTime(rs.getTimestamp("ScheduledTime"));
+                    dto.setServiceName(rs.getString("ServiceName"));
+                    dto.setStatus(rs.getString("Status"));
+                    list.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalAdminBookings(String dateStr, String statusFilter, String searchKeyword) {
+        int total = 0;
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM Bookings b " +
+            "JOIN Customers c ON b.CustomerID = c.CustomerID " +
+            "JOIN Vehicles v ON b.VehicleID = v.VehicleID " +
+            "WHERE 1=1 "
+        );
+        if (dateStr != null && !dateStr.isEmpty()) {
+            sql.append("AND b.BookingDate = ? ");
+        }
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
+            sql.append("AND b.Status = ? ");
+        }
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append("AND (c.Phone LIKE ? OR v.LicensePlate LIKE ?) ");
+        }
+
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql.toString())) {
+             
+            int paramIndex = 1;
+            if (dateStr != null && !dateStr.isEmpty()) {
+                st.setDate(paramIndex++, java.sql.Date.valueOf(dateStr));
+            }
+            if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
+                st.setString(paramIndex++, statusFilter);
+            }
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                String searchPattern = "%" + searchKeyword.trim() + "%";
+                st.setString(paramIndex++, searchPattern);
+                st.setString(paramIndex++, searchPattern);
+            }
+            
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 }

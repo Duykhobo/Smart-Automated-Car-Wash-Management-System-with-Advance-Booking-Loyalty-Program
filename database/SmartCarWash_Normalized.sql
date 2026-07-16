@@ -428,11 +428,12 @@ BEGIN
 
         -- Insert Multiple Services (Lấy giá theo ServicePrices)
         INSERT INTO BookingDetails (BookingID, ServiceID, Price, DurationMinutes)
-        SELECT @BookingID, CAST(value AS INT), 
-               ISNULL((SELECT Price FROM ServicePrices WHERE ServiceID = CAST(value AS INT) AND VehicleSize = @VehicleSize), 
-                      (SELECT BasePrice FROM Services WHERE ServiceID = CAST(value AS INT))),
-               (SELECT ISNULL(DurationMinutes, 30) FROM Services WHERE ServiceID = CAST(value AS INT))
-        FROM STRING_SPLIT(@ServiceIDs, ',');
+        SELECT @BookingID, CAST(T.c.value('.', 'VARCHAR(10)') AS INT), 
+               ISNULL((SELECT Price FROM ServicePrices WHERE ServiceID = CAST(T.c.value('.', 'VARCHAR(10)') AS INT) AND VehicleSize = @VehicleSize), 
+                      (SELECT BasePrice FROM Services WHERE ServiceID = CAST(T.c.value('.', 'VARCHAR(10)') AS INT))),
+               (SELECT ISNULL(DurationMinutes, 30) FROM Services WHERE ServiceID = CAST(T.c.value('.', 'VARCHAR(10)') AS INT))
+        FROM (SELECT CAST('<x>' + REPLACE(@ServiceIDs, ',', '</x><x>') + '</x>' AS XML) AS x) AS A
+        CROSS APPLY x.nodes('/x') AS T(c);
 
         COMMIT TRANSACTION;
     END TRY

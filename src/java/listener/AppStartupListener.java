@@ -29,6 +29,7 @@ public class AppStartupListener implements ServletContextListener {
             try {
                 BookingDAO bookingDAO = new BookingDAO();
                 bookingDAO.autoCancelExpiredBookings();
+                bookingDAO.autoPromoteWaitlist();
             } catch (Exception e) {
                 LOGGER.severe("Error in Background Job thread: " + e.getMessage());
             }

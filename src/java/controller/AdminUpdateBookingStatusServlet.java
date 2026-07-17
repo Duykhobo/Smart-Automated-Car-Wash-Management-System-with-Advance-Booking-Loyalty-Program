@@ -30,15 +30,16 @@ public class AdminUpdateBookingStatusServlet extends HttpServlet {
                 BookingDAO bookingDAO = new BookingDAO();
                 
                 if ("Completed".equalsIgnoreCase(newStatus)) {
-                    // Xử lý hoàn thành (cộng điểm, giải phóng slot)
+                    // Xử lý hoàn thành (giải phóng slot, trigger SQL server tự cộng điểm)
                     bookingDAO.completeBookingTransaction(bookingId);
+                } else if ("Cancelled".equalsIgnoreCase(newStatus) || "No Show".equalsIgnoreCase(newStatus)) {
+                    // Hủy hoặc khách không đến -> giải phóng slot
+                    bookingDAO.adminCancelBookingTransaction(bookingId, newStatus);
                 } else if ("Pending".equalsIgnoreCase(newStatus) || 
                            "Confirmed".equalsIgnoreCase(newStatus) || 
                            "InProgress".equalsIgnoreCase(newStatus) || 
-                           "Waitlisted".equalsIgnoreCase(newStatus) || 
-                           "Cancelled".equalsIgnoreCase(newStatus) || 
-                           "No Show".equalsIgnoreCase(newStatus)) {
-                    // Cập nhật trạng thái bình thường (Pending -> Confirmed -> InProgress)
+                           "Waitlisted".equalsIgnoreCase(newStatus)) {
+                    // Cập nhật trạng thái bình thường
                     bookingDAO.updateBookingStatus(bookingId, newStatus);
                 }
             } catch (Exception e) {

@@ -13,10 +13,10 @@
 
         <!-- Floating Glass Navbar -->
         <nav
-            class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl px-6 py-4 flex items-center justify-between transition-all duration-300">
+            class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between transition-all duration-300">
             <div class="flex items-center gap-2 cursor-pointer">
-                <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-                <span class="font-display font-bold text-xl tracking-wide text-white">AUTOWASH<span
+                <i data-lucide="droplets" class="text-[#00d4ff] w-6 h-6 sm:w-8 sm:h-8"></i>
+                <span class="font-display font-bold text-lg sm:text-xl tracking-wide text-white">AUTOWASH<span
                         class="text-[#00d4ff]">PRO</span></span>
             </div>
 
@@ -29,13 +29,12 @@
                     class="text-text-muted hover:text-white transition-colors text-sm font-medium">Loyalty Program</a>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 sm:gap-4">
                 <a href="${pageContext.request.contextPath}/auth/login"
-                    class="text-white hover:text-[#00d4ff] transition-colors text-sm font-medium hidden sm:block">Đăng
+                    class="text-white hover:text-[#00d4ff] transition-colors text-xs sm:text-sm font-medium whitespace-nowrap">Đăng
                     Nhập</a>
                 <a href="${pageContext.request.contextPath}/auth/register"
-                    class="btn-glow bg-[#00d4ff] text-black px-5 py-2.5 rounded-xl font-semibold text-sm">Đăng Ký
-                    Ngay</a>
+                    class="btn-glow bg-[#00d4ff] text-black px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap">Đăng Ký Ngay</a>
             </div>
         </nav>
 
@@ -43,7 +42,7 @@
 
             <!-- Hero Section -->
             <section aria-labelledby="hero-title"
-                class="flex w-full flex-col items-center justify-center px-6 py-32 md:py-48 relative min-h-[600px] md:min-h-[800px]">
+                class="flex w-full flex-col items-center justify-center px-4 sm:px-6 py-24 sm:py-32 md:py-48 relative min-h-[500px] md:min-h-[800px]">
                 <!-- Background Image with Blur -->
                 <div class="absolute inset-0 z-0">
                     <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80"
@@ -63,7 +62,7 @@
                     </div>
 
                     <h1 id="hero-title"
-                        class="font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 text-4xl md:text-6xl lg:text-7xl leading-tight md:leading-tight">
+                        class="font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 text-3xl sm:text-4xl md:text-6xl lg:text-7xl leading-tight md:leading-tight">
                         Trải Nghiệm Rửa Xe Chuẩn VIP <br /> <span class="text-[#00d4ff] glow-text">Không Chờ Đợi</span>
                     </h1>
 
@@ -86,7 +85,7 @@
 
                 <!-- Decorative Glow -->
                 <div
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00d4ff]/10 rounded-full blur-[120px] -z-10">
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-[600px] sm:h-[600px] bg-[#00d4ff]/10 rounded-full blur-[100px] sm:blur-[120px] -z-10">
                 </div>
             </section>
 
@@ -350,7 +349,7 @@
                         class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-accent-cyan to-transparent opacity-50">
                     </div>
                     <div
-                        class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#00d4ff]/20 blur-[80px] rounded-full">
+                        class="absolute -top-16 sm:-top-24 left-1/2 -translate-x-1/2 w-48 h-48 sm:w-64 sm:h-64 bg-[#00d4ff]/20 blur-[60px] sm:blur-[80px] rounded-full">
                     </div>
 
                     <div class="flex flex-col items-center gap-4 w-full relative z-10">

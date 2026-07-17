@@ -22,48 +22,9 @@
                     <!-- Global toast included at bottom -->
 
                     <!-- Desktop Sidebar -->
-                    <aside
-                        class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
-                        <a href="${pageContext.request.contextPath}/account/dashboard"
-                            class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-                            <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-                            <span class="text-xl font-display font-bold tracking-tight text-white">AUTOWASH<span
-                                    class="text-[#00d4ff]">PRO</span></span>
-                        </a>
-
-                        <nav class="flex-1 px-4 py-4 space-y-2 mt-4">
-                            <a href="${pageContext.request.contextPath}/account/dashboard"
-                                class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Tổng quan</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/bookings"
-                                class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Đặt lịch dịch vụ</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/customer/booking_history"
-                                class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
-                                <i data-lucide="history" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Lịch sử rửa xe</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/vehicles"
-                                class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                <i data-lucide="car" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Quản lý xe</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/customer/loyalty"
-                                class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                <i data-lucide="award" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Cửa hàng đổi quà</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/account/profile"
-                                class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                <i data-lucide="user" class="w-5 h-5"></i>
-                                <span class="font-medium text-sm">Hồ sơ cá nhân</span>
-                            </a>
-                        </nav>
-                    </aside>
+                    <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
+    <jsp:param name="activeMenu" value="history" />
+</jsp:include>
 
                     <!-- Main Content -->
                     <main class="flex-1 md:ml-64 relative min-h-screen bg-bg-primary">
@@ -187,7 +148,52 @@
                                                             </c:if>
                                                         </div>
 
-                                                        <!-- Live Tracking Stepper -->
+                                                        
+                                                    </div>
+
+                                                    <div
+                                                        class="flex flex-col items-start sm:items-end justify-center gap-4 h-full border-t sm:border-t-0 sm:border-l border-border-glass pt-4 sm:pt-0 sm:pl-6 mt-2 sm:mt-0 min-w-[140px]">
+                                                        <div class="text-xl font-display font-bold text-[#00d4ff]">
+                                                            <fmt:formatNumber value="${booking.finalPrice}"
+                                                                pattern="#,###" /><span
+                                                                class="text-sm font-sans font-normal text-text-muted">VND</span>
+                                                        </div>
+
+                                                        <c:if test="${booking.status == 'Pending' || booking.status == 'Waitlisted'}">
+                                                            <!-- Client-side QR Code Gen -->
+                                                            <div onclick="openQrModal('BK-${booking.bookingId}')" class="flex flex-col items-center justify-center mt-3 mb-2 p-3 bg-white rounded-xl shadow-[0_0_20px_rgba(0,212,255,0.15)] border border-[#00d4ff]/30 relative overflow-hidden group cursor-pointer hover:scale-105 transition-transform duration-300" title="Nhấn để phóng to">
+                                                                <div class="absolute inset-0 bg-gradient-to-tr from-[#00d4ff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                                <div class="qr-container w-20 h-20" data-code="BK-${booking.bookingId}"></div>
+                                                                <span class="text-[10px] text-[#0891b2] font-bold mt-2 uppercase tracking-wider bg-[#00d4ff]/10 px-3 py-1 rounded-full border border-[#00d4ff]/20">Quét tại quầy</span>
+                                                            </div>
+                                                        </c:if>
+
+                                                        <div
+                                                            class="flex gap-2 mt-auto w-full justify-between sm:justify-end">
+                                                            <c:if
+                                                                test="${booking.status == 'Pending' || booking.status == 'Waitlisted'}">
+                                                                <a href="${pageContext.request.contextPath}/customer/booking_history?action=edit&id=${booking.bookingId}"
+                                                                    class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30 text-sm font-semibold transition-colors text-center">
+                                                                    Sửa
+                                                                </a>
+                                                                <form
+                                                                    action="${pageContext.request.contextPath}/BookingHistoryController"
+                                                                    method="POST" class="flex-1 sm:flex-none m-0 p-0"
+                                                                    id="cancelForm_${booking.bookingId}">
+                                                                    <input type="hidden" name="action" value="cancel" />
+                                                                    <input type="hidden" name="bookingId"
+                                                                        value="${booking.bookingId}" />
+                                                                    <button type="button"
+                                                                        onclick="showGlobalConfirmModal('Hủy lịch hẹn', 'Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác và số suất sẽ được nhường cho người khác.', 'Xác nhận Hủy', function() { document.getElementById('cancelForm_${booking.bookingId}').submit(); })"
+                                                                        class="w-full px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
+                                                                        Hủy Lịch
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <!-- Live Tracking Stepper -->
                                                         <div class="mt-6 pt-5 border-t border-border-glass">
                                                             <div class="flex items-center justify-between relative">
                                                                 <!-- Progress Line Background -->
@@ -226,48 +232,6 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-
-                                                    <div
-                                                        class="flex flex-col items-start sm:items-end justify-between border-t sm:border-t-0 sm:border-l border-border-glass pt-4 sm:pt-0 sm:pl-6 mt-2 sm:mt-0 min-w-[140px]">
-                                                        <div class="text-xl font-display font-bold text-[#00d4ff]">
-                                                            <fmt:formatNumber value="${booking.finalPrice}"
-                                                                pattern="#,###" /><span
-                                                                class="text-sm font-sans font-normal text-text-muted">VND</span>
-                                                        </div>
-
-                                                        <!-- Client-side QR Code Gen -->
-                                                        <div class="flex flex-col items-center justify-center mt-3 mb-2 p-3 bg-white rounded-xl shadow-[0_0_20px_rgba(0,212,255,0.15)] border border-[#00d4ff]/30 relative overflow-hidden group">
-                                                            <div class="absolute inset-0 bg-gradient-to-tr from-[#00d4ff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                            <div class="qr-container w-20 h-20" data-code="${booking.bookingId}"></div>
-                                                            <span class="text-[10px] text-[#0891b2] font-bold mt-2 uppercase tracking-wider bg-[#00d4ff]/10 px-3 py-1 rounded-full border border-[#00d4ff]/20">Quét tại quầy</span>
-                                                        </div>
-
-                                                        <div
-                                                            class="flex gap-2 mt-auto w-full justify-between sm:justify-end">
-                                                            <c:if
-                                                                test="${booking.status == 'Pending' || booking.status == 'Waitlisted'}">
-                                                                <a href="${pageContext.request.contextPath}/customer/booking_history?action=edit&id=${booking.bookingId}"
-                                                                    class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/30 text-sm font-semibold transition-colors text-center">
-                                                                    Sửa
-                                                                </a>
-                                                                <form
-                                                                    action="${pageContext.request.contextPath}/BookingHistoryController"
-                                                                    method="POST" class="flex-1 sm:flex-none m-0 p-0"
-                                                                    id="cancelForm_${booking.bookingId}">
-                                                                    <input type="hidden" name="action" value="cancel" />
-                                                                    <input type="hidden" name="bookingId"
-                                                                        value="${booking.bookingId}" />
-                                                                    <button type="button"
-                                                                        onclick="showGlobalConfirmModal('Hủy lịch hẹn', 'Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác và số suất sẽ được nhường cho người khác.', 'Xác nhận Hủy', function() { document.getElementById('cancelForm_${booking.bookingId}').submit(); })"
-                                                                        class="w-full px-3 py-2 rounded-lg bg-bg-surface hover:bg-red-500/20 text-red-400 border border-red-500/30 text-sm font-semibold transition-colors text-center">
-                                                                        Hủy Lịch
-                                                                    </button>
-                                                                </form>
-                                                            </c:if>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </article>
                                         </c:forEach>
                                     </c:when>
@@ -327,29 +291,9 @@
                                                         <div class="flex items-center justify-between">
                                                             <h3 class="font-display font-bold text-lg text-white">Dịch
                                                                 Vụ Rửa Xe</h3>
-                                                            <c:choose>
-                                                                <c:when test="${booking.status == 'Completed'}">
-                                                                    <span
-                                                                        class="text-success text-sm font-bold border border-success/50 px-2 py-0.5 rounded">Hoàn
-                                                                        thành</span>
-                                                                </c:when>
-                                                                <c:when test="${booking.status == 'Cancelled'}">
-                                                                    <span
-                                                                        class="text-red-400 text-sm font-semibold border border-red-500/50 px-2 py-0.5 rounded">Đã
-                                                                        hủy</span>
-                                                                </c:when>
-                                                                <c:when test="${booking.status == 'No Show'}">
-                                                                    <span
-                                                                        class="text-red-400 text-sm font-semibold border border-red-500/50 px-2 py-0.5 rounded">Không
-                                                                        đến</span>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span
-                                                                        class="text-amber-500 text-sm font-semibold border border-amber-500/50 px-2 py-0.5 rounded uppercase">
-                                                                        <c:out value="${booking.status}" />
-                                                                    </span>
-                                                                </c:otherwise>
-                                                            </c:choose>
+                                                            <jsp:include page="../components/status_badge.jsp">
+                                                                <jsp:param name="status" value="${booking.status}" />
+                                                            </jsp:include>
                                                         </div>
                                                         <div
                                                             class="text-sm text-text-muted mt-1 flex flex-wrap gap-x-4 gap-y-1">
@@ -457,6 +401,66 @@
 
                         </div>
                     </main>
+
+    <jsp:include page="/WEB-INF/views/components/customer_bottom_nav.jsp">
+    <jsp:param name="activeMenu" value="history" />
+</jsp:include>
+
+
+                    <!-- QR Code Zoom Modal -->
+                    <div id="qrModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeQrModal()">
+                        <div class="bg-white p-8 rounded-2xl shadow-[0_0_30px_rgba(0,212,255,0.3)] border border-[#00d4ff]/30 scale-95 transition-transform duration-300" id="qrModalContent" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold text-center text-slate-800 mb-6">Mã QR Check-in</h3>
+                            <div id="qrModalCanvas" class="flex justify-center mb-6 min-w-[250px] min-h-[250px] bg-white p-2 rounded-xl"></div>
+                            <div class="text-center text-sm text-slate-500 mb-4 font-mono font-bold tracking-wider" id="qrModalId"></div>
+                            <button onclick="closeQrModal()" class="w-full py-3 bg-gradient-to-r from-cyan-400 to-[#00d4ff] text-black font-bold rounded-xl hover:from-cyan-300 hover:to-cyan-400 transition-all shadow-[0_0_15px_rgba(0,212,255,0.4)]">Đóng lại</button>
+                        </div>
+                    </div>
+
+                    <script>
+                        function openQrModal(code) {
+                            const modal = document.getElementById('qrModal');
+                            const modalContent = document.getElementById('qrModalContent');
+                            const qrCanvas = document.getElementById('qrModalCanvas');
+                            const idLabel = document.getElementById('qrModalId');
+                            
+                            qrCanvas.innerHTML = '';
+                            idLabel.innerText = code;
+                            
+                            new QRCode(qrCanvas, {
+                                text: code,
+                                width: 250,
+                                height: 250,
+                                colorDark : "#0f172a",
+                                colorLight : "#ffffff",
+                                correctLevel : QRCode.CorrectLevel.H
+                            });
+                            
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                            
+                            // Trigger reflow for animation
+                            void modal.offsetWidth;
+                            
+                            modal.classList.remove('opacity-0');
+                            modalContent.classList.remove('scale-95');
+                            modalContent.classList.add('scale-100');
+                        }
+                        
+                        function closeQrModal() {
+                            const modal = document.getElementById('qrModal');
+                            const modalContent = document.getElementById('qrModalContent');
+                            
+                            modal.classList.add('opacity-0');
+                            modalContent.classList.remove('scale-100');
+                            modalContent.classList.add('scale-95');
+                            
+                            setTimeout(() => {
+                                modal.classList.remove('flex');
+                                modal.classList.add('hidden');
+                            }, 300);
+                        }
+                    </script>
 
                     <!-- QRCode.js Library -->
                     <script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js?v=2"></script>

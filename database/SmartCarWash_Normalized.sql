@@ -261,8 +261,8 @@ GO
 INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, PriorityRank, MaxBookingDays, BadgeClass, BannerBorder, BannerBg, BannerIcon, BannerText) VALUES 
 ('Member', 0, 0, 0.00, 1, 7, 'badge-member', 'border-slate-500', 'bg-slate-500/20', 'text-slate-500', 'text-slate-400'),
 ('Silver', 5, 2000000, 0.10, 2, 10, 'badge-silver', 'border-slate-400', 'bg-slate-400/20', 'text-slate-400', 'text-slate-300'),
-('Gold', 15, 6000000, 0.30, 3, 12, 'badge-gold', 'border-amber-500', 'bg-amber-500/20', 'text-amber-500', 'text-amber-400'),
-('Platinum', 30, 15000000, 0.50, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
+('Gold', 15, 6000000, 0.20, 3, 12, 'badge-gold', 'border-amber-500', 'bg-amber-500/20', 'text-amber-500', 'text-amber-400'),
+('Platinum', 30, 15000000, 0.30, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
 GO
 
 INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
@@ -571,12 +571,22 @@ BEGIN
 
         IF NOT EXISTS (SELECT 1 FROM #CompletedBookings) RETURN;
 
+        -- Lấy tỷ lệ quy đổi điểm từ SystemConfig (Ví dụ cấu hình là 1,000đ = 1 điểm => tỷ lệ 1)
+        DECLARE @PointsPerUnit DECIMAL(18,4) = 1;
+        SELECT @PointsPerUnit = CAST(ConfigValue AS DECIMAL(18,4)) 
+        FROM SystemConfig 
+        WHERE ConfigKey = 'PointsPerCurrencyUnit';
+        
+        -- Kiểm tra tránh chia cho 0
+        IF @PointsPerUnit <= 0 SET @PointsPerUnit = 1;
+
         -- 2. Tính điểm bằng Set-based logic
+        -- Công thức: Điểm = FLOOR((FinalPrice / 1000.0) * PointsPerUnit) * (1.0 + PointsModifier)
         SELECT 
             BookingID,
             CustomerID,
             FinalPrice,
-            CAST(FLOOR(FinalPrice / 1000.0) * (1.0 + PointsModifier) AS INT) AS EarnedPoints
+            CAST(FLOOR((FinalPrice / 1000.0) * @PointsPerUnit) * (1.0 + PointsModifier) AS INT) AS EarnedPoints
         INTO #BookingPoints
         FROM #CompletedBookings;
 

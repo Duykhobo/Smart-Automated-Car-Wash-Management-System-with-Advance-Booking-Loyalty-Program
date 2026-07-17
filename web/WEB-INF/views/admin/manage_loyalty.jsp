@@ -14,7 +14,7 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div>
@@ -69,8 +69,8 @@
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-black/20 text-text-muted border-b border-border-glass">
+                <table class="w-full text-left text-sm whitespace-nowrap lg:whitespace-normal">
+                    <thead class="hidden lg:table-header-group bg-black/20 text-text-muted border-b border-border-glass whitespace-nowrap">
                         <tr>
                             <th class="px-6 py-4 font-medium">Mã Code</th>
                             <th class="px-6 py-4 font-medium">Mức Giảm</th>
@@ -83,9 +83,10 @@
                     <tbody class="divide-y divide-border-glass">
                         
                         <!-- Row 1 -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Mã Code:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00d4ff] to-blue-500 flex items-center justify-center shadow-[0_0_10px_rgba(0,212,255,0.2)]">
                                         <i data-lucide="tag" class="w-5 h-5 text-black"></i>
                                     </div>
@@ -95,24 +96,31 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Mức Giảm:</span>
                                 <span class="text-emerald-400 font-bold">-50,000đ</span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-amber-400">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-amber-400">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm Quy Đổi:</span>
                                 500 <span class="text-xs font-sans font-normal text-amber-400/70">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
-                                <div class="w-24 bg-black/40 rounded-full h-1.5 mb-1 overflow-hidden">
-                                    <div class="bg-[#00d4ff] h-1.5 rounded-full" style="width: 45%"></div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Giới hạn:</span>
+                                <div class="inline-block align-top">
+                                    <div class="w-24 bg-black/40 rounded-full h-1.5 mb-1 overflow-hidden">
+                                        <div class="bg-[#00d4ff] h-1.5 rounded-full" style="width: 45%"></div>
+                                    </div>
+                                    <span class="text-xs">45/100 lượt</span>
                                 </div>
-                                <span class="text-xs">45/100 lượt</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng thái:</span>
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -125,9 +133,10 @@
                         </tr>
 
                         <!-- Row 2 -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Mã Code:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                                         <i data-lucide="percent" class="w-5 h-5 text-black"></i>
                                     </div>
@@ -137,21 +146,26 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Mức Giảm:</span>
                                 <span class="text-emerald-400 font-bold">-20%</span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-amber-400">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-amber-400">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm Quy Đổi:</span>
                                 1000 <span class="text-xs font-sans font-normal text-amber-400/70">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Giới hạn:</span>
                                 Không giới hạn
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng thái:</span>
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -164,9 +178,10 @@
                         </tr>
 
                         <!-- Row 3: Disabled -->
-                        <tr class="hover:bg-white/[0.02] transition-colors opacity-60">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0 opacity-60">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Mã Code:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center border border-slate-600">
                                         <i data-lucide="ticket" class="w-5 h-5 text-slate-400"></i>
                                     </div>
@@ -176,21 +191,26 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Mức Giảm:</span>
                                 <span class="text-slate-400 font-bold">100%</span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-slate-400">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-slate-400">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm Quy Đổi:</span>
                                 3000 <span class="text-xs font-sans font-normal">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-400">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-400">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Giới hạn:</span>
                                 500/500 lượt (Hết)
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng thái:</span>
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
                                     <i data-lucide="x-circle" class="w-3 h-3"></i> Tạm ngưng
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors" title="Kích hoạt lại">
                                         <i data-lucide="power" class="w-4 h-4"></i>
@@ -205,5 +225,10 @@
     </main>
 <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+
+    <!-- Mobile Bottom Navigation -->
+    <jsp:include page="/WEB-INF/views/components/admin_bottom_nav.jsp">
+        <jsp:param name="activeMenu" value="loyalty" />
+    </jsp:include>
 </body>
 </html>

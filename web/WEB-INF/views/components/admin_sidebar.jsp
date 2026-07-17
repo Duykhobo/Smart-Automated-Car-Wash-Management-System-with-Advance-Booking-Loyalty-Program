@@ -8,7 +8,7 @@
 %>
 
 <!-- Sidebar (Left Menu) -->
-<aside class="w-64 glass-panel m-4 flex flex-col h-[calc(100vh-2rem)] sticky top-4 rounded-2xl bg-bg-surface border border-border-glass">
+<aside class="hidden md:flex w-64 glass-panel m-4 flex-col h-[calc(100vh-2rem)] sticky top-4 rounded-2xl bg-bg-surface border border-border-glass">
     <!-- Logo -->
     <div class="p-6 border-b border-border-glass flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#00d4ff] to-blue-300 flex items-center justify-center shadow-[0_0_15px_rgba(0,212,255,0.4)]">

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.CustomerService;
+import dao.BookingDAO;
 import utils.AppConstants;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -34,6 +35,11 @@ public class CustomerProfileServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         } else {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
+            if (customer != null) {
+                BookingDAO bookingDAO = new BookingDAO();
+                customer.setTotalSpend(bookingDAO.getTotalSpend(customer.getCustomerId()));
+                customer.setTotalWashes(bookingDAO.getTotalWashes(customer.getCustomerId()));
+            }
             request.setAttribute("customer", customer);
             request.getRequestDispatcher("/WEB-INF/views/customer/profile.jsp").forward(request, response);
         }

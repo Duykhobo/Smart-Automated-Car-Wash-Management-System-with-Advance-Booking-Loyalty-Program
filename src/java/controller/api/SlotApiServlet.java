@@ -79,6 +79,7 @@ public class SlotApiServlet extends HttpServlet {
             int openingHour = configDao.getOpeningHour();
             int closingHour = configDao.getClosingHour();
             int minAdvanceBookingMinutes = configDao.getMinAdvanceBookingMinutes();
+            int systemMaxCapacity = configDao.getMaxSlotCapacity();
 
             LocalTime openTime = LocalTime.of(openingHour, 0);
             LocalTime closeTime = LocalTime.of(closingHour, 0);
@@ -100,14 +101,15 @@ public class SlotApiServlet extends HttpServlet {
                 Map<String, Object> slotData = new HashMap<>();
                 slotData.put("time", timeStr);
                 
-                // Nạp thông số Booked/Capacity
+                // Dữ liệu DB (nếu có)
                 if (dbSlotMap.containsKey(timeStr)) {
                     BookingSlotCapacity dbSlot = dbSlotMap.get(timeStr);
                     slotData.put("currentBooked", dbSlot.getCurrentBooked());
                     slotData.put("maxCapacity", dbSlot.getMaxCapacity());
                 } else {
+                    // Chưa có booking nào cho khung giờ này trong DB
                     slotData.put("currentBooked", 0);
-                    slotData.put("maxCapacity", DEFAULT_MAX_CAPACITY);
+                    slotData.put("maxCapacity", systemMaxCapacity);
                 }
 
                 slotData.put("isPast", isPast);

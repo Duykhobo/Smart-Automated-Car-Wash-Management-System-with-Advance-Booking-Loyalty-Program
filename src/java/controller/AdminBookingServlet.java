@@ -63,6 +63,7 @@ public class AdminBookingServlet extends HttpServlet {
         request.setAttribute("currentStatus", status);
         request.setAttribute("currentDate", date);
         request.setAttribute("currentSearch", search);
+        request.setAttribute("encodedSearch", java.net.URLEncoder.encode(search, "UTF-8"));
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);

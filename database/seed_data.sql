@@ -133,7 +133,8 @@ BEGIN
     ('MinAdvanceBookingMinutes', '60', N'Thời gian đặt trước tối thiểu (phút)'),
     ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
     ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
-    ('ClosingHour', '22', N'Giờ đóng cửa (0-23)');
+    ('ClosingHour', '22', N'Giờ đóng cửa (0-23)'),
+    ('PointsPerCurrencyUnit', '1', N'Tỷ lệ quy đổi: 1,000 VND = ? Điểm');
 END
 GO
 

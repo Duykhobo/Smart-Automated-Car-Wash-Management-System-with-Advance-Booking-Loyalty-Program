@@ -7,10 +7,10 @@ lucide.createIcons();
             gradient.addColorStop(1, 'rgba(0, 212, 255, 0.0)');
 
             const mockData = {
-                labels: ['Th\u1ee9 2', 'Th\u1ee9 3', 'Th\u1ee9 4', 'Th\u1ee9 5', 'Th\u1ee9 6', 'Th\u1ee9 7', 'CN'],
+                labels: typeof chartLabels !== 'undefined' ? chartLabels : [],
                 datasets: [{
                     label: 'Doanh thu (VN\u0110)',
-                    data: [3500000, 4200000, 3800000, 5100000, 4800000, 8500000, 9200000],
+                    data: typeof chartData !== 'undefined' ? chartData : [],
                     borderColor: '#00d4ff',
                     backgroundColor: gradient,
                     borderWidth: 3,
@@ -53,7 +53,9 @@ lucide.createIcons();
                             grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
                             ticks: { 
                                 color: '#94a3b8',
-                                callback: function(value) { return (value / 1000000) + ' Tr'; }
+                                callback: function(value) { 
+                                    return new Intl.NumberFormat('vi-VN').format(value); 
+                                }
                             }
                         },
                         x: {

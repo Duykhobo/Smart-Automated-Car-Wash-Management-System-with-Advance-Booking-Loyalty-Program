@@ -45,6 +45,37 @@ public class CustomerDAO {
         return null;
     }
 
+    public Customer getCustomerById(int customerId) {
+        String sql = "SELECT c.*, t.TierName AS TierStatus FROM Customers c LEFT JOIN MemberTiers t ON c.TierID = t.TierID WHERE c.CustomerID = ?";
+
+        try (Connection cn = DBContext.getConnection(); PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, customerId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    int cusID = rs.getInt("CustomerID");
+                    int dbUserID = rs.getInt("UserID");
+                    String fullname = rs.getString("FullName");
+                    String phone = rs.getString("Phone");
+                    String email = rs.getString("Email");
+                    String licensePlate = ""; 
+                    String tierStatus = rs.getString("TierStatus");
+                    int pointBalance = rs.getInt("PointsBalance");
+                    double totalSpend = rs.getDouble("TotalSpend");
+                    int totalWashes = rs.getInt("TotalWashes");
+                    Timestamp tierUpgradeDate = rs.getTimestamp("TierUpgradeDate");
+                    String avatar = rs.getString("Avatar");
+
+                    return new Customer(cusID, dbUserID, fullname, phone, email, licensePlate,
+                            tierStatus, pointBalance, totalSpend, totalWashes, tierUpgradeDate, avatar);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi truy vấn CSDL tại CustomerDAO.getCustomerById:");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public int updateProfile(int cusId, String fullname, String email, String avatarPath) {
         int result = 0;
         String sql;

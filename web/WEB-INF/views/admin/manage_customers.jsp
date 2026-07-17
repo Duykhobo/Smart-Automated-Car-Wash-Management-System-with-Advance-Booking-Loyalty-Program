@@ -14,7 +14,7 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div>
@@ -57,8 +57,8 @@
         <!-- Data Table -->
         <div class="glass-panel rounded-2xl bg-bg-surface border border-border-glass overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-black/20 text-text-muted border-b border-border-glass">
+                <table class="w-full text-left text-sm whitespace-nowrap lg:whitespace-normal">
+                    <thead class="hidden lg:table-header-group bg-black/20 text-text-muted border-b border-border-glass whitespace-nowrap">
                         <tr>
                             <th class="px-6 py-4 font-medium">Khách hàng</th>
                             <th class="px-6 py-4 font-medium">Liên hệ</th>
@@ -71,35 +71,46 @@
                     </thead>
                     <tbody class="divide-y divide-border-glass">
                         <!-- Row 1: Platinum -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Khách hàng:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-300 to-[#00d4ff] flex items-center justify-center font-bold text-black shadow-[0_0_10px_rgba(0,212,255,0.3)]">
                                         P
                                     </div>
                                     <div class="font-medium text-white">Phạm Văn Đồng</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
-                                <div>0901 123 456</div>
-                                <div class="text-xs text-text-muted">dongpv@gmail.com</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Liên hệ:</span>
+                                <div class="inline-block align-top">
+                                    <div>0901 123 456</div>
+                                    <div class="text-xs text-text-muted">dongpv@gmail.com</div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex flex-col gap-1">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Biển số xe:</span>
+                                <div class="inline-flex lg:flex flex-col gap-1 align-top">
                                     <span class="px-2 py-0.5 bg-white/10 rounded text-xs font-mono w-max">51H-999.99</span>
                                     <span class="px-2 py-0.5 bg-white/10 rounded text-xs font-mono w-max">51K-123.45</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Hạng thẻ:</span>
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/40 shadow-[0_0_10px_rgba(0,212,255,0.2)]">
                                     <i data-lucide="crown" class="w-3 h-3"></i> Platinum
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-white">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-white">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm khả dụng:</span>
                                 12,450 <span class="text-xs font-sans font-normal text-[#00d4ff]">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">45 lượt</td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Lượt rửa:</span>
+                                45 lượt
+                            </td>
+                            <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <button class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                     Lịch sử điểm
                                 </button>
@@ -107,31 +118,42 @@
                         </tr>
 
                         <!-- Row 2: Gold -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Khách hàng:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center font-bold text-black shadow-[0_0_10px_rgba(245,158,11,0.3)]">
                                         T
                                     </div>
                                     <div class="font-medium text-white">Trần Lệ Xuân</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
-                                <div>0912 345 678</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Liên hệ:</span>
+                                <div class="inline-block align-top">
+                                    <div>0912 345 678</div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Biển số xe:</span>
                                 <span class="px-2 py-0.5 bg-white/10 rounded text-xs font-mono w-max">29A-678.90</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Hạng thẻ:</span>
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                                     <i data-lucide="star" class="w-3 h-3"></i> Gold
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-white">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-white">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm khả dụng:</span>
                                 4,200 <span class="text-xs font-sans font-normal text-amber-400">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">18 lượt</td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Lượt rửa:</span>
+                                18 lượt
+                            </td>
+                            <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <button class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                     Lịch sử điểm
                                 </button>
@@ -139,31 +161,42 @@
                         </tr>
 
                         <!-- Row 3: Silver -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Khách hàng:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-200 flex items-center justify-center font-bold text-slate-800">
                                         N
                                     </div>
                                     <div class="font-medium text-white">Nguyễn Khắc Nhu</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
-                                <div>0987 654 321</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Liên hệ:</span>
+                                <div class="inline-block align-top">
+                                    <div>0987 654 321</div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Biển số xe:</span>
                                 <span class="px-2 py-0.5 bg-white/10 rounded text-xs font-mono w-max">60B-112.23</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Hạng thẻ:</span>
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-500/20 text-slate-300 border border-slate-500/40">
                                     <i data-lucide="shield" class="w-3 h-3"></i> Silver
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-white">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-white">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm khả dụng:</span>
                                 1,850 <span class="text-xs font-sans font-normal text-slate-400">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">6 lượt</td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Lượt rửa:</span>
+                                6 lượt
+                            </td>
+                            <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <button class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                     Lịch sử điểm
                                 </button>
@@ -171,31 +204,42 @@
                         </tr>
                         
                         <!-- Row 4: Member -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Khách hàng:</span>
+                                <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center font-bold text-slate-300">
                                         L
                                     </div>
                                     <div class="font-medium text-white">Lý Hải</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">
-                                <div>0933 445 566</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Liên hệ:</span>
+                                <div class="inline-block align-top">
+                                    <div>0933 445 566</div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Biển số xe:</span>
                                 <span class="px-2 py-0.5 bg-white/10 rounded text-xs font-mono w-max">61C-445.56</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-text-muted border border-border-glass">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Hạng thẻ:</span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
                                     <i data-lucide="user" class="w-3 h-3"></i> Member
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-display font-bold text-white">
-                                250 <span class="text-xs font-sans font-normal text-text-muted">pts</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-white">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm khả dụng:</span>
+                                120 <span class="text-xs font-sans font-normal text-slate-400">pts</span>
                             </td>
-                            <td class="px-6 py-4 text-slate-300">1 lượt</td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Lượt rửa:</span>
+                                1 lượt
+                            </td>
+                            <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <button class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                     Lịch sử điểm
                                 </button>
@@ -221,5 +265,10 @@
     </main>
 <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+
+    <!-- Mobile Bottom Navigation -->
+    <jsp:include page="/WEB-INF/views/components/admin_bottom_nav.jsp">
+        <jsp:param name="activeMenu" value="customers" />
+    </jsp:include>
 </body>
 </html>

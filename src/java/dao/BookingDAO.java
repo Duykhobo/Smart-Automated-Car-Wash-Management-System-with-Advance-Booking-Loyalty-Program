@@ -44,7 +44,7 @@ public class BookingDAO {
             Date bookingDate, Time scheduledTime,
             double originalPrice, double discountAmount, double finalPrice, int totalDurationMinutes) throws Exception {
         boolean success = false;
-        String sql = "{CALL sp_CreateBookingTransaction(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        String sql = "{CALL sp_CreateBookingTransaction(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
         try (Connection cn = DBContext.getConnection();
                 CallableStatement cs = cn.prepareCall(sql)) {
@@ -65,6 +65,7 @@ public class BookingDAO {
             cs.setDouble(8, discountAmount);
             cs.setDouble(9, finalPrice);
             cs.setInt(10, totalDurationMinutes); // TotalDurationMinutes
+            cs.setInt(11, new dao.SystemConfigDAO().getMaxSlotCapacity()); // DefaultMaxCapacity
 
             cs.execute();
             success = true;
@@ -188,7 +189,7 @@ public class BookingDAO {
                 String checkSql = "SELECT SlotID, CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
                 boolean exists = false;
                 int current = 0;
-                int max = 3;
+                int max = new dao.SystemConfigDAO().getMaxSlotCapacity();
                 try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
                     stCheck.setDate(1, newDate);
                     stCheck.setString(2, newTime.toString());
@@ -214,10 +215,11 @@ public class BookingDAO {
                             st3.executeUpdate();
                         }
                     } else {
-                        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
+                        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), ?, 1)";
                         try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
                             st4.setDate(1, newDate);
                             st4.setString(2, newTime.toString());
+                            st4.setInt(3, new dao.SystemConfigDAO().getMaxSlotCapacity());
                             st4.executeUpdate();
                         }
                     }
@@ -291,6 +293,9 @@ public class BookingDAO {
                     LOGGER.log(Level.SEVERE, "Close connection failed", ex);
                 }
             }
+        }
+        if (success) {
+            this.autoPromoteWaitlist();
         }
         return success;
     }
@@ -369,6 +374,79 @@ public class BookingDAO {
                     LOGGER.log(Level.SEVERE, "Close connection failed", ex);
                 }
             }
+        }
+        if (success) {
+            this.autoPromoteWaitlist();
+        }
+        return success;
+    }
+
+    public boolean adminCancelBookingTransaction(int bookingId, String finalStatus) {
+        boolean success = false;
+        String queryBooking = "SELECT b.BookingDate, b.ScheduledTime, b.Status, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration "
+                + "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID "
+                + "WHERE b.BookingID = ? "
+                + "GROUP BY b.BookingDate, b.ScheduledTime, b.Status";
+        String updateStatus = "UPDATE Bookings SET Status = ?, UpdatedAt = GETDATE() WHERE BookingID = ?";
+
+        Connection cn = null;
+        try {
+            cn = DBContext.getConnection();
+            cn.setAutoCommit(false);
+            
+            try (PreparedStatement pstGet = cn.prepareStatement(queryBooking)) {
+                pstGet.setInt(1, bookingId);
+                try (ResultSet rs = pstGet.executeQuery()) {
+                    if (rs.next()) {
+                        String status = rs.getString("Status");
+                        if ("Completed".equalsIgnoreCase(status) || "Cancelled".equalsIgnoreCase(status) || "No Show".equalsIgnoreCase(status)) {
+                            return false; // Already finished
+                        }
+                        Date bDate = rs.getDate("BookingDate");
+                        Time bTime = rs.getTime("ScheduledTime");
+                        
+                        try (PreparedStatement pstUpdate = cn.prepareStatement(updateStatus)) {
+                            pstUpdate.setString(1, finalStatus);
+                            pstUpdate.setInt(2, bookingId);
+                            int row = pstUpdate.executeUpdate();
+                            if (row == 0) {
+                                cn.rollback();
+                                return false;
+                            }
+                        }
+                        
+                        // If it was taking up a slot, release it
+                        if ("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status) || "InProgress".equalsIgnoreCase(status)) {
+                            int totalDuration = rs.getInt("TotalDuration");
+                            releaseSlots(cn, bDate, bTime, totalDuration);
+                        }
+                        
+                        cn.commit();
+                        success = true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Rollback adminCancelBooking failed", ex);
+                }
+            }
+            LOGGER.log(Level.SEVERE, "Error in adminCancelBookingTransaction", e);
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.setAutoCommit(true);
+                    cn.close();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Close connection failed", ex);
+                }
+            }
+        }
+        if (success) {
+            this.autoPromoteWaitlist();
         }
         return success;
     }
@@ -465,7 +543,7 @@ public class BookingDAO {
 
     public List<dto.Booking> getHistoryBookings(int customerId, int page, int pageSize) {
         List<dto.Booking> list = new java.util.ArrayList<>();
-        String sql = "WITH PagedBookings AS (SELECT b.*, v.LicensePlate, STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '') AS ServiceNames, STUFF((SELECT ',' + CAST(ServiceID AS VARCHAR) FROM BookingDetails WHERE BookingID = b.BookingID FOR XML PATH('')), 1, 1, '') AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status IN ('Completed', 'InProgress') THEN b.ScheduledTime ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, b.UpdatedAt, ROW_NUMBER() OVER (ORDER BY b.BookingDate DESC, b.ScheduledTime DESC) AS RowNum FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show')) SELECT * FROM PagedBookings WHERE RowNum > ? AND RowNum <= ?";
+        String sql = "WITH PagedBookings AS (SELECT b.*, v.LicensePlate, STUFF((SELECT ', ' + s.Name FROM BookingDetails bd JOIN Services s ON bd.ServiceID = s.ServiceID WHERE bd.BookingID = b.BookingID FOR XML PATH('')), 1, 2, '') AS ServiceNames, STUFF((SELECT ',' + CAST(ServiceID AS VARCHAR) FROM BookingDetails WHERE BookingID = b.BookingID FOR XML PATH('')), 1, 1, '') AS ServiceIDsStr, COALESCE(wr.ActualStartTime, CASE WHEN b.Status IN ('Completed', 'InProgress') THEN b.ScheduledTime ELSE NULL END) AS ActualStartTime, COALESCE(wr.ActualEndTime, CASE WHEN b.Status = 'Completed' THEN b.UpdatedAt ELSE NULL END) AS ActualEndTime, ROW_NUMBER() OVER (ORDER BY b.BookingDate DESC, b.ScheduledTime DESC) AS RowNum FROM Bookings b INNER JOIN Vehicles v ON b.VehicleID = v.VehicleID LEFT JOIN WashRecords wr ON b.BookingID = wr.BookingID WHERE b.CustomerID = ? AND b.Status IN ('Completed', 'Cancelled', 'No Show')) SELECT * FROM PagedBookings WHERE RowNum > ? AND RowNum <= ?";
         try (Connection cn = DBContext.getConnection();
                 java.sql.PreparedStatement st = cn.prepareStatement(sql)) {
             st.setInt(1, customerId);
@@ -625,6 +703,9 @@ public class BookingDAO {
             LOGGER.log(Level.SEVERE, "Lỗi khi completeBookingTransaction", ex);
             throw ex;
         }
+        if (success) {
+            this.autoPromoteWaitlist();
+        }
         return success;
     }
 
@@ -723,15 +804,15 @@ public class BookingDAO {
     }
 
     public void autoPromoteWaitlist() {
-        String queryWaitlisted = "SELECT b.BookingID, b.BookingDate, b.ScheduledTime, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration " +
+        String queryWaitlisted = "SELECT b.BookingID, b.BookingDate, b.ScheduledTime, b.PriorityScore, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration " +
                 "FROM Bookings b LEFT JOIN BookingDetails bd ON b.BookingID = bd.BookingID " +
-                "WHERE b.Status = 'Waitlisted' AND b.BookingDate >= CAST(GETDATE() AS DATE) " +
-                "GROUP BY b.BookingID, b.BookingDate, b.ScheduledTime " +
-                "ORDER BY b.BookingDate ASC, b.ScheduledTime ASC";
+                "WHERE b.Status = 'Waitlisted' AND (b.BookingDate > CAST(GETDATE() AS DATE) OR (b.BookingDate = CAST(GETDATE() AS DATE) AND b.ScheduledTime > CAST(GETDATE() AS TIME))) " +
+                "GROUP BY b.BookingID, b.BookingDate, b.ScheduledTime, b.PriorityScore " +
+                "ORDER BY b.BookingDate ASC, b.ScheduledTime ASC, b.PriorityScore DESC";
         
         String checkSql = "SELECT CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
         String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
-        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), 3, 1)";
+        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), ?, 1)";
         String updateStatus = "UPDATE Bookings SET Status = 'Pending', UpdatedAt = GETDATE() WHERE BookingID = ?";
 
         try (Connection cn = DBContext.getConnection();
@@ -790,6 +871,7 @@ public class BookingDAO {
                                 try (PreparedStatement stIns = cn.prepareStatement(insSql)) {
                                     stIns.setDate(1, bDate);
                                     stIns.setString(2, slotTime.toString());
+                                    stIns.setInt(3, new dao.SystemConfigDAO().getMaxSlotCapacity());
                                     stIns.executeUpdate();
                                 }
                             }
@@ -876,6 +958,15 @@ public class BookingDAO {
 
     public List<BookingDetailDTO> getAdminBookings(String dateStr, String statusFilter, String searchKeyword, int page, int pageSize) {
         List<BookingDetailDTO> list = new ArrayList<>();
+        java.sql.Date sqlDate = null;
+        if (dateStr != null && !dateStr.isEmpty()) {
+            try {
+                sqlDate = java.sql.Date.valueOf(dateStr);
+            } catch (IllegalArgumentException e) {
+                return list; // Invalid date format
+            }
+        }
+
         StringBuilder sql = new StringBuilder(
             "WITH PagedBookings AS ( " +
             "SELECT b.BookingID, c.FullName, c.Phone AS PhoneNumber, v.LicensePlate, " +
@@ -889,7 +980,7 @@ public class BookingDAO {
             "WHERE 1=1 "
         );
 
-        if (dateStr != null && !dateStr.isEmpty()) {
+        if (sqlDate != null) {
             sql.append("AND b.BookingDate = ? ");
         }
         if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
@@ -905,8 +996,8 @@ public class BookingDAO {
              PreparedStatement st = conn.prepareStatement(sql.toString())) {
              
             int paramIndex = 1;
-            if (dateStr != null && !dateStr.isEmpty()) {
-                st.setDate(paramIndex++, java.sql.Date.valueOf(dateStr));
+            if (sqlDate != null) {
+                st.setDate(paramIndex++, sqlDate);
             }
             if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
                 st.setString(paramIndex++, statusFilter);
@@ -942,13 +1033,22 @@ public class BookingDAO {
 
     public int getTotalAdminBookings(String dateStr, String statusFilter, String searchKeyword) {
         int total = 0;
+        java.sql.Date sqlDate = null;
+        if (dateStr != null && !dateStr.isEmpty()) {
+            try {
+                sqlDate = java.sql.Date.valueOf(dateStr);
+            } catch (IllegalArgumentException e) {
+                return 0; // Invalid date format
+            }
+        }
+
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) FROM Bookings b " +
             "JOIN Customers c ON b.CustomerID = c.CustomerID " +
             "JOIN Vehicles v ON b.VehicleID = v.VehicleID " +
             "WHERE 1=1 "
         );
-        if (dateStr != null && !dateStr.isEmpty()) {
+        if (sqlDate != null) {
             sql.append("AND b.BookingDate = ? ");
         }
         if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
@@ -962,8 +1062,8 @@ public class BookingDAO {
              PreparedStatement st = conn.prepareStatement(sql.toString())) {
              
             int paramIndex = 1;
-            if (dateStr != null && !dateStr.isEmpty()) {
-                st.setDate(paramIndex++, java.sql.Date.valueOf(dateStr));
+            if (sqlDate != null) {
+                st.setDate(paramIndex++, sqlDate);
             }
             if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("All")) {
                 st.setString(paramIndex++, statusFilter);

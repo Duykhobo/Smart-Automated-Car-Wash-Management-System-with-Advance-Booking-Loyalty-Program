@@ -14,7 +14,7 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div>
@@ -31,8 +31,8 @@
         <!-- Services Table -->
         <div class="glass-panel rounded-2xl bg-bg-surface border border-border-glass overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-black/20 text-text-muted border-b border-border-glass">
+                <table class="w-full text-left text-sm whitespace-nowrap lg:whitespace-normal">
+                    <thead class="hidden lg:table-header-group bg-black/20 text-text-muted border-b border-border-glass whitespace-nowrap">
                         <tr>
                             <th class="px-6 py-4 font-medium">Tên Dịch Vụ</th>
                             <th class="px-6 py-4 font-medium">Đơn Giá</th>
@@ -44,9 +44,10 @@
                     <tbody class="divide-y divide-border-glass">
                         
                         <!-- Service 1 -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-4">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-3">Tên Dịch Vụ:</span>
+                                <div class="inline-flex lg:flex items-center gap-4 align-top">
                                     <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
                                         <i data-lucide="droplet" class="w-6 h-6 text-[#00d4ff]"></i>
                                     </div>
@@ -56,22 +57,26 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-display font-bold text-lg text-emerald-400">80,000đ</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Đơn Giá:</span>
+                                <span class="font-display font-bold text-lg text-emerald-400">80,000đ</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="flex items-center gap-1.5 text-slate-300">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Thời gian (Phút):</span>
+                                <span class="inline-flex lg:flex items-center gap-1.5 text-slate-300 align-top">
                                     <i data-lucide="clock" class="w-4 h-4 text-text-muted"></i> 25 phút
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="flex justify-between lg:table-cell lg:text-center px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng Thái:</span>
                                 <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer">
                                   <input type="checkbox" checked class="sr-only peer">
                                   <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00d4ff]"></div>
                                 </label>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -81,9 +86,10 @@
                         </tr>
 
                         <!-- Service 2 -->
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-4">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-3">Tên Dịch Vụ:</span>
+                                <div class="inline-flex lg:flex items-center gap-4 align-top">
                                     <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
                                         <i data-lucide="spray-can" class="w-6 h-6 text-amber-400"></i>
                                     </div>
@@ -93,22 +99,26 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-display font-bold text-lg text-emerald-400">350,000đ</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Đơn Giá:</span>
+                                <span class="font-display font-bold text-lg text-emerald-400">350,000đ</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="flex items-center gap-1.5 text-slate-300">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Thời gian (Phút):</span>
+                                <span class="inline-flex lg:flex items-center gap-1.5 text-slate-300 align-top">
                                     <i data-lucide="clock" class="w-4 h-4 text-text-muted"></i> 90 phút
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="flex justify-between lg:table-cell lg:text-center px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng Thái:</span>
                                 <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer">
                                   <input type="checkbox" checked class="sr-only peer">
                                   <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00d4ff]"></div>
                                 </label>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -118,9 +128,10 @@
                         </tr>
 
                         <!-- Service 3 (Inactive) -->
-                        <tr class="hover:bg-white/[0.02] transition-colors opacity-60 grayscale">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-4">
+                        <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0 opacity-60 grayscale">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-3">Tên Dịch Vụ:</span>
+                                <div class="inline-flex lg:flex items-center gap-4 align-top">
                                     <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
                                         <i data-lucide="sparkles" class="w-6 h-6 text-purple-400"></i>
                                     </div>
@@ -130,22 +141,26 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="font-display font-bold text-lg text-emerald-400">1,200,000đ</div>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Đơn Giá:</span>
+                                <span class="font-display font-bold text-lg text-emerald-400">1,200,000đ</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="flex items-center gap-1.5 text-slate-300">
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Thời gian (Phút):</span>
+                                <span class="inline-flex lg:flex items-center gap-1.5 text-slate-300 align-top">
                                     <i data-lucide="clock" class="w-4 h-4 text-text-muted"></i> 180 phút
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="flex justify-between lg:table-cell lg:text-center px-2 lg:px-6 py-2 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng Thái:</span>
                                 <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer">
                                   <input type="checkbox" class="sr-only peer">
                                   <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00d4ff]"></div>
                                 </label>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>
@@ -160,5 +175,10 @@
     </main>
 <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
+
+    <!-- Mobile Bottom Navigation -->
+    <jsp:include page="/WEB-INF/views/components/admin_bottom_nav.jsp">
+        <jsp:param name="activeMenu" value="services" />
+    </jsp:include>
 </body>
 </html>

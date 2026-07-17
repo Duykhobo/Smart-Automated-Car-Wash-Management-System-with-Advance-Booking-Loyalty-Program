@@ -2,7 +2,7 @@ package controller;
 
 import dao.ReportDAO;
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,34 +19,48 @@ public class AdminDashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Tạm thời forward thẳng tới JSP để test giao diện.
-        // Sau này sẽ thêm logic check role Admin và fetch Data từ ReportDAO ở đây.
-        try{
-            ReportDAO d = new ReportDAO();
-            
-            double todayRevenue = d.getTodayTotalRevenue();
-            int todayBooking = d.getTodayTotalBooking();
-            int pendingBooking = d.getPendingBookingsCount();
-            
-            List<String> label = d.getLabelsLast7Days();
-            List<Double> revenue = d.getRevenueLast7Days();
-            
-            StringBuilder labelJS = new StringBuilder("[");
-            for(int i = 0; i < label.size();i++){
-                labelJS.append("'").append(label.get(i)).append("'");
-                if (i < label.size() - 1) labelJS.append(",");
-            }   
-            labelJS.append("]");
-            
-            request.setAttribute("todayRevenue", todayRevenue);
-            request.setAttribute("todayBookings", todayBooking);
-            request.setAttribute("pendingBookings", pendingBooking);
-            request.setAttribute("chartLabels", labelJS.toString());
-            request.setAttribute("chartData", revenue.toString());
-            
-        }catch(Exception e){
-            e.printStackTrace();
+        ReportDAO reportDAO = new ReportDAO();
+        
+        double revenueThisMonth = reportDAO.getRevenueThisMonth();
+        double revenueLastMonth = reportDAO.getRevenueLastMonth();
+        double revenueGrowth = 0.0;
+        if (revenueLastMonth > 0) {
+            revenueGrowth = ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100;
+        } else if (revenueThisMonth > 0) {
+            revenueGrowth = 100.0;
         }
+
+        int washesToday = reportDAO.getWashesToday();
+        int washesYesterday = reportDAO.getWashesYesterday();
+        int washesGrowth = washesToday - washesYesterday;
+        
+        int pendingBookings = reportDAO.getPendingBookingsCount();
+        
+        Map<String, Double> revenueLast7Days = reportDAO.getRevenueLast7Days();
+        
+        StringBuilder labelsJson = new StringBuilder("[");
+        StringBuilder dataJson = new StringBuilder("[");
+        boolean first = true;
+        for (Map.Entry<String, Double> entry : revenueLast7Days.entrySet()) {
+            if (!first) {
+                labelsJson.append(",");
+                dataJson.append(",");
+            }
+            labelsJson.append("\"").append(entry.getKey()).append("\"");
+            dataJson.append(entry.getValue());
+            first = false;
+        }
+        labelsJson.append("]");
+        dataJson.append("]");
+        
+        request.setAttribute("revenueThisMonth", revenueThisMonth);
+        request.setAttribute("revenueGrowth", revenueGrowth);
+        request.setAttribute("washesToday", washesToday);
+        request.setAttribute("washesGrowth", washesGrowth);
+        request.setAttribute("pendingBookings", pendingBookings);
+        request.setAttribute("chartLabels", labelsJson.toString());
+        request.setAttribute("chartData", dataJson.toString());
+        
         request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);
     }
 

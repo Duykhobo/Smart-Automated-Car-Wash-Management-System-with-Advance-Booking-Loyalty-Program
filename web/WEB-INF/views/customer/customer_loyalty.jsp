@@ -23,39 +23,9 @@
     <div class="flex h-screen overflow-hidden bg-bg-primary">
 
         <!-- Desktop Sidebar -->
-        <aside class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
-            <a href="${pageContext.request.contextPath}/account/dashboard" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-                <span class="text-xl font-display font-bold tracking-tight text-white">AUTOWASH<span class="text-[#00d4ff]">PRO</span></span>
-            </a>
-
-            <nav class="flex-1 px-4 py-4 space-y-2 mt-4">
-                <a href="${pageContext.request.contextPath}/account/dashboard" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Tổng quan</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/bookings" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                    <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Đặt lịch dịch vụ</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                    <i data-lucide="history" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Lịch sử rửa xe</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/vehicles" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                    <i data-lucide="car" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Quản lý xe</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
-                    <i data-lucide="award" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Cửa hàng đổi quà</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                    <i data-lucide="user" class="w-5 h-5"></i>
-                    <span class="font-medium text-sm">Hồ sơ cá nhân</span>
-                </a>
-            </nav>
-        </aside>
+        <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
+    <jsp:param name="activeMenu" value="loyalty" />
+</jsp:include>
 
         <!-- Main Content Area -->
         <main class="flex-1 md:ml-64 relative min-h-screen bg-bg-primary overflow-y-auto pb-24 md:pb-8">
@@ -68,10 +38,10 @@
                 <div class="flex items-center gap-3">
                     <div class="hidden sm:flex flex-col items-end mr-2">
                         <span class="text-xs text-text-muted">Xin chào,</span>
-                        <span class="text-sm font-bold text-white">${sessionScope.USER.fullName}</span>
+                        <span class="text-sm font-bold text-white">${sessionScope.CUSTOMER_INFO.fullName}</span>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-[#00d4ff]/20 border border-[#00d4ff] flex items-center justify-center text-[#00d4ff] font-bold">
-                        ${sessionScope.USER.fullName.substring(0,1)}
+                        ${sessionScope.CUSTOMER_INFO.fullName.substring(0,1)}
                     </div>
                 </div>
             </header>
@@ -214,27 +184,9 @@
         </main>
 
         <!-- Mobile Bottom Navigation (Chỉ hiện trên điện thoại) -->
-        <nav class="md:hidden fixed bottom-0 left-0 w-full glass-panel border-t border-border-glass z-50 px-2 py-2"
-            style="padding-bottom: env(safe-area-inset-bottom);" aria-label="Điều hướng chính Mobile">
-            <div class="flex justify-around items-center h-14">
-                <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-medium">Tổng quan</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/bookings" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                    <i data-lucide="calendar-plus" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-medium">Đặt lịch</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                    <i data-lucide="history" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-medium">Lịch sử</span>
-                </a>
-                <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-[#00d4ff]">
-                    <i data-lucide="award" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-medium">Cửa hàng đổi quà</span>
-                </a>
-            </div>
-        </nav>
+        <jsp:include page="/WEB-INF/views/components/customer_bottom_nav.jsp">
+    <jsp:param name="activeMenu" value="loyalty" />
+</jsp:include>
     </div>
 
     <!-- Redeem Confirmation Modal -->

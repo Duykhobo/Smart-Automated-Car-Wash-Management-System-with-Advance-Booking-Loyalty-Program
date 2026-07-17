@@ -32,7 +32,7 @@ public class QRScanServlet extends HttpServlet {
             boolean forceConfirmPayment = "true".equals(confirmPaymentStr);
             
             if (bookingIdStr == null || bookingIdStr.trim().isEmpty()) {
-                out.print("{\"status\":\"error\",\"message\":\"Thiếu mã Booking ID\"}");
+                out.print("{\"status\":\"error\",\"message\":\"Thieu ma Booking ID\"}");
                 return;
             }
             
@@ -41,7 +41,7 @@ public class QRScanServlet extends HttpServlet {
                 Booking booking = bookingDAO.getBookingById(bookingId);
                 
                 if (booking == null) {
-                    out.print("{\"status\":\"error\",\"message\":\"Không tìm thấy lịch hẹn này trong hệ thống.\"}");
+                    out.print("{\"status\":\"error\",\"message\":\"Khong tim thay lich hen nay (Not found).\"}");
                     return;
                 }
                 
@@ -49,11 +49,24 @@ public class QRScanServlet extends HttpServlet {
                 String paymentMethod = booking.getPaymentMethod();
                 String paymentStatus = booking.getPaymentStatus();
                 
-                if ("Pending".equals(currentStatus) || "Confirmed".equals(currentStatus)) {
+                if ("Pending".equals(currentStatus)) {
                     // Logic Lựa chọn 1: Thu tiền TRƯỚC
+                    dao.CustomerDAO customerDAO = new dao.CustomerDAO();
+                    dto.Customer customer = customerDAO.getCustomerById(booking.getCustomerId());
+                    String customerName = (customer != null) ? customer.getFullName() : "Khách hàng";
+
                     if ("Cash".equals(paymentMethod) && "Unpaid".equals(paymentStatus) && !forceConfirmPayment) {
                         // Yêu cầu thu tiền mặt
-                        out.print("{\"status\":\"require_payment\",\"amount\":" + booking.getFinalPrice() + "}");
+                        String safeCustomerName = customerName != null ? customerName.replace("\"", "\\\"") : "Khách hàng";
+                        String safePlate = booking.getLicensePlate() != null ? booking.getLicensePlate().replace("\"", "\\\"") : "";
+                        String safeService = booking.getServiceNames() != null ? booking.getServiceNames().replace("\"", "\\\"") : "";
+                        
+                        out.print("{\"status\":\"require_payment\","
+                                + "\"amount\":" + (booking.getFinalPrice() != null ? booking.getFinalPrice() : 0) + ","
+                                + "\"customerName\":\"" + safeCustomerName + "\","
+                                + "\"vehiclePlate\":\"" + safePlate + "\","
+                                + "\"serviceName\":\"" + safeService + "\""
+                                + "}");
                         return;
                     }
                     
@@ -62,36 +75,32 @@ public class QRScanServlet extends HttpServlet {
                         bookingDAO.updatePaymentStatus(bookingId, "Paid");
                     }
                     
-                    boolean success = bookingDAO.updateBookingStatus(bookingId, "InProgress");
+                    boolean success = bookingDAO.updateBookingStatus(bookingId, "Confirmed");
                     if (success) {
-                        out.print("{\"status\":\"success\",\"message\":\"Check-in thành công! Xe đang được rửa (InProgress).\"}");
+                        out.print("{\"status\":\"success\",\"message\":\"Check-in thanh cong!\"}");
                     } else {
-                        out.print("{\"status\":\"error\",\"message\":\"Lỗi cập nhật trạng thái.\"}");
+                        out.print("{\"status\":\"error\",\"message\":\"Update status failed.\"}");
                     }
+                } else if ("Confirmed".equals(currentStatus)) {
+                    out.print("{\"status\":\"error\",\"message\":\"Xe nay da check-in roi (Already Confirmed).\"}");
                 } else if ("InProgress".equals(currentStatus)) {
-                    // Xe đã rửa xong
-                    boolean success = bookingDAO.completeBookingTransaction(bookingId);
-                    if (success) {
-                        out.print("{\"status\":\"success\",\"message\":\"Tuyệt vời! Đã hoàn thành (Completed) và xe sẵn sàng giao khách.\"}");
-                    } else {
-                        out.print("{\"status\":\"error\",\"message\":\"Lỗi cập nhật trạng thái.\"}");
-                    }
+                    out.print("{\"status\":\"error\",\"message\":\"Xe dang duoc rua (In Progress).\"}");
                 } else {
-                    // Cac trang thai khac nhu Cancelled, NoShow, Completed, Waitlisted
                     if ("Completed".equals(currentStatus)) {
-                        out.print("{\"status\":\"error\",\"message\":\"Lịch hẹn này đã hoàn thành trước đó rồi.\"}");
+                        out.print("{\"status\":\"error\",\"message\":\"Lich hen da hoan thanh (Completed).\"}");
                     } else if ("Cancelled".equals(currentStatus)) {
-                        out.print("{\"status\":\"error\",\"message\":\"Lịch hẹn này đã bị Hủy, mã QR không còn hiệu lực.\"}");
+                        out.print("{\"status\":\"error\",\"message\":\"Lich hen nay da bi huy (Cancelled).\"}");
                     } else {
-                        out.print("{\"status\":\"error\",\"message\":\"Trạng thái hiện tại (" + currentStatus + ") không cho phép Check-in.\"}");
+                        out.print("{\"status\":\"error\",\"message\":\"Trang thai hien tai (" + currentStatus + ") khong cho phep Check-in.\"}");
                     }
                 }
                 
             } catch (NumberFormatException e) {
-                out.print("{\"status\":\"error\",\"message\":\"Mã Booking ID không hợp lệ.\"}");
+                out.print("{\"status\":\"error\",\"message\":\"Ma Booking ID khong hop le (Invalid ID).\"}");
             } catch (SQLException ex) {
                 Logger.getLogger(QRScanServlet.class.getName()).log(Level.SEVERE, null, ex);
-                out.print("{\"status\":\"error\",\"message\":\"Lỗi cơ sở dữ liệu.\"}");
+                String safeEx = ex.getMessage() != null ? ex.getMessage().replace("\"", "\\\"").replace("\n", " ") : "Unknown Error";
+                out.print("{\"status\":\"error\",\"message\":\"DB Error: " + safeEx + "\"}");
             }
         }
     }

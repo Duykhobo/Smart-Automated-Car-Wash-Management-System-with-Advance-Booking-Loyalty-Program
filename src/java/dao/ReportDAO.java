@@ -1,118 +1,101 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import utils.DBContext;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utils.DBContext;
 
 public class ReportDAO {
-
     private static final Logger LOGGER = Logger.getLogger(ReportDAO.class.getName());
 
-    public double getTodayTotalRevenue() {
-        double total = 0;
-        String sql = "SELECT ISNULL(SUM(FinalPrice), 0) FROM Bookings "
-                + "WHERE CAST(BookingDate AS DATE) = CAST(GETDATE() AS DATE) "
-                + "AND Status = 'Completed'";
-        try ( Connection conn = DBContext.getConnection();  PreparedStatement st = conn.prepareStatement(sql);  ResultSet rs = st.executeQuery()) {
-            if (rs.next()) {
-                total = rs.getDouble(1);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching today's revenue", e);
-        }
-        return total;
+    public double getRevenueThisMonth() {
+        String sql = "SELECT SUM(FinalPrice) AS Revenue FROM Bookings WHERE Status = 'Completed' AND MONTH(BookingDate) = MONTH(GETDATE()) AND YEAR(BookingDate) = YEAR(GETDATE())";
+        return fetchDoubleValue(sql);
     }
 
-    public int getTodayTotalBooking() {
-        int count = 0;
-        String sql = "SELECT COUNT(*) FROM Bookings "
-                + "WHERE CAST(BookingDate AS DATE) = CAST(GETDATE() AS DATE)";
-        try ( Connection cn = DBContext.getConnection();  
-                PreparedStatement st = cn.prepareStatement(sql);  
-                ResultSet rs = st.executeQuery()) {
-            if(rs.next()){
-                count = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching pending bookings count", e);
-        }
-        return count;
+    public double getRevenueLastMonth() {
+        String sql = "SELECT SUM(FinalPrice) AS Revenue FROM Bookings WHERE Status = 'Completed' AND MONTH(BookingDate) = MONTH(DATEADD(month, -1, GETDATE())) AND YEAR(BookingDate) = YEAR(DATEADD(month, -1, GETDATE()))";
+        return fetchDoubleValue(sql);
     }
-    // Đếm số đơn đang chờ xử lý
+
+    public int getWashesToday() {
+        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(BookingDate AS DATE) = CAST(GETDATE() AS DATE)";
+        return fetchIntValue(sql);
+    }
+
+    public int getWashesYesterday() {
+        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(BookingDate AS DATE) = CAST(DATEADD(day, -1, GETDATE()) AS DATE)";
+        return fetchIntValue(sql);
+    }
+
     public int getPendingBookingsCount() {
-        int count = 0;
-        String sql = "SELECT COUNT(*) FROM Bookings WHERE Status = 'Pending'";
-        try (Connection cn = DBContext.getConnection();
-            PreparedStatement st = cn.prepareStatement(sql);
-            ResultSet rs = st.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching pending bookings count", e);
-        }
-        return count;
-    }
-    // Lấy doanh thu 7 ngày gần nhất (dùng CTE để không bị thiếu ngày)
-    public List<Double> getRevenueLast7Days() {
-        List<Double> revenues = new ArrayList<>();
-        String sql = "WITH Last7Days AS ("
-                   + "    SELECT CAST(GETDATE() - 6 AS DATE) AS Date "
-                   + "    UNION ALL "
-                   + "    SELECT DATEADD(day, 1, Date) FROM Last7Days "
-                   + "    WHERE Date < CAST(GETDATE() AS DATE)"
-                   + ") "
-                   + "SELECT d.Date, ISNULL(SUM(b.FinalPrice), 0) AS Revenue "
-                   + "FROM Last7Days d "
-                   + "LEFT JOIN Bookings b ON CAST(b.BookingDate AS DATE) = d.Date "
-                   + "AND b.Status = 'Completed' "
-                   + "GROUP BY d.Date "
-                   + "ORDER BY d.Date ASC";
-        try (Connection cn = DBContext.getConnection();
-            PreparedStatement st = cn.prepareStatement(sql);
-            ResultSet rs = st.executeQuery()) {
-            while (rs.next()) {
-                revenues.add(rs.getDouble("Revenue"));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching revenue last 7 days", e);
-            // Fallback: trả mảng 7 số 0 để biểu đồ không sập
-            for (int i = 0; i < 7; i++) revenues.add(0.0);
-        }
-        return revenues;
-    }
-    // Lấy nhãn ngày (dd/MM) cho 7 ngày gần nhất
-    public List<String> getLabelsLast7Days() {
-        List<String> labels = new ArrayList<>();
-        String sql = "WITH Last7Days AS ("
-                   + "    SELECT CAST(GETDATE() - 6 AS DATE) AS Date "
-                   + "    UNION ALL "
-                   + "    SELECT DATEADD(day, 1, Date) FROM Last7Days "
-                   + "    WHERE Date < CAST(GETDATE() AS DATE)"
-                   + ") "
-                   + "SELECT FORMAT(Date, 'dd/MM') AS Label "
-                   + "FROM Last7Days ORDER BY Date ASC";
-        try (Connection cn = DBContext.getConnection();
-            PreparedStatement st = cn.prepareStatement(sql);
-            ResultSet rs = st.executeQuery()) {
-            while (rs.next()) {
-                labels.add(rs.getString("Label"));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching labels last 7 days", e);
-            for (int i = 0; i < 7; i++) labels.add("");
-        }
-        return labels;
+        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Pending'";
+        return fetchIntValue(sql);
     }
 
+    public Map<String, Double> getRevenueLast7Days() {
+        Map<String, Double> revenueMap = new LinkedHashMap<>();
+        // Initialize map with 0.0 for the last 7 days
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+        for (int i = 6; i >= 0; i--) {
+            revenueMap.put(today.minusDays(i).format(formatter), 0.0);
+        }
+
+        String sql = "SELECT CAST(BookingDate AS DATE) as DateValue, SUM(FinalPrice) as Revenue " +
+                     "FROM Bookings " +
+                     "WHERE Status = 'Completed' AND BookingDate >= CAST(DATEADD(day, -6, GETDATE()) AS DATE) " +
+                     "GROUP BY CAST(BookingDate AS DATE)";
+        
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            
+            while (rs.next()) {
+                Date sqlDate = rs.getDate("DateValue");
+                double rev = rs.getDouble("Revenue");
+                if (sqlDate != null) {
+                    String dateStr = sqlDate.toLocalDate().format(formatter);
+                    if (revenueMap.containsKey(dateStr)) {
+                        revenueMap.put(dateStr, rev);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching 7 days revenue", e);
+        }
+        return revenueMap;
+    }
+
+    private double fetchDoubleValue(String sql) {
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching double value", e);
+        }
+        return 0.0;
+    }
+
+    private int fetchIntValue(String sql) {
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching int value", e);
+        }
+        return 0;
+    }
 }

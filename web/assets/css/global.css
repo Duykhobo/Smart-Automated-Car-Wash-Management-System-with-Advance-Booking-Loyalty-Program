@@ -104,3 +104,39 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
     caret-color: white;
 }
+
+/* TomSelect Custom Glassmorphism Styles */
+.ts-wrapper.custom-select .ts-control {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 0.75rem !important;
+  color: #fff !important;
+  padding: 0.75rem 1rem !important;
+  box-shadow: none !important;
+}
+.ts-wrapper.custom-select.focus .ts-control {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 10px rgba(0,212,255,0.1) !important;
+}
+.ts-wrapper.custom-select .ts-dropdown {
+  background: #0b0f1a !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 0.75rem !important;
+  color: #fff !important;
+  margin-top: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+.ts-wrapper.custom-select .ts-dropdown .option {
+  padding: 0.5rem 1rem !important;
+}
+.ts-wrapper.custom-select .ts-dropdown .option.active, .ts-wrapper.custom-select .ts-dropdown .option:hover {
+  background: rgba(0,212,255,0.1) !important;
+  color: #00d4ff !important;
+}
+.ts-wrapper.custom-select .ts-control input {
+  color: #fff !important;
+}
+.ts-wrapper.custom-select .ts-dropdown .create {
+  background: rgba(0,212,255,0.1) !important;
+  color: #00d4ff !important;
+}

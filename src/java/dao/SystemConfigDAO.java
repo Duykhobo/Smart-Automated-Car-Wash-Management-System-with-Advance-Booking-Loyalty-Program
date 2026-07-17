@@ -138,6 +138,18 @@ public class SystemConfigDAO {
     }
 
     /**
+     * Lấy sức chứa tối đa của mỗi slot.
+     */
+    public int getMaxSlotCapacity() {
+        try {
+            String val = getConfigValue("MaxSlotCapacity");
+            return val != null ? Integer.parseInt(val) : 3;
+        } catch (Exception e) {
+            return 3;
+        }
+    }
+
+    /**
      * Cập nhật giá trị cấu hình. Nếu chưa có thì Insert, nếu có rồi thì Update.
      */
     public boolean updateConfigValue(String key, String value) {
@@ -165,6 +177,40 @@ public class SystemConfigDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating system config", e);
             return false;
+        }
+    }
+
+    /**
+     * Cập nhật MaxCapacity cho các slot trong tương lai (từ hôm nay trở đi)
+     * khi Admin thay đổi cấu hình sức chứa tối đa.
+     */
+    public void updateFutureSlotCapacities(int newCapacity) {
+        String sql = "UPDATE BookingSlotCapacity SET MaxCapacity = ? WHERE SlotDate >= CAST(GETDATE() AS DATE)";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, newCapacity);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating future slot capacities", e);
+        }
+    }
+
+    /**
+     * Đồng bộ hệ số điểm thưởng của hạng thành viên xuống bảng MemberTiers
+     */
+    public void updateTierMultiplier(String tierName, double multiplier) {
+        // multiplier trên UI là 1.1, 1.2, 1.3... Trong DB PointsModifier = multiplier - 1.0 (VD: 0.1, 0.2, 0.3)
+        double modifier = multiplier - 1.0;
+        if (modifier < 0) modifier = 0; // Đảm bảo không âm
+        
+        String sql = "UPDATE MemberTiers SET PointsModifier = ? WHERE TierName = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setDouble(1, modifier);
+            st.setString(2, tierName);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating tier multiplier for " + tierName, e);
         }
     }
 }

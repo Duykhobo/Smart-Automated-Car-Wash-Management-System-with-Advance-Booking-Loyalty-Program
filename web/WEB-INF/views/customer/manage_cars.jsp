@@ -12,40 +12,9 @@
 <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
-    <aside class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
-        <a href="${pageContext.request.contextPath}/account/dashboard" class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-            <span class="text-xl font-display font-bold tracking-tight text-white">AUTOWASH<span class="text-[#00d4ff]">PRO</span></span>
-        </a>
-        
-        <nav class="flex-1 px-4 py-4 space-y-2 mt-4">
-            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Tổng quan</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/bookings" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Đặt lịch dịch vụ</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                <i data-lucide="history" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Lịch sử rửa xe</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/vehicles" class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
-                <i data-lucide="car" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Quản lý xe</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                <i data-lucide="award" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Cửa hàng đổi quà</span>
-            </a>
-
-            <a href="${pageContext.request.contextPath}/account/profile" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                <i data-lucide="user" class="w-5 h-5"></i>
-                <span class="font-medium text-sm">Hồ sơ cá nhân</span>
-            </a>
-        </nav>
-    </aside>
+    <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
+    <jsp:param name="activeMenu" value="vehicles" />
+</jsp:include>
 
     <main class="flex-1 md:ml-64 relative min-h-screen pb-[120px] md:pb-8 bg-bg-primary">
         <header class="sticky top-0 z-20 glass-panel border-b border-border-glass px-4 md:px-8 py-4 flex items-center justify-between">
@@ -176,30 +145,9 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-border-glass z-40 pb-safe">
-        <div class="flex items-center justify-around p-2">
-            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Tổng quan</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/bookings" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
-                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Đặt lịch</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/vehicles" class="flex flex-col items-center gap-1 p-2 text-[#00d4ff]">
-                <i data-lucide="car" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"></i>
-                <span class="text-[10px] font-medium">Xe của tôi</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                                        <i data-lucide="award" class="w-6 h-6"></i>
-                                        <span class="text-[10px] font-medium">Đổi quà</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/account/profile" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
-                <i data-lucide="user" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Cá nhân</span>
-            </a>
-        </div>
-    </nav>
+    <jsp:include page="/WEB-INF/views/components/customer_bottom_nav.jsp">
+    <jsp:param name="activeMenu" value="vehicles" />
+</jsp:include>
 
     <!-- Car Modal Wrapper -->
     <div id="carModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md px-4">
@@ -229,74 +177,68 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium ml-1">Hãng xe *</label>
-                        <select id="modalBrandSelect" onchange="handleBrandChange()" required class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all cursor-pointer appearance-none">
-                            <option value="" class="bg-[#0b0f1a]">Chọn hãng</option>
-                            <option value="Toyota" class="bg-[#0b0f1a]">Toyota</option>
-                            <option value="Honda" class="bg-[#0b0f1a]">Honda</option>
-                            <option value="Hyundai" class="bg-[#0b0f1a]">Hyundai</option>
-                            <option value="Kia" class="bg-[#0b0f1a]">Kia</option>
-                            <option value="Mazda" class="bg-[#0b0f1a]">Mazda</option>
-                            <option value="Ford" class="bg-[#0b0f1a]">Ford</option>
-                            <option value="Mitsubishi" class="bg-[#0b0f1a]">Mitsubishi</option>
-                            <option value="VinFast" class="bg-[#0b0f1a]">VinFast</option>
-                            <option value="Suzuki" class="bg-[#0b0f1a]">Suzuki</option>
-                            <option value="Mercedes-Benz" class="bg-[#0b0f1a]">Mercedes-Benz</option>
-                            <option value="BMW" class="bg-[#0b0f1a]">BMW</option>
-                            <option value="Audi" class="bg-[#0b0f1a]">Audi</option>
-                            <option value="Khác" class="bg-[#0b0f1a]">Khác...</option>
+                        <select id="modalBrand" name="brand" required class="custom-select" data-create="true" placeholder="Chọn hoặc nhập hãng xe">
+                            <option value="">Chọn hãng</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="VinFast">VinFast</option>
+                            <option value="Suzuki">Suzuki</option>
+                            <option value="Mercedes-Benz">Mercedes-Benz</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Audi">Audi</option>
                         </select>
-                        <input type="hidden" id="modalBrand" name="brand" value="">
-                        <input type="text" id="modalBrandOther" placeholder="Hãng khác..." oninput="updateBrandHiddenValue()" class="hidden mt-2 w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all">
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium ml-1">Dòng xe *</label>
-                        <input type="text" list="carModels" id="modalModel" name="model" placeholder="VD: Civic" required class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all">
-                        <datalist id="carModels">
-                            <option value="Vios">
-                            <option value="City">
-                            <option value="Mazda 3">
-                            <option value="Cerato">
-                            <option value="CX-5">
-                            <option value="CR-V">
-                            <option value="Ranger">
-                            <option value="Everest">
-                            <option value="Santa Fe">
-                            <option value="Tucson">
-                            <option value="Accent">
-                            <option value="Fadil">
-                            <option value="Camry">
-                            <option value="Innova">
-                            <option value="Xpander">
-                        </datalist>
+                        <select id="modalModel" name="model" required class="custom-select" data-create="true" placeholder="Chọn hoặc nhập dòng xe">
+                            <option value="">Chọn dòng xe</option>
+                            <option value="Vios">Vios</option>
+                            <option value="City">City</option>
+                            <option value="Mazda 3">Mazda 3</option>
+                            <option value="Cerato">Cerato</option>
+                            <option value="CX-5">CX-5</option>
+                            <option value="CR-V">CR-V</option>
+                            <option value="Ranger">Ranger</option>
+                            <option value="Everest">Everest</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="Tucson">Tucson</option>
+                            <option value="Accent">Accent</option>
+                            <option value="Fadil">Fadil</option>
+                            <option value="Camry">Camry</option>
+                            <option value="Innova">Innova</option>
+                            <option value="Xpander">Xpander</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium ml-1">Loại xe *</label>
-                        <select id="modalType" name="vehicleTypeId" class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all cursor-pointer appearance-none">
+                        <select id="modalType" name="vehicleTypeId" class="custom-select" placeholder="Chọn loại xe">
                             <c:forEach var="vType" items="${vehicleTypes}">
-                                <option value="${vType.vehicleTypeId}" class="bg-[#0b0f1a]">${vType.typeName}</option>
+                                <option value="${vType.vehicleTypeId}">${vType.typeName}</option>
                             </c:forEach>
                         </select>
                     </div>
                     <div class="space-y-1.5">
                         <label class="text-gray-300 text-sm font-medium ml-1">Màu sắc *</label>
-                        <select id="modalColorSelect" onchange="handleColorChange()" required class="w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all cursor-pointer appearance-none">
-                            <option value="" class="bg-[#0b0f1a]">Chọn màu sắc</option>
-                            <option value="Trắng" class="bg-[#0b0f1a]">Trắng</option>
-                            <option value="Đen" class="bg-[#0b0f1a]">Đen</option>
-                            <option value="Bạc" class="bg-[#0b0f1a]">Bạc</option>
-                            <option value="Xám" class="bg-[#0b0f1a]">Xám</option>
-                            <option value="Đỏ" class="bg-[#0b0f1a]">Đỏ</option>
-                            <option value="Xanh dương" class="bg-[#0b0f1a]">Xanh dương</option>
-                            <option value="Xanh lá" class="bg-[#0b0f1a]">Xanh lá</option>
-                            <option value="Nâu" class="bg-[#0b0f1a]">Nâu</option>
-                            <option value="Vàng" class="bg-[#0b0f1a]">Vàng</option>
-                            <option value="Khác" class="bg-[#0b0f1a]">Khác...</option>
+                        <select id="modalColor" name="color" required class="custom-select" data-create="true" placeholder="Chọn hoặc nhập màu">
+                            <option value="">Chọn màu sắc</option>
+                            <option value="Trắng">Trắng</option>
+                            <option value="Đen">Đen</option>
+                            <option value="Bạc">Bạc</option>
+                            <option value="Xám">Xám</option>
+                            <option value="Đỏ">Đỏ</option>
+                            <option value="Xanh dương">Xanh dương</option>
+                            <option value="Xanh lá">Xanh lá</option>
+                            <option value="Nâu">Nâu</option>
+                            <option value="Vàng">Vàng</option>
                         </select>
-                        <input type="hidden" id="modalColor" name="color" value="">
-                        <input type="text" id="modalColorOther" placeholder="Nhập màu khác..." oninput="updateColorHiddenValue()" class="hidden mt-2 w-full bg-black/20 border border-border-glass text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[#00d4ff] focus:shadow-[0_0_10px_rgba(0,212,255,0.1)] transition-all">
                     </div>
                 </div>
 

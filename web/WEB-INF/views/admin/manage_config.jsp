@@ -2,16 +2,16 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <title>Cấu Hình Hệ Thống - AutoWash Pro</title>
-    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
-</head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+    <head>
+        <title>Cấu Hình Hệ Thống - AutoWash Pro</title>
+        <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    </head>
+    <body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
 
-    <!-- Sidebar Component -->
-    <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
-        <jsp:param name="activeMenu" value="config" />
-    </jsp:include>
+        <!-- Sidebar Component -->
+        <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
+            <jsp:param name="activeMenu" value="config" />
+        </jsp:include>
 
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
@@ -72,15 +72,14 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-6">
-                <!-- Settings Panel: Điểm Thưởng & Hạng Thẻ -->
-                <div class="glass-panel p-6 rounded-2xl border border-border-glass bg-bg-surface flex-1">
-                    <div class="flex items-center gap-3 mb-6 border-b border-border-glass pb-4">
-                        <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
-                            <i data-lucide="crown" class="w-5 h-5 text-amber-400"></i>
+                    <!-- Settings Panel: Vận Hành Trạm -->
+                    <div class="glass-panel p-6 rounded-2xl border border-border-glass bg-bg-surface">
+                        <div class="flex items-center gap-3 mb-6 border-b border-border-glass pb-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                <i data-lucide="factory" class="w-5 h-5 text-blue-400"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Vận Hành Trạm</h3>
                         </div>
-                        <h3 class="text-xl font-bold text-white">Chính Sách Loyalty</h3>
-                    </div>
 
                     <div class="space-y-6">
                         <div>
@@ -92,6 +91,7 @@
                                 <span class="text-text-muted">điểm</span>
                             </div>
                         </div>
+                    </div>
 
                         <div class="border-t border-border-glass pt-4">
                             <label class="block text-sm font-medium text-slate-300 mb-3">Hệ số cộng điểm theo Hạng</label>
@@ -110,22 +110,27 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Settings Panel: Danger Zone -->
-                <div class="glass-panel p-6 rounded-2xl border border-red-500/20 bg-red-500/5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-red-400">Danger Zone</h3>
-                    </div>
-                    
-                    <div class="flex items-center justify-between p-4 bg-black/40 rounded-xl border border-red-500/20">
-                        <div>
-                            <p class="font-medium text-white">Chế độ Bảo Trì (Maintenance Mode)</p>
-                            <p class="text-xs text-slate-400 mt-1">Khóa toàn bộ chức năng đặt lịch của khách hàng. Chỉ bật khi trạm gặp sự cố.</p>
+                        <!-- Settings Panel: Danger Zone -->
+                        <div class="glass-panel p-6 rounded-2xl border border-red-500/20 bg-red-500/5">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-red-400">Danger Zone</h3>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-black/40 rounded-xl border border-red-500/20">
+                                <div>
+                                    <p class="font-medium text-white">Chế độ Bảo Trì (Maintenance Mode)</p>
+                                    <p class="text-xs text-slate-400 mt-1">Khóa toàn bộ chức năng đặt lịch của khách hàng. Chỉ bật khi trạm gặp sự cố.</p>
+                                </div>
+                                <!-- Toggle Switch -->
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="MaintenanceMode" value="on" class="sr-only peer" ${config['MaintenanceMode'] == 'on' ? 'checked' : ''}>
+                                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                </label>
+                            </div>
                         </div>
                         <!-- Toggle Switch -->
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -134,7 +139,7 @@
                         </label>
                     </div>
                 </div>
-            </div>
+            </form>
 
         </form>
     </main>

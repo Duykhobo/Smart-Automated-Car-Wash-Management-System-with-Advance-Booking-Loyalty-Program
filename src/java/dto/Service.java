@@ -15,7 +15,9 @@ public class Service {
     private Double basePrice;
     private int durationMinutes;
     private boolean isActive;
-
+        private double priceSedan;
+    private double priceSuv;
+    private double priceXlarge;
     private java.sql.Timestamp inactiveFromDate;
 
     public Service() {
@@ -86,4 +88,28 @@ public class Service {
         this.inactiveFromDate = inactiveFromDate;
     }
 
+    public double getPriceSedan() {
+        return priceSedan;
+    }
+
+    public void setPriceSedan(double priceSedan) {
+        this.priceSedan = priceSedan;
+    }
+
+    public double getPriceSuv() {
+        return priceSuv;
+    }
+
+    public void setPriceSuv(double priceSuv) {
+        this.priceSuv = priceSuv;
+    }
+
+    public double getPriceXlarge() {
+        return priceXlarge;
+    }
+
+    public void setPriceXlarge(double priceXlarge) {
+        this.priceXlarge = priceXlarge;
+    }
+    
 }

@@ -45,7 +45,7 @@ public class ApplyVoucherServlet extends HttpServlet {
                 out.print("{\"valid\": false, \"message\": \"Mã Voucher không hợp lệ hoặc đã hết hạn.\"}");
             } else {
                 // Voucher is valid
-                out.print("{\"valid\": true, \"rewardType\": \"" + voucher.getRewardType() + "\", \"message\": \"Áp dụng Voucher thành công!\"}");
+                out.print("{\"valid\": true, \"rewardType\": \"" + voucher.getRewardType() + "\", \"discountPercent\": " + voucher.getDiscountPercent() + ", \"message\": \"Áp dụng Voucher thành công!\"}");
             }
         } catch (Exception ex) {
             Logger.getLogger(ApplyVoucherServlet.class.getName()).log(Level.SEVERE, null, ex);

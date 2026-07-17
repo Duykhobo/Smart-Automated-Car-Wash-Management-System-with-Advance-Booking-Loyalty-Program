@@ -51,9 +51,14 @@ public class RedeemVoucherServlet extends HttpServlet {
             if (pointsCost <= 0) {
                 throw new Exception("Số điểm đổi voucher không hợp lệ.");
             }
+            dao.RewardCatalogDAO rcDao = new dao.RewardCatalogDAO();
+            dto.RewardCatalog reward = rcDao.getRewardByType(rewardType);
+            if (reward == null) {
+                throw new Exception("Không tìm thấy phần thưởng này.");
+            }
 
             VoucherDAO dao = new VoucherDAO();
-            dao.redeemVoucher(customerID, rewardType, pointsCost);
+            dao.redeemVoucher(customerID, rewardType, pointsCost, reward.getDiscountPercent());
             cus.setPointsBalance(cus.getPointsBalance() - pointsCost);
 
             session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);

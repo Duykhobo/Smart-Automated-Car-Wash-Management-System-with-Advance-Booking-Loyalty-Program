@@ -19,11 +19,12 @@ public class Voucher {
     private int pointsCost;
     private Date expiryDate;
     private String status;
+    private double discountPercent;
 
     public Voucher() {
     }
 
-    public Voucher(int voucherId, int customerId, String voucherCode, String rewardType, int pointsCost, Date expiryDate, String status) {
+    public Voucher(int voucherId, int customerId, String voucherCode, String rewardType, int pointsCost, Date expiryDate, String status, double discountPercent) {
         this.voucherId = voucherId;
         this.customerId = customerId;
         this.voucherCode = voucherCode;
@@ -31,6 +32,15 @@ public class Voucher {
         this.pointsCost = pointsCost;
         this.expiryDate = expiryDate;
         this.status = status;
+        this.discountPercent = discountPercent;
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = discountPercent;
     }
 
     public int getVoucherId() {

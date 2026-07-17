@@ -346,6 +346,7 @@
         const priceDisplay = document.getElementById('totalPriceDisplay');
 
         let appliedRewardType = null;
+        let appliedDiscountPercent = 0;
         
         function updatePrice() {
             // Xác định Kích cỡ Xe hiện tại
@@ -403,8 +404,15 @@
             
             // Voucher logic
             let discountAmount = 0;
-            if (appliedRewardType && appliedRewardType.endsWith('_PERCENT_OFF')) {
+            if (appliedDiscountPercent > 0) {
+                discountAmount = totalPrice * (appliedDiscountPercent / 100.0);
+            } else if (appliedRewardType && appliedRewardType.endsWith('_PERCENT_OFF')) {
                 let percent = parseFloat(appliedRewardType.replace('_PERCENT_OFF', ''));
+                if (!isNaN(percent)) {
+                    discountAmount = totalPrice * (percent / 100.0);
+                }
+            } else if (appliedRewardType && appliedRewardType.startsWith('PERCENT_')) {
+                let percent = parseFloat(appliedRewardType.replace('PERCENT_', ''));
                 if (!isNaN(percent)) {
                     discountAmount = totalPrice * (percent / 100.0);
                 }
@@ -505,11 +513,13 @@
                         if (data.valid) {
                             showToast(data.message, 'success');
                             appliedRewardType = data.rewardType;
+                            appliedDiscountPercent = data.discountPercent || 0;
                             voucherInput.classList.add('border', 'border-green-500', 'text-green-400');
                             updatePrice();
                         } else {
                             showToast(data.message, 'error');
                             appliedRewardType = null;
+                            appliedDiscountPercent = 0;
                             voucherInput.classList.remove('border-green-500', 'text-green-400');
                             updatePrice();
                         }

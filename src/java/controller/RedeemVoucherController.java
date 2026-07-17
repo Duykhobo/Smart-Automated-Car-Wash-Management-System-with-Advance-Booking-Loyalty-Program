@@ -53,7 +53,7 @@ public class RedeemVoucherController extends HttpServlet {
             
             // 3. Redeem
             VoucherDAO voucherDAO = new VoucherDAO();
-            voucherDAO.redeemVoucher(cus.getCustomerId(), reward.getRewardType(), reward.getPointsCost());
+            voucherDAO.redeemVoucher(cus.getCustomerId(), reward.getRewardType(), reward.getPointsCost(), reward.getDiscountPercent());
             
             session.setAttribute(AppConstants.SESSION_MSG_SUCCESS, "Đổi mã " + reward.getRewardName() + " thành công!");
             

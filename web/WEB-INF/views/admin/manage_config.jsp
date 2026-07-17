@@ -46,9 +46,9 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-300 mb-2">Giờ Mở/Đóng Cửa</label>
                                 <div class="flex items-center gap-4">
-                                    <input type="time" name="OpeningHour" value="${empty config['OpeningHour'] ? '08:00' : (config['OpeningHour'].length() == 1 ? '0' : '').concat(config['OpeningHour']).concat(':00')}" class="flex-1 ...">
+                                    <input type="time" name="OpeningHour" value="${empty config['OpeningHour'] ? '08:00' : (config['OpeningHour'].length() == 1 ? '0' : '').concat(config['OpeningHour']).concat(':00')}" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
                                     <span class="text-text-muted">đến</span>
-                                    <input type="time" name="ClosingHour" value="${empty config['ClosingHour'] ? '22:00' : (config['ClosingHour'].length() == 1 ? '0' : '').concat(config['ClosingHour']).concat(':00')}" class="flex-1 ...">
+                                    <input type="time" name="ClosingHour" value="${empty config['ClosingHour'] ? '22:00' : (config['ClosingHour'].length() == 1 ? '0' : '').concat(config['ClosingHour']).concat(':00')}" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
                                 </div>
                                 <p class="text-xs text-text-muted mt-2">Hệ thống Booking sẽ khóa các khung giờ ngoài khoảng thời gian này.</p>
                             </div>

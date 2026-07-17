@@ -39,9 +39,9 @@ public class AdminDashboardServlet extends HttpServlet {
             labelJS.append("]");
             
             request.setAttribute("todayRevenue", todayRevenue);
-            request.setAttribute("todayBooking", todayBooking);
-            request.setAttribute("pendingBooking", pendingBooking);
-            request.setAttribute("chartLabel", labelJS.toString());
+            request.setAttribute("todayBookings", todayBooking);
+            request.setAttribute("pendingBookings", pendingBooking);
+            request.setAttribute("chartLabels", labelJS.toString());
             request.setAttribute("chartData", revenue.toString());
             
         }catch(Exception e){

@@ -34,48 +34,53 @@ public class AdminConfigServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             SystemConfigDAO d = new SystemConfigDAO();
+            boolean success = true;
 
             String openingHour = request.getParameter("OpeningHour");
             if (openingHour != null && openingHour.contains(":")) {
                 String hour = String.valueOf(Integer.parseInt(openingHour.split(":")[0]));
-                d.updateConfigValue("OpeningHour", hour);
+                success &= d.updateConfigValue("OpeningHour", hour);
             }
             
             String closingHour = request.getParameter("ClosingHour");
-            if(closingHour != null && closingHour.contains(":")){
+            if (closingHour != null && closingHour.contains(":")) {
                 String closed = String.valueOf(Integer.parseInt(closingHour.split(":")[0]));
-                d.updateConfigValue("ClosingHour", closed);
+                success &= d.updateConfigValue("ClosingHour", closed);
             }
             
             String maxCapacity = request.getParameter("MaxCapacity");
-            if(maxCapacity != null) d.updateConfigValue("MaxCapacity", maxCapacity);
+            if (maxCapacity != null) success &= d.updateConfigValue("MaxCapacity", maxCapacity);
             
             String gracePeriod = request.getParameter("GracePeriod");
-            if(gracePeriod != null) d.updateConfigValue("GracePeriod", gracePeriod);
+            if (gracePeriod != null) success &= d.updateConfigValue("GracePeriod", gracePeriod);
             
             String pointPerCurrencyUnit = request.getParameter("PointsPerCurrencyUnit");
-            if(pointPerCurrencyUnit != null) d.updateConfigValue("PointsPerCurrencyUnit", pointPerCurrencyUnit);
+            if (pointPerCurrencyUnit != null) success &= d.updateConfigValue("PointsPerCurrencyUnit", pointPerCurrencyUnit);
             
             String silverMultiplier = request.getParameter("SilverMultiplier");
-            if(silverMultiplier != null) d.updateConfigValue("SilverMultiplier", silverMultiplier);
+            if (silverMultiplier != null) success &= d.updateConfigValue("SilverMultiplier", silverMultiplier);
             
             String goldMultiplier = request.getParameter("GoldMultiplier");
-            if(goldMultiplier != null) d.updateConfigValue("GoldMultiplier", goldMultiplier);
+            if (goldMultiplier != null) success &= d.updateConfigValue("GoldMultiplier", goldMultiplier);
             
             String platinumMultiplier = request.getParameter("PlatinumMultiplier");
-            if(platinumMultiplier != null) d.updateConfigValue("PlatinumMultiplier", platinumMultiplier);
+            if (platinumMultiplier != null) success &= d.updateConfigValue("PlatinumMultiplier", platinumMultiplier);
             
             String MaintenanceMode = request.getParameter("MaintenanceMode");
-            if(MaintenanceMode != null){
-                d.updateConfigValue("MaintenanceMode", "on");
-            }else{
-                d.updateConfigValue("MaintenanceMode", "off");
+            if (MaintenanceMode != null) {
+                success &= d.updateConfigValue("MaintenanceMode", "on");
+            } else {
+                success &= d.updateConfigValue("MaintenanceMode", "off");
             }
             
-            request.getSession().setAttribute("SUCCESS", "Cập nhật cấu hình thành công");
+            if (success) {
+                request.getSession().setAttribute("SUCCESS", "Cập nhật cấu hình thành công");
+            } else {
+                request.getSession().setAttribute("ERROR", "Có lỗi xảy ra khi cập nhật một số cấu hình");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            request.getSession().setAttribute("ERROR", "Lỗi cập nhật cấu hình");
+            request.getSession().setAttribute("ERROR", "Lỗi cập nhật cấu hình: " + e.getMessage());
         }
         response.sendRedirect(request.getContextPath() + "/admin/config");
     }

@@ -142,7 +142,7 @@ public class SystemConfigDAO {
      */
     public boolean updateConfigValue(String key, String value) {
         // Cố gắng update trước
-        String updateSql = "UPDATE [SystemConfig] SET [ConfigValue] = ?, [UpdatedAt] = GETDATE() WHERE [ConfigKey] = ?";
+        String updateSql = "UPDATE [SystemConfig] SET [ConfigValue] = ? WHERE [ConfigKey] = ?";
         String insertSql = "INSERT INTO [SystemConfig] ([ConfigKey], [ConfigValue]) VALUES (?, ?)";
         
         try (Connection cn = DBContext.getConnection();

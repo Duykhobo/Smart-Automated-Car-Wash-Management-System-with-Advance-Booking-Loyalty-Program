@@ -493,7 +493,7 @@
         }
     </script>
 
-<jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+
     <!-- Edit Tier Modal (Cấu hình Hạng thẻ - Đồng bộ) -->
     <div id="editTierModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-all">
         <div class="glass-panel w-full max-w-md bg-bg-surface border border-border-glass rounded-2xl p-6 relative shadow-[0_0_50px_rgba(0,0,0,0.8)]">

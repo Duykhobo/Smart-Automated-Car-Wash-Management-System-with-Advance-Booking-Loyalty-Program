@@ -127,6 +127,7 @@ CREATE TABLE Services (
     DurationMinutes INT DEFAULT 30,
     IsActive BIT DEFAULT 1,
     InactiveFromDate DATETIME NULL,
+    ServiceType VARCHAR(20) DEFAULT 'Main' NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
 );
@@ -649,49 +650,3 @@ BEGIN
 END
 GO
 
--- ==============================================================
--- TRIGGER: TỰ ĐỘNG BỐC NGƯỜI TỪ WAITLIST LÊN KHI CÓ NGƯỜI HỦY
--- ==============================================================
-IF OBJECT_ID('dbo.trg_AutoPromoteWaitlist') IS NOT NULL DROP TRIGGER dbo.trg_AutoPromoteWaitlist;
-GO
-CREATE TRIGGER trg_AutoPromoteWaitlist
-ON Bookings
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    IF UPDATE(Status)
-    BEGIN
-        DECLARE @BookingDate DATE, @ScheduledTime TIME, @OldStatus VARCHAR(20), @NewStatus VARCHAR(20);
-        
-        SELECT @OldStatus = d.Status, @NewStatus = i.Status, 
-               @BookingDate = i.BookingDate, @ScheduledTime = i.ScheduledTime
-        FROM deleted d INNER JOIN inserted i ON d.BookingID = i.BookingID;
-
-        IF @OldStatus = 'Pending' AND @NewStatus = 'Cancelled'
-        BEGIN
-            DECLARE @LuckyBookingID INT;
-            
-            SELECT TOP 1 @LuckyBookingID = b.BookingID
-            FROM Bookings b
-            JOIN Customers c ON b.CustomerID = c.CustomerID
-            JOIN MemberTiers t ON c.TierID = t.TierID
-            WHERE b.Status = 'Waitlisted' 
-              AND b.BookingDate = @BookingDate AND b.ScheduledTime = @ScheduledTime
-            ORDER BY t.PriorityRank DESC, b.CreatedAt ASC;
-
-            IF @LuckyBookingID IS NOT NULL
-            BEGIN
-                UPDATE Bookings SET Status = 'Pending', UpdatedAt = GETDATE() WHERE BookingID = @LuckyBookingID;
-            END
-            ELSE
-            BEGIN
-                UPDATE BookingSlotCapacity 
-                SET CurrentBooked = CurrentBooked - 1 
-                WHERE SlotDate = @BookingDate AND TimeSlot = @ScheduledTime;
-            END
-        END
-    END
-END;
-GO

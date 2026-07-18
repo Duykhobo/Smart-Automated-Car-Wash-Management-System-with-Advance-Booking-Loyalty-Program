@@ -64,6 +64,9 @@ public class AdminLoyaltyServlet extends HttpServlet {
                 } else {
                     request.getSession().setAttribute("errorMessage", "Cập nhật hạng thành viên thất bại.");
                 }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("errorMessage", "Vui lòng nhập đúng định dạng số.");
             } catch (Exception e) {
                 e.printStackTrace();
                 request.getSession().setAttribute("errorMessage", "Đã xảy ra lỗi: " + e.getMessage());

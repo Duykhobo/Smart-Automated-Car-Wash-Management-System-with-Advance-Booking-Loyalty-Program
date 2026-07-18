@@ -19,7 +19,7 @@ public class Service {
     private double priceSuv;
     private double priceXlarge;
     private java.sql.Timestamp inactiveFromDate;
-
+    private String serviceType;
     public Service() {
     }
 
@@ -31,13 +31,14 @@ public class Service {
         this.isActive = true; // default
     }
 
-    public Service(int serviceId, String name, Double basePrice, int durationMinutes, boolean isActive, java.sql.Timestamp inactiveFromDate) {
+    public Service(int serviceId, String name, Double basePrice, int durationMinutes, boolean isActive, java.sql.Timestamp inactiveFromDate, String serviceType) {
         this.serviceId = serviceId;
         this.name = name;
         this.basePrice = basePrice;
         this.durationMinutes = durationMinutes;
         this.isActive = isActive;
         this.inactiveFromDate = inactiveFromDate;
+        this.serviceType = serviceType;
     }
 
     public void setServiceId(int serviceId) {
@@ -112,4 +113,11 @@ public class Service {
         this.priceXlarge = priceXlarge;
     }
     
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
 }

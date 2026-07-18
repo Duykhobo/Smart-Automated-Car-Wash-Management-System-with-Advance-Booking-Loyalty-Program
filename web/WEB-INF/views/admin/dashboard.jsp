@@ -122,7 +122,7 @@
                 <form id="lprMockForm" class="flex flex-col flex-1" onsubmit="event.preventDefault(); simulateLPR();">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-slate-300 mb-2">Biển số xe nhận diện được:</label>
-                        <input type="text" id="licensePlate" placeholder="VD: 51H-123.45" class="w-full bg-bg-primary border border-border-glass text-white text-lg font-mono text-center rounded-xl p-3 focus:border-glow outline-none placeholder-slate-600 transition-all uppercase shadow-inner" required>
+                        <input type="text" id="licensePlate" placeholder="VD: 51H-123.45" class="w-full bg-slate-800 border border-border-glass text-white text-lg font-mono text-center rounded-xl p-3 focus:border-glow outline-none placeholder-slate-600 transition-all uppercase shadow-inner" required>
                     </div>
                     
                     <div class="mb-6 p-4 rounded-xl bg-white/5 border border-border-glass">

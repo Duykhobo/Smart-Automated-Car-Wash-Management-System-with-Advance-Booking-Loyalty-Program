@@ -8,11 +8,13 @@ GO
 -- 1. THÊM SERVICES (DỊCH VỤ RỬA XE)
 IF NOT EXISTS (SELECT 1 FROM Services)
 BEGIN
-    INSERT INTO Services (Name, BasePrice, DurationMinutes, IsActive) VALUES 
-    (N'Rửa xe ngoài (demi)', 70000.00, 30, 1),
-    (N'Rửa xe tiêu chuẩn', 100000.00, 45, 1),
-    (N'Rửa xe cao cấp (Wax bóng)', 200000.00, 60, 1),
-    (N'Vệ sinh nội thất', 350000.00, 90, 1);
+    INSERT INTO Services (Name, BasePrice, DurationMinutes, IsActive, ServiceType) VALUES 
+    (N'Rửa xe ngoài (demi)', 70000.00, 30, 1, 'Main'),
+    (N'Rửa xe tiêu chuẩn', 100000.00, 45, 1, 'Main'),
+    (N'Rửa xe cao cấp (Wax bóng)', 200000.00, 60, 1, 'Main'),
+    (N'Vệ sinh nội thất', 350000.00, 90, 1, 'Addon'),
+    (N'Tẩy ố kính', 150000.00, 30, 1, 'Addon'),
+    (N'Khử mùi dàn lạnh', 100000.00, 20, 1, 'Addon');
 END
 
 IF NOT EXISTS (SELECT 1 FROM ServicePrices)
@@ -26,8 +28,14 @@ BEGIN
     -- Dịch vụ 3: Rửa xe cao cấp
     INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (3, 'SEDAN', 200000), (3, 'SUV', 250000), (3, 'XLARGE', 300000);
     
-    -- Dịch vụ 4: Vệ sinh nội thất (Giả định giá)
+    -- Dịch vụ 4: Vệ sinh nội thất
     INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (4, 'SEDAN', 350000), (4, 'SUV', 400000), (4, 'XLARGE', 450000);
+    
+    -- Dịch vụ 5: Tẩy ố kính
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (5, 'SEDAN', 150000), (5, 'SUV', 180000), (5, 'XLARGE', 200000);
+    
+    -- Dịch vụ 6: Khử mùi dàn lạnh
+    INSERT INTO ServicePrices (ServiceID, VehicleSize, Price) VALUES (6, 'SEDAN', 100000), (6, 'SUV', 120000), (6, 'XLARGE', 150000);
 END
 GO
 
@@ -117,8 +125,8 @@ SELECT TOP 1 @CID_VOUCHER = CustomerID FROM Customers WHERE Phone = '0901111111'
 IF @CID_VOUCHER IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Vouchers WHERE CustomerID = @CID_VOUCHER)
 BEGIN
     INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status) VALUES
-    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 500, DATEADD(month, 1, GETDATE()), 'Unused'),
-    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 300, DATEADD(day, 15, GETDATE()), 'Unused');
+    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 3000, DATEADD(month, 1, GETDATE()), 'Unused'),
+    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 600, DATEADD(day, 15, GETDATE()), 'Unused');
 END
 GO
 
@@ -134,7 +142,10 @@ BEGIN
     ('MinCancellationMinutes', '120', N'Thời gian hủy lịch tối thiểu (phút)'),
     ('OpeningHour', '8', N'Giờ mở cửa (0-23)'),
     ('ClosingHour', '22', N'Giờ đóng cửa (0-23)'),
-    ('PointsPerCurrencyUnit', '1', N'Tỷ lệ quy đổi: 1,000 VND = ? Điểm');
+    ('PointsPerCurrencyUnit', '1', N'Tỷ lệ quy đổi: 1,000 VND = ? Điểm'),
+    ('VehicleMultiplier_SEDAN', '1.0', N'Hệ số giá cho xe SEDAN (Chuẩn)'),
+    ('VehicleMultiplier_SUV', '1.2', N'Hệ số giá cho xe SUV'),
+    ('VehicleMultiplier_XLARGE', '1.5', N'Hệ số giá cho xe XLARGE (Bán tải, xe lớn)');
 END
 GO
 
@@ -142,8 +153,8 @@ GO
 IF NOT EXISTS (SELECT 1 FROM RewardCatalog)
 BEGIN
     INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
-    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
-    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
-    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
+    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 300, '10_PERCENT_OFF', 'percent'),
+    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 600, '20_PERCENT_OFF', 'tag'),
+    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 3000, 'FREE_WASH', 'droplets');
 END
 GO

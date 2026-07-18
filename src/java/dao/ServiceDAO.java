@@ -26,7 +26,7 @@ public class ServiceDAO {
      */
     public List<Service> getAllActiveServices() throws SQLException {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes], [InactiveFromDate] FROM [Services] WHERE [IsActive] = 1 AND ([InactiveFromDate] IS NULL OR [InactiveFromDate] > GETDATE()) ORDER BY [BasePrice] ASC";
+        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes], [InactiveFromDate], [ServiceType] FROM [Services] WHERE [IsActive] = 1 AND ([InactiveFromDate] IS NULL OR [InactiveFromDate] > GETDATE()) ORDER BY [BasePrice] ASC";
 
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql);
@@ -38,7 +38,8 @@ public class ServiceDAO {
                 double price = rs.getDouble("BasePrice");
                 int duration = rs.getInt("DurationMinutes");
                 java.sql.Timestamp inactiveFrom = rs.getTimestamp("InactiveFromDate");
-                services.add(new Service(id, name, price, duration, true, inactiveFrom));
+                String serviceType = rs.getString("ServiceType");
+                services.add(new Service(id, name, price, duration, true, inactiveFrom, serviceType));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching active services", e);
@@ -51,7 +52,7 @@ public class ServiceDAO {
     }
 
     public Service getServiceById(int id) throws SQLException {
-        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes] FROM [Services] WHERE [ServiceID] = ?";
+        String sql = "SELECT [ServiceID], [Name], [BasePrice], [DurationMinutes], [ServiceType] FROM [Services] WHERE [ServiceID] = ?";
         try (Connection cn = DBContext.getConnection();
                 PreparedStatement st = cn.prepareStatement(sql)) {
 
@@ -61,7 +62,10 @@ public class ServiceDAO {
                     String name = rs.getString("Name");
                     double price = rs.getDouble("BasePrice");
                     int duration = rs.getInt("DurationMinutes");
-                    return new Service(id, name, price, duration);
+                    String serviceType = rs.getString("ServiceType");
+                    Service s = new Service(id, name, price, duration);
+                    s.setServiceType(serviceType);
+                    return s;
                 }
             }
         } catch (SQLException e) {
@@ -187,9 +191,9 @@ public class ServiceDAO {
         }
         return success;
     }
-        public List<Service> getAllServicesForAdmin() throws SQLException {
+    public List<Service> getAllServicesForAdmin() throws SQLException {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT s.[ServiceID], s.[Name], s.[BasePrice], s.[DurationMinutes], s.[IsActive], s.[InactiveFromDate], " +
+        String sql = "SELECT s.[ServiceID], s.[Name], s.[BasePrice], s.[DurationMinutes], s.[IsActive], s.[InactiveFromDate], s.[ServiceType], " +
                      "       p1.Price AS PriceSedan, " +
                      "       p2.Price AS PriceSuv, " +
                      "       p3.Price AS PriceXlarge " +
@@ -210,8 +214,9 @@ public class ServiceDAO {
                 int duration = rs.getInt("DurationMinutes");
                 boolean isActive = rs.getBoolean("IsActive");
                 java.sql.Timestamp inactiveFrom = rs.getTimestamp("InactiveFromDate");
+                String serviceType = rs.getString("ServiceType");
                 
-                Service s = new Service(id, name, price, duration, isActive, inactiveFrom);
+                Service s = new Service(id, name, price, duration, isActive, inactiveFrom, serviceType);
                 
                 double priceSedan = rs.getDouble("PriceSedan");
                 if (rs.wasNull()) priceSedan = price;
@@ -233,8 +238,14 @@ public class ServiceDAO {
     }
 
     public boolean createServiceWithPrices(Service service) throws SQLException {
-        String sqlService = "INSERT INTO [Services] ([Name], [BasePrice], [DurationMinutes], [IsActive]) VALUES (?, ?, ?, 1)";
+        String sqlService = "INSERT INTO [Services] ([Name], [BasePrice], [DurationMinutes], [IsActive], [ServiceType]) VALUES (?, ?, ?, 1, ?)";
         String sqlPrice = "INSERT INTO [ServicePrices] ([ServiceID], [VehicleSize], [Price]) VALUES (?, ?, ?)";
+        
+        dao.SystemConfigDAO configDAO = new dao.SystemConfigDAO();
+        double mulSedan = 1.0, mulSuv = 1.2, mulXlarge = 1.5;
+        try { mulSedan = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SEDAN")); } catch(Exception e){}
+        try { mulSuv = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SUV")); } catch(Exception e){}
+        try { mulXlarge = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_XLARGE")); } catch(Exception e){}
         
         try (Connection cn = DBContext.getConnection()) {
             cn.setAutoCommit(false);
@@ -242,6 +253,7 @@ public class ServiceDAO {
                 stService.setString(1, service.getName());
                 stService.setDouble(2, service.getBasePrice());
                 stService.setInt(3, service.getDurationMinutes());
+                stService.setString(4, service.getServiceType() != null ? service.getServiceType() : "Main");
                 
                 int affected = stService.executeUpdate();
                 if (affected > 0) {
@@ -252,9 +264,9 @@ public class ServiceDAO {
                     
                     if (serviceId != -1) {
                         try (PreparedStatement stPrice = cn.prepareStatement(sqlPrice)) {
-                            stPrice.setInt(1, serviceId); stPrice.setString(2, "SEDAN"); stPrice.setDouble(3, service.getPriceSedan()); stPrice.executeUpdate();
-                            stPrice.setInt(1, serviceId); stPrice.setString(2, "SUV"); stPrice.setDouble(3, service.getPriceSuv()); stPrice.executeUpdate();
-                            stPrice.setInt(1, serviceId); stPrice.setString(2, "XLARGE"); stPrice.setDouble(3, service.getPriceXlarge()); stPrice.executeUpdate();
+                            stPrice.setInt(1, serviceId); stPrice.setString(2, "SEDAN"); stPrice.setDouble(3, service.getBasePrice() * mulSedan); stPrice.executeUpdate();
+                            stPrice.setInt(1, serviceId); stPrice.setString(2, "SUV"); stPrice.setDouble(3, service.getBasePrice() * mulSuv); stPrice.executeUpdate();
+                            stPrice.setInt(1, serviceId); stPrice.setString(2, "XLARGE"); stPrice.setDouble(3, service.getBasePrice() * mulXlarge); stPrice.executeUpdate();
                         }
                         cn.commit();
                         return true;
@@ -270,7 +282,13 @@ public class ServiceDAO {
     }
 
     public boolean updateServiceWithPrices(Service service) throws SQLException {
-        String sqlService = "UPDATE [Services] SET [Name] = ?, [BasePrice] = ?, [DurationMinutes] = ?, [IsActive] = ?, [UpdatedAt] = GETDATE() WHERE [ServiceID] = ?";
+        String sqlService = "UPDATE [Services] SET [Name] = ?, [BasePrice] = ?, [DurationMinutes] = ?, [IsActive] = ?, [UpdatedAt] = GETDATE(), [ServiceType] = ? WHERE [ServiceID] = ?";
+        
+        dao.SystemConfigDAO configDAO = new dao.SystemConfigDAO();
+        double mulSedan = 1.0, mulSuv = 1.2, mulXlarge = 1.5;
+        try { mulSedan = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SEDAN")); } catch(Exception e){}
+        try { mulSuv = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SUV")); } catch(Exception e){}
+        try { mulXlarge = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_XLARGE")); } catch(Exception e){}
         
         try (Connection cn = DBContext.getConnection()) {
             cn.setAutoCommit(false);
@@ -280,16 +298,47 @@ public class ServiceDAO {
                     stService.setDouble(2, service.getBasePrice());
                     stService.setInt(3, service.getDurationMinutes());
                     stService.setBoolean(4, service.isIsActive());
-                    stService.setInt(5, service.getServiceId());
+                    stService.setString(5, service.getServiceType() != null ? service.getServiceType() : "Main");
+                    stService.setInt(6, service.getServiceId());
                     stService.executeUpdate();
                 }
                 
-                updateOrInsertPrice(cn, service.getServiceId(), "SEDAN", service.getPriceSedan());
-                updateOrInsertPrice(cn, service.getServiceId(), "SUV", service.getPriceSuv());
-                updateOrInsertPrice(cn, service.getServiceId(), "XLARGE", service.getPriceXlarge());
+                updateOrInsertPrice(cn, service.getServiceId(), "SEDAN", service.getBasePrice() * mulSedan);
+                updateOrInsertPrice(cn, service.getServiceId(), "SUV", service.getBasePrice() * mulSuv);
+                updateOrInsertPrice(cn, service.getServiceId(), "XLARGE", service.getBasePrice() * mulXlarge);
                 
                 cn.commit();
                 return true;
+            } catch (SQLException e) {
+                cn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void syncAllServicePrices() throws SQLException {
+        dao.SystemConfigDAO configDAO = new dao.SystemConfigDAO();
+        double mulSedan = 1.0, mulSuv = 1.2, mulXlarge = 1.5;
+        try { mulSedan = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SEDAN")); } catch(Exception e){}
+        try { mulSuv = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_SUV")); } catch(Exception e){}
+        try { mulXlarge = Double.parseDouble(configDAO.getConfigValue("VehicleMultiplier_XLARGE")); } catch(Exception e){}
+
+        String fetchSql = "SELECT ServiceID, BasePrice FROM [Services]";
+        try (Connection cn = DBContext.getConnection()) {
+            cn.setAutoCommit(false);
+            try {
+                try (PreparedStatement stFetch = cn.prepareStatement(fetchSql);
+                     ResultSet rs = stFetch.executeQuery()) {
+                    while (rs.next()) {
+                        int serviceId = rs.getInt("ServiceID");
+                        double basePrice = rs.getDouble("BasePrice");
+                        
+                        updateOrInsertPrice(cn, serviceId, "SEDAN", basePrice * mulSedan);
+                        updateOrInsertPrice(cn, serviceId, "SUV", basePrice * mulSuv);
+                        updateOrInsertPrice(cn, serviceId, "XLARGE", basePrice * mulXlarge);
+                    }
+                }
+                cn.commit();
             } catch (SQLException e) {
                 cn.rollback();
                 throw e;

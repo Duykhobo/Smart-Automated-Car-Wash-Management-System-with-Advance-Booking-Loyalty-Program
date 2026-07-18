@@ -144,7 +144,7 @@
                                 </td>
                                 <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
                                     <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
-                                    <a href="${pageContext.request.contextPath}/admin/loyalty/history?customerId=${cust.customerId}" class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
+                                    <a href="${pageContext.request.contextPath}/admin/loyalty/history?customerId=${cust.customerId}" class="whitespace-nowrap inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                         Lịch sử điểm
                                     </a>
                                 </td>

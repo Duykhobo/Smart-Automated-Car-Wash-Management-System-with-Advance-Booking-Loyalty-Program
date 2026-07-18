@@ -214,23 +214,23 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm text-text-muted mb-1 font-medium">Số lượt rửa tối thiểu</label>
-                            <input type="number" id="editMinWashes" name="minWashes" class="w-full bg-bg-primary border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
+                            <input type="number" id="editMinWashes" name="minWashes" class="w-full bg-slate-800 border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm text-text-muted mb-1 font-medium">Chi tiêu tối thiểu (VND)</label>
-                            <input type="number" id="editMinSpend" name="minSpend" class="w-full bg-bg-primary border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
+                            <input type="number" id="editMinSpend" name="minSpend" class="w-full bg-slate-800 border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm text-text-muted mb-1 font-medium">Hệ số cộng điểm thưởng</label>
-                            <input type="number" id="editPointsModifier" name="pointsModifier" step="0.01" min="0" max="1" class="w-full bg-bg-primary border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
+                            <input type="number" id="editPointsModifier" name="pointsModifier" step="0.01" min="0" max="1" class="w-full bg-slate-800 border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
                             <span class="text-[10px] text-text-muted mt-1 block">Ví dụ: 0.1 = +10% điểm</span>
                         </div>
                         <div>
                             <label class="block text-sm text-text-muted mb-1 font-medium">Số ngày đặt lịch trước</label>
-                            <input type="number" id="editMaxBookingDays" name="maxBookingDays" class="w-full bg-bg-primary border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
+                            <input type="number" id="editMaxBookingDays" name="maxBookingDays" class="w-full bg-slate-800 border border-border-glass rounded-xl px-4 py-2.5 text-white focus:border-[#00d4ff] outline-none transition-all" required>
                         </div>
                     </div>
                 </div>

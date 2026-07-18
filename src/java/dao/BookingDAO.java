@@ -172,53 +172,92 @@ public class BookingDAO {
             cn = DBContext.getConnection();
             cn.setAutoCommit(false); // Begin transaction
 
-            boolean dateChanged = !oldDate.toString().equals(newDate.toString()) || !oldTime.toString().equals(newTime.toString());
-            String targetStatus = null;
-
-            // If date/time changed, update capacity and determine new status
-            if (dateChanged) {
-                // Decrease old capacity
-                String decSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] - 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME) AND [CurrentBooked] > 0";
-                try (PreparedStatement st2 = cn.prepareStatement(decSql)) {
-                    st2.setDate(1, oldDate);
-                    st2.setString(2, oldTime.toString());
-                    st2.executeUpdate();
+            // 1. Lấy thông tin lịch cũ và nhả toàn bộ slot cũ nếu đang Pending
+            int oldTotalDuration = 30;
+            String oldStatus = "Pending";
+            String getOldSql = "SELECT b.Status, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration FROM [Bookings] b LEFT JOIN [BookingDetails] bd ON b.BookingID = bd.BookingID WHERE b.BookingID = ? GROUP BY b.Status";
+            try (PreparedStatement stGetOld = cn.prepareStatement(getOldSql)) {
+                stGetOld.setInt(1, bookingId);
+                try (ResultSet rs = stGetOld.executeQuery()) {
+                    if (rs.next()) {
+                        oldStatus = rs.getString("Status");
+                        oldTotalDuration = rs.getInt("TotalDuration");
+                    }
                 }
+            }
+            if ("Pending".equalsIgnoreCase(oldStatus)) {
+                this.releaseSlots(cn, oldDate, oldTime, oldTotalDuration);
+            }
 
-                // Check new capacity
-                String checkSql = "SELECT SlotID, CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
-                boolean exists = false;
-                int current = 0;
-                int max = new dao.SystemConfigDAO().getMaxSlotCapacity();
-                try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
-                    stCheck.setDate(1, newDate);
-                    stCheck.setString(2, newTime.toString());
-                    try (ResultSet rs = stCheck.executeQuery()) {
+            // 2. Lấy tổng thời gian mới
+            int newTotalDuration = 30;
+            if (serviceIds != null && serviceIds.length > 0) {
+                String inClause = String.join(",", java.util.Collections.nCopies(serviceIds.length, "?"));
+                String getNewDurSql = "SELECT ISNULL(SUM(DurationMinutes), 30) AS TotalDuration FROM [Services] WHERE ServiceID IN (" + inClause + ")";
+                try (PreparedStatement stGetNewDur = cn.prepareStatement(getNewDurSql)) {
+                    for (int i = 0; i < serviceIds.length; i++) {
+                        stGetNewDur.setInt(i + 1, Integer.parseInt(serviceIds[i]));
+                    }
+                    try (ResultSet rs = stGetNewDur.executeQuery()) {
                         if (rs.next()) {
-                            exists = true;
-                            current = rs.getInt("CurrentBooked");
-                            max = rs.getInt("MaxCapacity");
+                            newTotalDuration = rs.getInt("TotalDuration");
                         }
                     }
                 }
+            }
+            if (newTotalDuration == 0) newTotalDuration = 30;
 
-                if (current >= max) {
-                    // Slot is full -> automatically put to Waitlist instead of throwing Exception
-                    targetStatus = "Waitlisted";
-                } else {
-                    targetStatus = "Pending";
+            String targetStatus = "Pending";
+            int newSlotsNeeded = (int) Math.ceil(newTotalDuration / 30.0);
+            if (newSlotsNeeded < 1) newSlotsNeeded = 1;
+
+            // 3. Kiểm tra tất cả các slot mới xem có bị đầy không (Waitlist)
+            boolean isWaitlisted = false;
+            String checkSql = "SELECT CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+            
+            for (int i = 0; i < newSlotsNeeded; i++) {
+                java.time.LocalTime currentSlotTime = newTime.toLocalTime().plusMinutes(i * 30L);
+                try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                    stCheck.setDate(1, newDate);
+                    stCheck.setString(2, currentSlotTime.toString());
+                    try (ResultSet rs = stCheck.executeQuery()) {
+                        if (rs.next()) {
+                            if (rs.getInt("CurrentBooked") >= rs.getInt("MaxCapacity")) {
+                                isWaitlisted = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isWaitlisted) {
+                targetStatus = "Waitlisted";
+            } else {
+                // 4. Giữ tất cả các slot mới
+                for (int i = 0; i < newSlotsNeeded; i++) {
+                    java.time.LocalTime currentSlotTime = newTime.toLocalTime().plusMinutes(i * 30L);
+                    boolean exists = false;
+                    try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                        stCheck.setDate(1, newDate);
+                        stCheck.setString(2, currentSlotTime.toString());
+                        try (ResultSet rs = stCheck.executeQuery()) {
+                            if (rs.next()) exists = true;
+                        }
+                    }
+                    
                     if (exists) {
                         String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
                         try (PreparedStatement st3 = cn.prepareStatement(incSql)) {
                             st3.setDate(1, newDate);
-                            st3.setString(2, newTime.toString());
+                            st3.setString(2, currentSlotTime.toString());
                             st3.executeUpdate();
                         }
                     } else {
                         String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) VALUES (?, CAST(? AS TIME), ?, 1)";
                         try (PreparedStatement st4 = cn.prepareStatement(insSql)) {
                             st4.setDate(1, newDate);
-                            st4.setString(2, newTime.toString());
+                            st4.setString(2, currentSlotTime.toString());
                             st4.setInt(3, new dao.SystemConfigDAO().getMaxSlotCapacity());
                             st4.executeUpdate();
                         }
@@ -226,14 +265,8 @@ public class BookingDAO {
                 }
             }
 
-            // 1. Update Booking
-            String updateBookingSql;
-            if (targetStatus != null) {
-                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
-            } else {
-                updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
-            }
-
+            // 5. Update Booking
+            String updateBookingSql = "UPDATE [Bookings] SET [VehicleID] = ?, [BookingDate] = ?, [ScheduledTime] = ?, [OriginalPrice] = ?, [DiscountAmount] = ?, [FinalPrice] = ?, [Status] = ?, [UpdatedAt] = GETDATE() WHERE [BookingID] = ?";
             try (PreparedStatement st1 = cn.prepareStatement(updateBookingSql)) {
                 st1.setInt(1, vehicleId);
                 st1.setDate(2, newDate);
@@ -241,12 +274,8 @@ public class BookingDAO {
                 st1.setDouble(4, originalPrice);
                 st1.setDouble(5, discountAmount);
                 st1.setDouble(6, finalPrice);
-                if (targetStatus != null) {
-                    st1.setString(7, targetStatus);
-                    st1.setInt(8, bookingId);
-                } else {
-                    st1.setInt(7, bookingId);
-                }
+                st1.setString(7, targetStatus);
+                st1.setInt(8, bookingId);
                 st1.executeUpdate();
             }
 
@@ -283,6 +312,136 @@ public class BookingDAO {
                 }
             }
             LOGGER.log(Level.SEVERE, "Error updating booking transaction", e);
+            throw e;
+        } finally {
+            if (cn != null) {
+                try {
+                    cn.setAutoCommit(true);
+                    cn.close();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Close connection failed", ex);
+                }
+            }
+        }
+        if (success) {
+            this.autoPromoteWaitlist();
+        }
+        return success;
+    }
+
+    public boolean updateBookingTimeOnly(int bookingId, java.sql.Date newDate, java.sql.Time newTime) throws Exception {
+        boolean success = false;
+        Connection cn = null;
+        try {
+            cn = DBContext.getConnection();
+            cn.setAutoCommit(false);
+
+            int totalDuration = 30;
+            String oldStatus = "Pending";
+            java.sql.Date oldDate = null;
+            java.sql.Time oldTime = null;
+            
+            String getOldSql = "SELECT b.Status, b.BookingDate, b.ScheduledTime, ISNULL(SUM(bd.DurationMinutes), 30) AS TotalDuration FROM [Bookings] b LEFT JOIN [BookingDetails] bd ON b.BookingID = bd.BookingID WHERE b.BookingID = ? GROUP BY b.Status, b.BookingDate, b.ScheduledTime";
+            try (PreparedStatement stGetOld = cn.prepareStatement(getOldSql)) {
+                stGetOld.setInt(1, bookingId);
+                try (ResultSet rs = stGetOld.executeQuery()) {
+                    if (rs.next()) {
+                        oldStatus = rs.getString("Status");
+                        oldDate = rs.getDate("BookingDate");
+                        oldTime = rs.getTime("ScheduledTime");
+                        totalDuration = rs.getInt("TotalDuration");
+                    } else {
+                        throw new Exception("Booking not found");
+                    }
+                }
+            }
+            
+            if ("Pending".equalsIgnoreCase(oldStatus)) {
+                this.releaseSlots(cn, oldDate, oldTime, totalDuration);
+            }
+
+            String targetStatus = "Pending";
+            int newSlotsNeeded = (int) Math.ceil(totalDuration / 30.0);
+            if (newSlotsNeeded < 1) newSlotsNeeded = 1;
+
+            boolean isWaitlisted = false;
+            String checkSql = "SELECT CurrentBooked, MaxCapacity FROM [BookingSlotCapacity] WITH (UPDLOCK) WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+            
+            for (int i = 0; i < newSlotsNeeded; i++) {
+                java.time.LocalTime currentSlotTime = newTime.toLocalTime().plusMinutes(i * 30L);
+                try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                    stCheck.setDate(1, newDate);
+                    stCheck.setString(2, currentSlotTime.toString());
+                    try (ResultSet rs = stCheck.executeQuery()) {
+                        if (rs.next()) {
+                            if (rs.getInt("CurrentBooked") >= rs.getInt("MaxCapacity")) {
+                                isWaitlisted = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isWaitlisted) {
+                targetStatus = "Waitlisted";
+            } else {
+                for (int i = 0; i < newSlotsNeeded; i++) {
+                    java.time.LocalTime currentSlotTime = newTime.toLocalTime().plusMinutes(i * 30L);
+                    boolean exists = false;
+                    try (PreparedStatement stCheck = cn.prepareStatement(checkSql)) {
+                        stCheck.setDate(1, newDate);
+                        stCheck.setString(2, currentSlotTime.toString());
+                        try (ResultSet rs = stCheck.executeQuery()) {
+                            if (rs.next()) exists = true;
+                        }
+                    }
+                    
+                    if (exists) {
+                        String incSql = "UPDATE [BookingSlotCapacity] SET [CurrentBooked] = [CurrentBooked] + 1 WHERE [SlotDate] = ? AND [TimeSlot] = CAST(? AS TIME)";
+                        try (PreparedStatement stInc = cn.prepareStatement(incSql)) {
+                            stInc.setDate(1, newDate);
+                            stInc.setString(2, currentSlotTime.toString());
+                            stInc.executeUpdate();
+                        }
+                    } else {
+                        String insSql = "INSERT INTO [BookingSlotCapacity] (SlotDate, TimeSlot, MaxCapacity, CurrentBooked) "
+                                + "VALUES (?, CAST(? AS TIME), CAST((SELECT ConfigValue FROM SystemConfig WHERE ConfigKey='MaxSlotsPerHalfHour') AS INT), 1)";
+                        try (PreparedStatement stIns = cn.prepareStatement(insSql)) {
+                            stIns.setDate(1, newDate);
+                            stIns.setString(2, currentSlotTime.toString());
+                            stIns.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            String updateSql = "UPDATE [Bookings] SET BookingDate = ?, ScheduledTime = ?, Status = ?, UpdatedAt = GETDATE() WHERE BookingID = ?";
+            try (PreparedStatement stUpdate = cn.prepareStatement(updateSql)) {
+                stUpdate.setDate(1, newDate);
+                stUpdate.setTime(2, newTime);
+                stUpdate.setString(3, targetStatus);
+                stUpdate.setInt(4, bookingId);
+                int updatedRows = stUpdate.executeUpdate();
+                if (updatedRows > 0) {
+                    success = true;
+                }
+            }
+
+            if (success) {
+                cn.commit();
+            } else {
+                cn.rollback();
+            }
+
+        } catch (Exception e) {
+            if (cn != null) {
+                try {
+                    cn.rollback();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "Rollback failed", ex);
+                }
+            }
             throw e;
         } finally {
             if (cn != null) {

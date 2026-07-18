@@ -42,15 +42,10 @@ public class AdminServiceServlet extends HttpServlet {
                 String name = request.getParameter("name");
                 double basePrice = Double.parseDouble(request.getParameter("basePrice"));
                 int duration = Integer.parseInt(request.getParameter("duration"));
-                
-                double priceSedan = Double.parseDouble(request.getParameter("priceSedan"));
-                double priceSuv = Double.parseDouble(request.getParameter("priceSuv"));
-                double priceXlarge = Double.parseDouble(request.getParameter("priceXlarge"));
+                String serviceType = request.getParameter("serviceType");
                 
                 Service newService = new Service(0, name, basePrice, duration);
-                newService.setPriceSedan(priceSedan);
-                newService.setPriceSuv(priceSuv);
-                newService.setPriceXlarge(priceXlarge);
+                newService.setServiceType(serviceType);
                 
                 serviceDAO.createServiceWithPrices(newService);
             } 
@@ -60,15 +55,9 @@ public class AdminServiceServlet extends HttpServlet {
                 double basePrice = Double.parseDouble(request.getParameter("basePrice"));
                 int duration = Integer.parseInt(request.getParameter("duration"));
                 boolean isActive = request.getParameter("isActive") != null;
+                String serviceType = request.getParameter("serviceType");
                 
-                double priceSedan = Double.parseDouble(request.getParameter("priceSedan"));
-                double priceSuv = Double.parseDouble(request.getParameter("priceSuv"));
-                double priceXlarge = Double.parseDouble(request.getParameter("priceXlarge"));
-                
-                Service editService = new Service(id, name, basePrice, duration, isActive, null);
-                editService.setPriceSedan(priceSedan);
-                editService.setPriceSuv(priceSuv);
-                editService.setPriceXlarge(priceXlarge);
+                Service editService = new Service(id, name, basePrice, duration, isActive, null, serviceType);
                 
                 serviceDAO.updateServiceWithPrices(editService);
             } 
@@ -77,8 +66,12 @@ public class AdminServiceServlet extends HttpServlet {
                 boolean isActive = Boolean.parseBoolean(request.getParameter("isActive"));
                 serviceDAO.toggleServiceStatus(id, isActive);
             }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            request.getSession().setAttribute("errorMessage", "Vui lòng nhập đúng định dạng số.");
         } catch (Exception e) {
             e.printStackTrace();
+            request.getSession().setAttribute("errorMessage", "Đã xảy ra lỗi: " + e.getMessage());
         }
         
         response.sendRedirect(request.getContextPath() + "/admin/services");

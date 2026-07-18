@@ -65,6 +65,11 @@ public class AdminConfigServlet extends HttpServlet {
         String multiplierGold = request.getParameter("Multiplier_Gold");
         String multiplierPlatinum = request.getParameter("Multiplier_Platinum");
         String maintenanceMode = request.getParameter("MaintenanceMode") != null ? "true" : "false";
+        
+        String vehicleMultiplierSedan = request.getParameter("VehicleMultiplier_SEDAN");
+        String vehicleMultiplierSuv = request.getParameter("VehicleMultiplier_SUV");
+        String vehicleMultiplierXlarge = request.getParameter("VehicleMultiplier_XLARGE");
+
 
         try {
             if (openingHour != null && !openingHour.isEmpty()) configDAO.updateConfigValue("OpeningHour", openingHour.substring(0, 2));
@@ -90,6 +95,26 @@ public class AdminConfigServlet extends HttpServlet {
                 try { configDAO.updateTierMultiplier("Platinum", Double.parseDouble(multiplierPlatinum)); } catch(Exception e){}
             }
             configDAO.updateConfigValue("MaintenanceMode", maintenanceMode);
+            
+            boolean priceChanged = false;
+            if (vehicleMultiplierSedan != null && !vehicleMultiplierSedan.isEmpty()) {
+                configDAO.updateConfigValue("VehicleMultiplier_SEDAN", vehicleMultiplierSedan);
+                priceChanged = true;
+            }
+            if (vehicleMultiplierSuv != null && !vehicleMultiplierSuv.isEmpty()) {
+                configDAO.updateConfigValue("VehicleMultiplier_SUV", vehicleMultiplierSuv);
+                priceChanged = true;
+            }
+            if (vehicleMultiplierXlarge != null && !vehicleMultiplierXlarge.isEmpty()) {
+                configDAO.updateConfigValue("VehicleMultiplier_XLARGE", vehicleMultiplierXlarge);
+                priceChanged = true;
+            }
+            
+            if (priceChanged) {
+                dao.ServiceDAO serviceDao = new dao.ServiceDAO();
+                serviceDao.syncAllServicePrices();
+            }
+            
             
             request.getSession().setAttribute("successMessage", "Đã lưu cấu hình hệ thống thành công.");
         } catch (Exception e) {

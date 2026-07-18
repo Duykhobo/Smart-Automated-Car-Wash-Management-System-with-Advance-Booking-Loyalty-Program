@@ -173,6 +173,7 @@ CREATE TABLE RewardCatalog (
     Description NVARCHAR(255) NULL,
     PointsCost INT NOT NULL,
     RewardType VARCHAR(30) NOT NULL,
+    DiscountPercent DECIMAL(5,2) DEFAULT 0.00,
     ImageIcon VARCHAR(50) DEFAULT 'gift',
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME DEFAULT GETDATE(),
@@ -186,6 +187,7 @@ CREATE TABLE Vouchers (
     CustomerID INT NOT NULL,
     VoucherCode VARCHAR(30) UNIQUE NOT NULL,
     RewardType VARCHAR(30) NULL,
+    DiscountPercent DECIMAL(5,2) DEFAULT 0.00,
     PointsCost INT NOT NULL,
     ExpiryDate DATETIME NOT NULL,
     Status VARCHAR(15) DEFAULT 'Unused' CHECK (Status IN ('Unused', 'Used', 'Expired')),
@@ -265,10 +267,10 @@ INSERT INTO MemberTiers (TierName, MinWashes, MinSpend, PointsModifier, Priority
 ('Platinum', 30, 15000000, 0.30, 4, 14, 'badge-platinum', 'border-[#00d4ff]', 'bg-[#00d4ff]/20', 'text-[#00d4ff]', 'text-cyan-400');
 GO
 
-INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
-(N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 5000, '10_PERCENT_OFF', 'percent'),
-(N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 10000, '20_PERCENT_OFF', 'tag'),
-(N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 20000, 'FREE_WASH', 'droplets');
+INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon, DiscountPercent) VALUES
+(N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 300, '10_PERCENT_OFF', 'percent', 10.00),
+(N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 600, '20_PERCENT_OFF', 'tag', 20.00),
+(N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 3000, 'FREE_WASH', 'droplets', 100.00);
 GO
 
 -- =======================================================================
@@ -448,7 +450,7 @@ GO
 IF OBJECT_ID('dbo.sp_RedeemVoucherFIFO') IS NOT NULL DROP PROCEDURE dbo.sp_RedeemVoucherFIFO;
 GO
 CREATE PROCEDURE dbo.sp_RedeemVoucherFIFO
-    @CustomerID INT, @RewardType VARCHAR(30), @PointsCost INT
+    @CustomerID INT, @RewardType VARCHAR(30), @PointsCost INT, @DiscountPercent DECIMAL(5,2)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -494,8 +496,8 @@ BEGIN
         DEALLOCATE fifo_cursor;
 
         DECLARE @VoucherCode VARCHAR(30) = @RewardType + '-' + RIGHT(CAST(NEWID() AS VARCHAR(36)), 6);
-        INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status)
-        VALUES (@CustomerID, UPPER(@VoucherCode), @RewardType, @PointsCost, DATEADD(day, 30, GETDATE()), 'Unused');
+        INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status, DiscountPercent)
+        VALUES (@CustomerID, UPPER(@VoucherCode), @RewardType, @PointsCost, DATEADD(day, 30, GETDATE()), 'Unused', @DiscountPercent);
         DECLARE @NewVoucherID INT = SCOPE_IDENTITY();
 
         UPDATE Customers SET PointsBalance = PointsBalance - @PointsCost, UpdatedAt = GETDATE() WHERE CustomerID = @CustomerID;

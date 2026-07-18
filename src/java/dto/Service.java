@@ -15,9 +15,11 @@ public class Service {
     private Double basePrice;
     private int durationMinutes;
     private boolean isActive;
-
+        private double priceSedan;
+    private double priceSuv;
+    private double priceXlarge;
     private java.sql.Timestamp inactiveFromDate;
-
+    private String serviceType;
     public Service() {
     }
 
@@ -29,13 +31,14 @@ public class Service {
         this.isActive = true; // default
     }
 
-    public Service(int serviceId, String name, Double basePrice, int durationMinutes, boolean isActive, java.sql.Timestamp inactiveFromDate) {
+    public Service(int serviceId, String name, Double basePrice, int durationMinutes, boolean isActive, java.sql.Timestamp inactiveFromDate, String serviceType) {
         this.serviceId = serviceId;
         this.name = name;
         this.basePrice = basePrice;
         this.durationMinutes = durationMinutes;
         this.isActive = isActive;
         this.inactiveFromDate = inactiveFromDate;
+        this.serviceType = serviceType;
     }
 
     public void setServiceId(int serviceId) {
@@ -86,4 +89,35 @@ public class Service {
         this.inactiveFromDate = inactiveFromDate;
     }
 
+    public double getPriceSedan() {
+        return priceSedan;
+    }
+
+    public void setPriceSedan(double priceSedan) {
+        this.priceSedan = priceSedan;
+    }
+
+    public double getPriceSuv() {
+        return priceSuv;
+    }
+
+    public void setPriceSuv(double priceSuv) {
+        this.priceSuv = priceSuv;
+    }
+
+    public double getPriceXlarge() {
+        return priceXlarge;
+    }
+
+    public void setPriceXlarge(double priceXlarge) {
+        this.priceXlarge = priceXlarge;
+    }
+    
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
 }

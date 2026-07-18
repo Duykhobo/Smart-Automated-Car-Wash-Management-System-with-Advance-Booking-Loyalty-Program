@@ -110,6 +110,26 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
+
+                        <div class="border-t border-border-glass pt-4 mt-4">
+                            <label class="block text-sm font-medium text-slate-300 mb-3">Hệ số tính giá theo Cỡ Xe (Nhân với Giá gốc)</label>
+                            <p class="text-xs text-text-muted mb-4">Mỗi khi Lưu cấu hình, toàn bộ bảng giá Dịch vụ sẽ được tính lại tự động!</p>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 text-sm">SEDAN</span>
+                                    <input type="number" name="VehicleMultiplier_SEDAN" value="${empty configs['VehicleMultiplier_SEDAN'] ? '1.0' : configs['VehicleMultiplier_SEDAN']}" step="0.1" class="w-24 bg-black/40 border border-border-glass rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-amber-400 text-sm font-medium">SUV</span>
+                                    <input type="number" name="VehicleMultiplier_SUV" value="${empty configs['VehicleMultiplier_SUV'] ? '1.2' : configs['VehicleMultiplier_SUV']}" step="0.1" class="w-24 bg-black/40 border border-amber-500/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-amber-400">
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[#00d4ff] text-sm font-bold">XLARGE</span>
+                                    <input type="number" name="VehicleMultiplier_XLARGE" value="${empty configs['VehicleMultiplier_XLARGE'] ? '1.5' : configs['VehicleMultiplier_XLARGE']}" step="0.1" class="w-24 bg-black/40 border border-[#00d4ff]/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Settings Panel: Danger Zone -->
                         <div class="glass-panel p-6 rounded-2xl border border-red-500/20 bg-red-500/5">
@@ -127,16 +147,11 @@
                                 </div>
                                 <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="MaintenanceMode" value="on" class="sr-only peer" ${config['MaintenanceMode'] == 'on' ? 'checked' : ''}>
+                                    <input type="checkbox" name="MaintenanceMode" value="true" class="sr-only peer" ${configs['MaintenanceMode'] == 'true' ? 'checked' : ''}>
                                     <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
                                 </label>
                             </div>
                         </div>
-                        <!-- Toggle Switch -->
-                        <label class="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" name="MaintenanceMode" value="true" ${configs['MaintenanceMode'] == 'true' ? 'checked' : ''} class="sr-only peer">
-                          <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                        </label>
                     </div>
                 </div>
             </form>

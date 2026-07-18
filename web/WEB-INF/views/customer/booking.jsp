@@ -9,9 +9,13 @@
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     <style>
     /* Sửa lỗi Tailwind peer-checked không ăn cho thẻ con */
-    input[name="services"]:checked + div h3 { color: #ffffff !important; }
-    input[name="services"]:checked + div .radio-outer { border-color: #00d4ff !important; }
-    input[name="services"]:checked + div .radio-inner { opacity: 1 !important; }
+    input[type="radio"][name="services"]:checked + div h3 { color: #ffffff !important; }
+    input[type="radio"][name="services"]:checked + div .radio-outer { border-color: #00d4ff !important; }
+    input[type="radio"][name="services"]:checked + div .radio-inner { opacity: 1 !important; }
+    
+    input[type="checkbox"][name="services"]:checked + div h3 { color: #ffffff !important; }
+    input[type="checkbox"][name="services"]:checked + div .checkbox-outer { border-color: #fbbf24 !important; background-color: #fbbf24 !important; }
+    input[type="checkbox"][name="services"]:checked + div .checkbox-icon { opacity: 1 !important; }
     
     input[name="date"]:checked + div span:first-child { color: rgba(0, 0, 0, 0.7) !important; }
     input[name="date"]:checked + div span:last-child { color: black !important; }
@@ -125,44 +129,93 @@
                 <h2 class="font-display font-bold text-xl text-white flex items-center gap-2">
                     <i data-lucide="sparkles" class="w-5 h-5 text-[#00d4ff]"></i> 2. Chọn Gói Dịch Vụ
                 </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <h3 class="text-[#00d4ff] text-xs font-bold uppercase tracking-wider mb-3">Gói Chính (Chọn 1)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <c:choose>
                         <c:when test="${not empty services}">
+                            <c:set var="mainHasChecked" value="false" />
                             <c:forEach var="service" items="${services}" varStatus="status">
-                                <c:set var="searchPattern" value=",${service.serviceId}," />
-                                <c:set var="paramServicesStr" value=",${param.services}," />
-                                <label class="block relative cursor-pointer group">
-                                    <input type="checkbox" name="services" value="${service.serviceId}" data-base-price="${initialPrices[service.serviceId]}" data-duration="${service.durationMinutes}" class="peer sr-only" ${(not empty param.services and paramServicesStr.contains(searchPattern)) or (empty param.services and status.first) ? 'checked' : ''}>
-                                    <div class="glass-panel p-4 md:p-5 rounded-2xl border border-border-glass cursor-pointer hover:border-[#00d4ff]/50 transition-all flex flex-col h-full group">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <h3 class="font-bold text-gray-300 text-sm md:text-base">${service.name}</h3>
-                                            <div class="radio-outer w-5 h-5 rounded border border-border-glass flex items-center justify-center shrink-0 transition-colors">
-                                                <div class="radio-inner w-3 h-3 rounded bg-[#00d4ff] opacity-0 transition-opacity"></div>
+                                <c:if test="${service.serviceType == 'Main' or empty service.serviceType}">
+                                    <c:set var="searchPattern" value=",${service.serviceId}," />
+                                    <c:set var="paramServicesStr" value=",${param.services}," />
+                                    <c:set var="isChecked" value="${not empty param.services and paramServicesStr.contains(searchPattern)}" />
+                                    <c:if test="${isChecked}"><c:set var="mainHasChecked" value="true" /></c:if>
+                                    
+                                    <label class="block relative cursor-pointer group">
+                                        <input type="radio" name="services" value="${service.serviceId}" data-base-price="${initialPrices[service.serviceId]}" data-duration="${service.durationMinutes}" class="peer sr-only main-service" ${isChecked or (empty param.services and status.first) ? 'checked' : ''}>
+                                        <div class="glass-panel p-4 md:p-5 rounded-2xl border border-border-glass cursor-pointer hover:border-[#00d4ff]/50 transition-all flex flex-col h-full group">
+                                            <div class="flex items-center justify-between mb-3">
+                                                <h3 class="font-bold text-gray-300 text-sm md:text-base">${service.name}</h3>
+                                                <div class="radio-outer w-5 h-5 rounded-full border border-border-glass flex items-center justify-center shrink-0 transition-colors">
+                                                    <div class="radio-inner w-2.5 h-2.5 rounded-full bg-[#00d4ff] opacity-0 transition-opacity"></div>
+                                                </div>
                                             </div>
+                                            <div class="mt-auto flex items-center justify-between">
+                                                <div class="text-[#00d4ff] font-semibold text-lg service-price-display" data-sid="${service.serviceId}">
+                                                    <fmt:formatNumber value="${initialPrices[service.serviceId]}" type="number" maxFractionDigits="0" /> đ
+                                                </div>
+                                                <div class="text-text-muted text-xs md:text-sm flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full">
+                                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${service.durationMinutes}p
+                                                </div>
+                                            </div>
+                                            <c:if test="${not empty service.inactiveFromDate}">
+                                                <div class="text-xs text-amber-500 bg-amber-500/10 p-2 rounded-lg mt-2 flex items-start gap-1.5 border border-amber-500/20">
+                                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                                                    <span>Ngưng hoạt động từ <fmt:formatDate value="${service.inactiveFromDate}" pattern="dd/MM/yyyy HH:mm" /></span>
+                                                </div>
+                                            </c:if>
                                         </div>
-                                        <div class="mt-auto flex items-center justify-between">
-                                            <div class="text-[#00d4ff] font-semibold text-lg service-price-display" data-sid="${service.serviceId}">
-                                                <fmt:formatNumber value="${initialPrices[service.serviceId]}" type="number" maxFractionDigits="0" /> đ
-                                            </div>
-                                            <div class="text-text-muted text-xs md:text-sm flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full">
-                                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${service.durationMinutes}p
-                                            </div>
-                                        </div>
-                                        <c:if test="${not empty service.inactiveFromDate}">
-                                            <div class="text-xs text-amber-500 bg-amber-500/10 p-2 rounded-lg mt-2 flex items-start gap-1.5 border border-amber-500/20">
-                                                <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
-                                                <span>Dịch vụ này sẽ ngưng hoạt động từ <fmt:formatDate value="${service.inactiveFromDate}" pattern="dd/MM/yyyy HH:mm" /></span>
-                                            </div>
-                                        </c:if>
-                                    </div>
-                                </label>
+                                    </label>
+                                </c:if>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <p class="text-gray-400 italic">Không có dịch vụ nào đang hoạt động.</p>
+                            <p class="text-gray-400 italic">Không có gói chính nào đang hoạt động.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
+                
+                <c:set var="hasAddon" value="false" />
+                <c:forEach var="s" items="${services}">
+                    <c:if test="${s.serviceType == 'Addon'}"><c:set var="hasAddon" value="true" /></c:if>
+                </c:forEach>
+                
+                <c:if test="${hasAddon}">
+                <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-3">Dịch Vụ Thêm (Tùy chọn)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <c:forEach var="service" items="${services}" varStatus="status">
+                        <c:if test="${service.serviceType == 'Addon'}">
+                            <c:set var="searchPattern" value=",${service.serviceId}," />
+                            <c:set var="paramServicesStr" value=",${param.services}," />
+                            <label class="block relative cursor-pointer group">
+                                <input type="checkbox" name="services" value="${service.serviceId}" data-base-price="${initialPrices[service.serviceId]}" data-duration="${service.durationMinutes}" class="peer sr-only addon-service" ${(not empty param.services and paramServicesStr.contains(searchPattern)) ? 'checked' : ''}>
+                                <div class="glass-panel p-4 md:p-5 rounded-2xl border border-border-glass cursor-pointer hover:border-amber-400/50 transition-all flex flex-col h-full group">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-bold text-gray-300 text-sm md:text-base">${service.name}</h3>
+                                        <div class="checkbox-outer w-5 h-5 rounded border border-border-glass flex items-center justify-center shrink-0 transition-colors">
+                                            <i data-lucide="check" class="checkbox-icon w-3.5 h-3.5 text-black opacity-0 transition-opacity"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto flex items-center justify-between">
+                                        <div class="text-[#00d4ff] font-semibold text-lg service-price-display" data-sid="${service.serviceId}">
+                                            <fmt:formatNumber value="${initialPrices[service.serviceId]}" type="number" maxFractionDigits="0" /> đ
+                                        </div>
+                                        <div class="text-text-muted text-xs md:text-sm flex items-center gap-1.5 bg-black/20 px-2.5 py-1 rounded-full">
+                                            <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${service.durationMinutes}p
+                                        </div>
+                                    </div>
+                                    <c:if test="${not empty service.inactiveFromDate}">
+                                        <div class="text-xs text-amber-500 bg-amber-500/10 p-2 rounded-lg mt-2 flex items-start gap-1.5 border border-amber-500/20">
+                                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                                            <span>Ngưng hoạt động từ <fmt:formatDate value="${service.inactiveFromDate}" pattern="dd/MM/yyyy HH:mm" /></span>
+                                        </div>
+                                    </c:if>
+                                </div>
+                            </label>
+                        </c:if>
+                    </c:forEach>
+                </div>
+                </c:if>
             </section>
 
             <!-- Chọn Ngày & Giờ -->

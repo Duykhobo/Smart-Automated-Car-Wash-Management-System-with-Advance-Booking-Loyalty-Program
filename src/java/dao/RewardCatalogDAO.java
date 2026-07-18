@@ -96,4 +96,67 @@ public class RewardCatalogDAO {
         }
         return null;
     }
+        public List<RewardCatalog> getAllRewardsForAdmin() throws Exception {
+        List<RewardCatalog> list = new ArrayList<>();
+        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt " +
+                     "FROM RewardCatalog ORDER BY PointsCost ASC";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(new RewardCatalog(
+                    rs.getInt("RewardID"),
+                    rs.getString("RewardName"),
+                    rs.getString("Description"),
+                    rs.getInt("PointsCost"),
+                    rs.getString("RewardType"),
+                    rs.getString("ImageIcon"),
+                    rs.getBoolean("IsActive"),
+                    rs.getTimestamp("CreatedAt"),
+                    rs.getTimestamp("UpdatedAt")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi CSDL: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public int getActiveVouchersCount() {
+        String sql = "SELECT COUNT(*) FROM RewardCatalog WHERE IsActive = 1";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getRedemptionsThisMonth() {
+        String sql = "SELECT COUNT(*) FROM Vouchers WHERE MONTH(CreatedAt) = MONTH(GETDATE()) AND YEAR(CreatedAt) = YEAR(GETDATE())";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getTotalPointsSpent() {
+        String sql = "SELECT SUM(PointsCost) FROM Vouchers";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

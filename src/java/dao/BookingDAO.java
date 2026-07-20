@@ -647,7 +647,7 @@ public class BookingDAO {
     }
 
     public Voucher getActiveVoucherByCode(String voucherCode, int customerId) throws Exception {
-        String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status " +
+        String sql = "SELECT VoucherID, CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status, DiscountPercent " +
                 "FROM Vouchers " +
                 "WHERE VoucherCode = ? AND CustomerID = ? AND Status = 'Unused' AND ExpiryDate >= GETDATE()";
         try (Connection cn = utils.DBContext.getConnection();
@@ -663,7 +663,8 @@ public class BookingDAO {
                             rs.getString("RewardType"),
                             rs.getInt("PointsCost"),
                             rs.getTimestamp("ExpiryDate"),
-                            rs.getString("Status"));
+                            rs.getString("Status"),
+                            rs.getDouble("DiscountPercent"));
                 }
             }
         } catch (SQLException e) {

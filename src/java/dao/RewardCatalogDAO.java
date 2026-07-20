@@ -13,7 +13,7 @@ public class RewardCatalogDAO {
 
     public List<RewardCatalog> getAllActiveRewards() throws Exception {
         List<RewardCatalog> list = new ArrayList<>();
-        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt " +
+        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt, DiscountPercent " +
                      "FROM RewardCatalog WHERE IsActive = 1 ORDER BY PointsCost ASC";
 
         try (Connection cn = DBContext.getConnection();
@@ -30,7 +30,8 @@ public class RewardCatalogDAO {
                     rs.getString("ImageIcon"),
                     rs.getBoolean("IsActive"),
                     rs.getTimestamp("CreatedAt"),
-                    rs.getTimestamp("UpdatedAt")
+                    rs.getTimestamp("UpdatedAt"),
+                    rs.getDouble("DiscountPercent")
                 ));
             }
         } catch (SQLException e) {
@@ -39,8 +40,37 @@ public class RewardCatalogDAO {
         return list;
     }
 
+    public List<RewardCatalog> getAllRewards() throws Exception {
+        List<RewardCatalog> list = new ArrayList<>();
+        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt, DiscountPercent " +
+                     "FROM RewardCatalog ORDER BY PointsCost ASC";
+
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(new RewardCatalog(
+                    rs.getInt("RewardID"),
+                    rs.getString("RewardName"),
+                    rs.getString("Description"),
+                    rs.getInt("PointsCost"),
+                    rs.getString("RewardType"),
+                    rs.getString("ImageIcon"),
+                    rs.getBoolean("IsActive"),
+                    rs.getTimestamp("CreatedAt"),
+                    rs.getTimestamp("UpdatedAt"),
+                    rs.getDouble("DiscountPercent")
+                ));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi khi lấy toàn bộ danh sách quà tặng: " + e.getMessage());
+        }
+        return list;
+    }
+
     public RewardCatalog getRewardById(int rewardId) throws Exception {
-        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt " +
+        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt, DiscountPercent " +
                      "FROM RewardCatalog WHERE RewardID = ?";
 
         try (Connection cn = DBContext.getConnection();
@@ -58,7 +88,8 @@ public class RewardCatalogDAO {
                         rs.getString("ImageIcon"),
                         rs.getBoolean("IsActive"),
                         rs.getTimestamp("CreatedAt"),
-                        rs.getTimestamp("UpdatedAt")
+                        rs.getTimestamp("UpdatedAt"),
+                        rs.getDouble("DiscountPercent")
                     );
                 }
             }
@@ -69,7 +100,7 @@ public class RewardCatalogDAO {
     }
 
     public RewardCatalog getRewardByType(String rewardType) throws Exception {
-        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt " +
+        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt, DiscountPercent " +
                      "FROM RewardCatalog WHERE RewardType = ?";
 
         try (Connection cn = DBContext.getConnection();
@@ -87,7 +118,8 @@ public class RewardCatalogDAO {
                         rs.getString("ImageIcon"),
                         rs.getBoolean("IsActive"),
                         rs.getTimestamp("CreatedAt"),
-                        rs.getTimestamp("UpdatedAt")
+                        rs.getTimestamp("UpdatedAt"),
+                        rs.getDouble("DiscountPercent")
                     );
                 }
             }
@@ -96,67 +128,62 @@ public class RewardCatalogDAO {
         }
         return null;
     }
-        public List<RewardCatalog> getAllRewardsForAdmin() throws Exception {
-        List<RewardCatalog> list = new ArrayList<>();
-        String sql = "SELECT RewardID, RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt " +
-                     "FROM RewardCatalog ORDER BY PointsCost ASC";
+
+    public void addReward(RewardCatalog reward) throws Exception {
+        String sql = "INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon, IsActive, CreatedAt, UpdatedAt, DiscountPercent) " +
+                     "VALUES (?, ?, ?, ?, ?, 1, GETDATE(), GETDATE(), ?)";
 
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
-
-            while (rs.next()) {
-                list.add(new RewardCatalog(
-                    rs.getInt("RewardID"),
-                    rs.getString("RewardName"),
-                    rs.getString("Description"),
-                    rs.getInt("PointsCost"),
-                    rs.getString("RewardType"),
-                    rs.getString("ImageIcon"),
-                    rs.getBoolean("IsActive"),
-                    rs.getTimestamp("CreatedAt"),
-                    rs.getTimestamp("UpdatedAt")
-                ));
-            }
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, reward.getRewardName());
+            st.setString(2, reward.getDescription());
+            st.setInt(3, reward.getPointsCost());
+            st.setString(4, reward.getRewardType());
+            st.setString(5, reward.getImageIcon());
+            st.setDouble(6, reward.getDiscountPercent());
+            
+            st.executeUpdate();
+            
         } catch (SQLException e) {
-            throw new Exception("Lỗi CSDL: " + e.getMessage());
+            throw new Exception("Lỗi khi thêm Voucher mới: " + e.getMessage());
         }
-        return list;
     }
 
-    public int getActiveVouchersCount() {
-        String sql = "SELECT COUNT(*) FROM RewardCatalog WHERE IsActive = 1";
+    public void updateReward(RewardCatalog reward) throws Exception {
+        String sql = "UPDATE RewardCatalog SET RewardName = ?, Description = ?, PointsCost = ?, RewardType = ?, ImageIcon = ?, DiscountPercent = ?, UpdatedAt = GETDATE() WHERE RewardID = ?";
+
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
-            if (rs.next()) return rs.getInt(1);
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setString(1, reward.getRewardName());
+            st.setString(2, reward.getDescription());
+            st.setInt(3, reward.getPointsCost());
+            st.setString(4, reward.getRewardType());
+            st.setString(5, reward.getImageIcon());
+            st.setDouble(6, reward.getDiscountPercent());
+            st.setInt(7, reward.getRewardId());
+            
+            st.executeUpdate();
+            
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new Exception("Lỗi khi cập nhật Voucher: " + e.getMessage());
         }
-        return 0;
     }
 
-    public int getRedemptionsThisMonth() {
-        String sql = "SELECT COUNT(*) FROM Vouchers WHERE MONTH(CreatedAt) = MONTH(GETDATE()) AND YEAR(CreatedAt) = YEAR(GETDATE())";
-        try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
+    public void toggleRewardStatus(int rewardId, boolean isActive) throws Exception {
+        String sql = "UPDATE RewardCatalog SET IsActive = ?, UpdatedAt = GETDATE() WHERE RewardID = ?";
 
-    public int getTotalPointsSpent() {
-        String sql = "SELECT SUM(PointsCost) FROM Vouchers";
         try (Connection cn = DBContext.getConnection();
-             PreparedStatement st = cn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
-            if (rs.next()) return rs.getInt(1);
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            
+            st.setBoolean(1, isActive);
+            st.setInt(2, rewardId);
+            
+            st.executeUpdate();
+            
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new Exception("Lỗi khi đổi trạng thái Voucher: " + e.getMessage());
         }
-        return 0;
     }
 }

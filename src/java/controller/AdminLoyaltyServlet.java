@@ -11,7 +11,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import dao.VoucherDAO;
+import dto.VoucherHistoryDTO;
 
+
+
+/**
+ * AdminLoyaltyServlet điều hướng trang Quản lý Voucher & Điểm.
+ */
 @WebServlet(name = "AdminLoyaltyServlet", urlPatterns = {"/admin/loyalty"})
 public class AdminLoyaltyServlet extends HttpServlet {
 
@@ -19,25 +26,49 @@ public class AdminLoyaltyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        RewardCatalogDAO catalogDAO = new RewardCatalogDAO();
-        MemberTierDAO tierDAO = new MemberTierDAO();
         try {
-            List<RewardCatalog> list = catalogDAO.getAllRewardsForAdmin();
-            List<MemberTier> tiers = tierDAO.getAllTiers();
-            int activeVouchersCount = catalogDAO.getActiveVouchersCount();
-            int redemptionsThisMonth = catalogDAO.getRedemptionsThisMonth();
-            int totalPointsSpent = catalogDAO.getTotalPointsSpent();
+            VoucherDAO voucherDAO = new VoucherDAO();
+            RewardCatalogDAO rewardDAO = new RewardCatalogDAO();
+            MemberTierDAO tierDAO = new MemberTierDAO();
             
-            request.setAttribute("rewardList", list);
-            request.setAttribute("tierList", tiers);
-            request.setAttribute("activeVouchersCount", activeVouchersCount);
-            request.setAttribute("redemptionsThisMonth", redemptionsThisMonth);
+            int activeVouchers = voucherDAO.getActiveVouchersCount();
+            int redeemedThisMonth = voucherDAO.getRedeemedVouchersThisMonth();
+            int totalPointsSpent = voucherDAO.getTotalPointsSpent();
+            List<RewardCatalog> rewardsList = rewardDAO.getAllRewards();
+            List<MemberTier> tiers = tierDAO.getAllTiers();
+            
+            request.setAttribute("activeVouchers", activeVouchers);
+            request.setAttribute("redeemedThisMonth", redeemedThisMonth);
             request.setAttribute("totalPointsSpent", totalPointsSpent);
+            request.setAttribute("rewardsList", rewardsList);
+            request.setAttribute("tierList", tiers);
+            
+            // Pagination logic for Voucher History
+            int page = 1;
+            int recordsPerPage = 10;
+            if (request.getParameter("page") != null) {
+                try {
+                    page = Integer.parseInt(request.getParameter("page"));
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            int offset = (page - 1) * recordsPerPage;
+            
+            List<VoucherHistoryDTO> voucherHistory = voucherDAO.getVoucherHistory(recordsPerPage, offset);
+            int totalRecords = voucherDAO.getTotalVouchersCount();
+            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+            
+            request.setAttribute("voucherHistory", voucherHistory);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecords", totalRecords);
+            
+            request.getRequestDispatcher("/WEB-INF/views/admin/manage_loyalty.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi tải dữ liệu loyalty");
         }
-        
-        request.getRequestDispatcher("/WEB-INF/views/admin/manage_loyalty.jsp").forward(request, response);
     }
 
     @Override

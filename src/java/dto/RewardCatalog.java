@@ -14,6 +14,7 @@ public class RewardCatalog {
     private Date updatedAt;
     
     // Dynamic discount fields
+    private double discountPercent; // New dynamic discount
     private String discountType;
     private double discountValue;
     private double maxDiscount;
@@ -21,7 +22,7 @@ public class RewardCatalog {
     public RewardCatalog() {
     }
 
-    public RewardCatalog(int rewardId, String rewardName, String description, int pointsCost, String rewardType, String imageIcon, boolean isActive, Date createdAt, Date updatedAt) {
+    public RewardCatalog(int rewardId, String rewardName, String description, int pointsCost, String rewardType, String imageIcon, boolean isActive, Date createdAt, Date updatedAt, double discountPercent) {
         this.rewardId = rewardId;
         this.rewardName = rewardName;
         this.description = description;
@@ -31,9 +32,10 @@ public class RewardCatalog {
         this.isActive = isActive;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.discountPercent = discountPercent;
     }
 
-    public RewardCatalog(int rewardId, String rewardName, String description, int pointsCost, String rewardType, String imageIcon, boolean isActive, Date createdAt, Date updatedAt, String discountType, double discountValue, double maxDiscount) {
+    public RewardCatalog(int rewardId, String rewardName, String description, int pointsCost, String rewardType, String imageIcon, boolean isActive, Date createdAt, Date updatedAt, String discountType, double discountValue, double maxDiscount, double discountPercent) {
         this.rewardId = rewardId;
         this.rewardName = rewardName;
         this.description = description;
@@ -46,6 +48,15 @@ public class RewardCatalog {
         this.discountType = discountType;
         this.discountValue = discountValue;
         this.maxDiscount = maxDiscount;
+        this.discountPercent = discountPercent;
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = discountPercent;
     }
 
     public int getRewardId() {

@@ -124,9 +124,9 @@ SELECT TOP 1 @CID_VOUCHER = CustomerID FROM Customers WHERE Phone = '0901111111'
 
 IF @CID_VOUCHER IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Vouchers WHERE CustomerID = @CID_VOUCHER)
 BEGIN
-    INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status) VALUES
-    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 3000, DATEADD(month, 1, GETDATE()), 'Unused'),
-    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 600, DATEADD(day, 15, GETDATE()), 'Unused');
+    INSERT INTO Vouchers (CustomerID, VoucherCode, RewardType, PointsCost, ExpiryDate, Status, DiscountPercent) VALUES
+    (@CID_VOUCHER, 'FREE-111111', 'FREE_WASH', 3000, DATEADD(month, 1, GETDATE()), 'Unused', 100.00),
+    (@CID_VOUCHER, 'DISC-222222', '20_PERCENT_OFF', 600, DATEADD(day, 15, GETDATE()), 'Unused', 20.00);
 END
 GO
 
@@ -152,9 +152,9 @@ GO
 -- 7. THÊM REWARD CATALOG (QUÀ TẶNG)
 IF NOT EXISTS (SELECT 1 FROM RewardCatalog)
 BEGIN
-    INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon) VALUES
-    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 300, '10_PERCENT_OFF', 'percent'),
-    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 600, '20_PERCENT_OFF', 'tag'),
-    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 3000, 'FREE_WASH', 'droplets');
+    INSERT INTO RewardCatalog (RewardName, Description, PointsCost, RewardType, ImageIcon, DiscountPercent) VALUES
+    (N'Voucher Giảm 10%', N'Áp dụng cho mọi dịch vụ rửa xe', 300, '10_PERCENT_OFF', 'percent', 10.00),
+    (N'Voucher Giảm 20%', N'Áp dụng cho mọi dịch vụ rửa xe', 600, '20_PERCENT_OFF', 'tag', 20.00),
+    (N'Rửa Xe Miễn Phí', N'Miễn phí 1 lần rửa xe tiêu chuẩn', 3000, 'FREE_WASH', 'droplets', 100.00);
 END
 GO

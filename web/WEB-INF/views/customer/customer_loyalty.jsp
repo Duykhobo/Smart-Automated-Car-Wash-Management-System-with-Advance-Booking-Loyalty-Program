@@ -1,4 +1,4 @@
-﻿<%@page import="utils.AppConstants" %>
+<%@page import="utils.AppConstants" %>
 <%@page import="dto.Customer" %>
 <%@page import="dto.RewardCatalog" %>
 <%@page import="dto.Voucher" %>
@@ -157,7 +157,15 @@
                                             <div class="absolute top-0 left-0 bottom-0 w-1 bg-amber-400"></div>
                                             
                                             <div class="flex justify-between items-start mb-2 pl-2">
-                                                <h4 class="text-white font-bold text-sm truncate"><c:out value="${v.rewardType}" /></h4>
+                                                <h4 class="text-white font-bold text-sm truncate">
+                                                    <c:choose>
+                                                        <c:when test="${v.discountPercent > 0}">Giảm <fmt:formatNumber value="${v.discountPercent}" maxFractionDigits="0"/>%</c:when>
+                                                        <c:when test="${v.rewardType == 'FREE_WASH'}">Miễn Phí</c:when>
+                                                        <c:when test="${v.rewardType == '10_PERCENT_OFF'}">Giảm 10%</c:when>
+                                                        <c:when test="${v.rewardType == '20_PERCENT_OFF'}">Giảm 20%</c:when>
+                                                        <c:otherwise><c:out value="${v.rewardType}" /></c:otherwise>
+                                                    </c:choose>
+                                                </h4>
                                                 <span class="text-xs text-text-muted"><fmt:formatDate value="${v.expiryDate}" pattern="dd/MM/yyyy" /></span>
                                             </div>
                                             

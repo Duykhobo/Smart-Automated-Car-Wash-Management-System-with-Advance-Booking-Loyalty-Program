@@ -116,7 +116,9 @@ public class BookingController extends HttpServlet {
                 dto.Voucher v = dao.getActiveVoucherByCode(voucherCode.trim(), customer.getCustomerId());
                 if (v != null) {
                     voucherId = v.getVoucherId();
-                    if ("PERCENT_10".equals(v.getRewardType())) discountAmount = originalPrice * 0.10;
+                    if (v.getDiscountPercent() > 0) {
+                        discountAmount = originalPrice * (v.getDiscountPercent() / 100.0);
+                    } else if ("PERCENT_10".equals(v.getRewardType())) discountAmount = originalPrice * 0.10;
                     else if ("PERCENT_20".equals(v.getRewardType())) discountAmount = originalPrice * 0.20;
                     else if ("FREE_WASH".equals(v.getRewardType())) discountAmount = originalPrice;
                     else if ("UPGRADE_WAX".equals(v.getRewardType())) discountAmount = 50000; // Assume 50k for wax upgrade

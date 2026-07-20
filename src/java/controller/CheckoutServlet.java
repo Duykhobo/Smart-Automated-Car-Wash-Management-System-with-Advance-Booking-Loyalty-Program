@@ -193,9 +193,12 @@ public class CheckoutServlet extends HttpServlet {
                     return;
                 }
                 
-                if (rewardType.startsWith("PERCENT_") || rewardType.endsWith("_PERCENT_OFF")) {
+                if (reward.getDiscountPercent() > 0) {
+                    discountAmount = originalPrice * (reward.getDiscountPercent() / 100.0);
+                } else if ("FREE_WASH".equalsIgnoreCase(rewardType)) {
+                    discountAmount = originalPrice; // Miễn phí hoàn toàn
+                } else if (rewardType.startsWith("PERCENT_") || rewardType.endsWith("_PERCENT_OFF")) {
                     try {
-                        // Extract digits from e.g. "10_PERCENT_OFF" or "PERCENT_10"
                         String percentStr = rewardType.replaceAll("[^0-9.]", "");
                         double percent = Double.parseDouble(percentStr);
                         discountAmount = originalPrice * (percent / 100.0);
@@ -203,8 +206,6 @@ public class CheckoutServlet extends HttpServlet {
                         sendErrorResponse(request, response, "Lỗi phân tích phần trăm khuyến mãi.");
                         return;
                     }
-                } else if ("FREE_WASH".equalsIgnoreCase(rewardType)) {
-                    discountAmount = originalPrice; // Miễn phí hoàn toàn
                 } else {
                     sendErrorResponse(request, response, "Định dạng khuyến mãi của Voucher không hợp lệ.");
                     return;

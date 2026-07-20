@@ -46,10 +46,10 @@ public class DBContext {
             // Khởi tạo Pool!
             dataSource = new HikariDataSource(config);
             
-            System.out.println("HikariCP Connection Pool đã được khởi tạo thành công!");
+            System.out.println("HikariCP Connection Pool initialized successfully!");
             
         } catch (Exception e) {
-            System.err.println("Lỗi nghiêm trọng khi khởi tạo HikariCP: ");
+            System.err.println("Critical error initializing HikariCP: ");
             e.printStackTrace();
         }
     }
@@ -69,13 +69,13 @@ public class DBContext {
     public static void closePool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
-            System.out.println("Đã đóng HikariCP Connection Pool.");
+            System.out.println("HikariCP Connection Pool closed.");
         }
     }
 
     // Hàm Main để Dev test local xem file jar đã nhận và kết nối được chưa
     public static void main(String[] args) {
-        System.out.println("=== Test mượn Connection từ HikariCP Pool ===");
+        System.out.println("=== Testing Connection from HikariCP Pool ===");
         try (Connection conn = DBContext.getConnection()) {
             if (conn != null && !conn.isClosed()) {
                 System.out.println("Tuyệt vời! Đã lấy được connection: " + conn.toString());

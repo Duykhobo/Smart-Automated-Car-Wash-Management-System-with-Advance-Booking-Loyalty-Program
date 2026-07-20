@@ -13,6 +13,7 @@ import dao.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import service.BookingService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
@@ -28,7 +29,7 @@ import utils.AppConstants;
  * - Phương thức POST: Xử lý 2 luồng thao tác từ người dùng là Dời Lịch (update) và Hủy Lịch (cancel).
  *   Kèm theo các logic xác thực thời gian chuẩn xác lấy từ SystemConfig.
  */
-@WebServlet(name = "BookingHistoryController", urlPatterns = {"/BookingHistoryController"})
+@WebServlet(name = "BookingHistoryController", urlPatterns = {"/BookingHistoryController", "/customer/booking_history"})
 public class BookingHistoryController extends HttpServlet {
 
     /**
@@ -77,6 +78,7 @@ public class BookingHistoryController extends HttpServlet {
 
                         dao.ServiceDAO serviceDao = new dao.ServiceDAO();
                         request.setAttribute("services", serviceDao.getAllActiveServices());
+                        request.setAttribute("servicePricesJson", serviceDao.getServicePricesJson());
 
                         // Determine Tier Name and Max Booking Days
                         String tierStatus = cus.getTierStatus();
@@ -139,9 +141,32 @@ public class BookingHistoryController extends HttpServlet {
             }
             cus.setTotalWashes(bookDao.getTotalWashes(cus.getCustomerId()));
             List<Booking> upcomingBookings = bookDao.getUpcomingBookings(cus.getCustomerId());
-            List<Booking> historyBookings = bookDao.getHistoryBookings(cus.getCustomerId());
+            
+            // Pagination logic for history bookings
+            int page = 1;
+            int pageSize = 5; // Display 5 items per page
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                try {
+                    page = Integer.parseInt(pageParam);
+                    if (page < 1) page = 1;
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            
+            int totalRecords = bookDao.getTotalHistoryBookings(cus.getCustomerId());
+            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
+            
+            List<Booking> historyBookings = bookDao.getHistoryBookings(cus.getCustomerId(), page, pageSize);
+            
             request.setAttribute("upcomingBookings", upcomingBookings);
             request.setAttribute("historyBookings", historyBookings);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("customer", cus);
             request.getRequestDispatcher("/WEB-INF/views/customer/booking_history.jsp").forward(request, response);
         }
@@ -167,7 +192,11 @@ public class BookingHistoryController extends HttpServlet {
             try {
                 int bookingId = Integer.parseInt(request.getParameter("bookingId"));
                 int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
-                int serviceId = Integer.parseInt(request.getParameter("service"));
+                String[] serviceIds = request.getParameterValues("services");
+                if (serviceIds == null || serviceIds.length == 0) {
+                    throw new Exception("Vui lòng chọn ít nhất một dịch vụ.");
+                }
+                
                 String dateStr = request.getParameter("date");
                 String timeStr = request.getParameter("time");
 
@@ -196,24 +225,43 @@ public class BookingHistoryController extends HttpServlet {
                 BookingDAO bookDao = new BookingDAO();
                 CustomerDAO cusDao = new CustomerDAO();
                 Customer cus = cusDao.getCustomerByAccountId(user.getUserId());
+                
+                // Validate max advance booking date based on Tier
+                BookingService bookingService = new BookingService();
+                bookingService.validateMaxBookingDate(cus.getTierStatus(), newDate);
 
                 Booking oldBooking = bookDao.getBookingById(bookingId);
                 if (oldBooking != null && oldBooking.getCustomerId() == cus.getCustomerId() && "Pending".equalsIgnoreCase(oldBooking.getStatus())) {
-                    // Cập nhật giá dựa trên dịch vụ mới
+                    // Cập nhật giá dựa trên dịch vụ mới và kích thước xe
                     ServiceDAO serviceDAO = new ServiceDAO();
-                    dto.Service selectedService = null;
+                    dao.CarDao carDao = new dao.CarDao();
+                    dto.Cars currentCar = carDao.getCarById(vehicleId);
+                    String vehicleSize = (currentCar != null) ? currentCar.getVehicleSize() : "SEDAN";
+
+                    double originalPrice = 0;
+                    int totalDurationMinutes = 0;
                     for (dto.Service s : serviceDAO.getAllActiveServices()) {
-                        if (s.getServiceId() == serviceId) {
-                            selectedService = s;
-                            break;
+                        for (String sid : serviceIds) {
+                            if (s.getServiceId() == Integer.parseInt(sid)) {
+                                originalPrice += serviceDAO.getServicePrice(s.getServiceId(), vehicleSize);
+                                totalDurationMinutes += s.getDurationMinutes();
+                                break;
+                            }
                         }
                     }
 
-                    if (selectedService == null) {
+                    if (originalPrice == 0) {
                         throw new Exception("Dịch vụ không hợp lệ.");
                     }
+                    
+                    // Validate if total duration exceeds closing hour
+                    bookingService.validateWorkingHours(newTime, totalDurationMinutes);
 
-                    double originalPrice = selectedService.getBasePrice();
+                    // Validate double booking
+                    if (bookDao.isVehicleDoubleBooked(vehicleId, newDate, newTime, totalDurationMinutes, bookingId)) {
+                        throw new Exception("Lỗi: Xe của bạn đã có lịch hẹn trùng thời gian này. Vui lòng chọn giờ khác hoặc xe khác.");
+                    }
+
                     double oldOriginalPrice = oldBooking.getOriginalPrice();
                     double discountAmount = 0;
                     
@@ -227,7 +275,7 @@ public class BookingHistoryController extends HttpServlet {
                     if (finalPrice < 0) finalPrice = 0;
 
                     boolean success = bookDao.updateBookingTransaction(
-                            bookingId, vehicleId, serviceId,
+                            bookingId, vehicleId, serviceIds,
                             new java.sql.Date(oldBooking.getBookingDate().getTime()), 
                             new java.sql.Time(oldBooking.getScheduledTime().getTime()),
                             newDate, newTime,
@@ -235,20 +283,18 @@ public class BookingHistoryController extends HttpServlet {
                     );
 
                     if (success) {
-                        response.sendRedirect(request.getContextPath() + "/customer/booking_history?msg=UpdateSuccess");
+                        request.getSession().setAttribute("successMessage", "Cập nhật lịch hẹn thành công!");
                     } else {
-                        response.sendRedirect(request.getContextPath() + "/customer/booking_history?msg=UpdateFailed");
+                        request.getSession().setAttribute("errorMessage", "Cập nhật lịch hẹn thất bại.");
                     }
+                    response.sendRedirect(request.getContextPath() + "/customer/booking_history");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/customer/booking_history");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                String errMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-                try {
-                    errMsg = java.net.URLEncoder.encode(errMsg, "UTF-8");
-                } catch (Exception ex) {}
-                response.sendRedirect(request.getContextPath() + "/customer/booking_history?msg=UpdateError&err=" + errMsg);
+                request.getSession().setAttribute("errorMessage", e.getMessage() != null ? e.getMessage() : "Đã xảy ra lỗi hệ thống.");
+                response.sendRedirect(request.getContextPath() + "/customer/booking_history");
             }
         } else if ("cancel".equals(action)) {
             try {
@@ -306,3 +352,4 @@ public class BookingHistoryController extends HttpServlet {
     }// </editor-fold>
 
 }
+

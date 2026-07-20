@@ -19,7 +19,7 @@ public class RedeemVoucherServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/customer/loyalty");
+        response.sendRedirect(request.getContextPath() + "/account/dashboard");
     }
 
     @Override
@@ -51,28 +51,33 @@ public class RedeemVoucherServlet extends HttpServlet {
             if (pointsCost <= 0) {
                 throw new Exception("Số điểm đổi voucher không hợp lệ.");
             }
+            dao.RewardCatalogDAO rcDao = new dao.RewardCatalogDAO();
+            dto.RewardCatalog reward = rcDao.getRewardByType(rewardType);
+            if (reward == null) {
+                throw new Exception("Không tìm thấy phần thưởng này.");
+            }
 
             VoucherDAO dao = new VoucherDAO();
-            dao.redeemVoucher(customerID, rewardType, pointsCost);
+            dao.redeemVoucher(customerID, rewardType, pointsCost, reward.getDiscountPercent());
             cus.setPointsBalance(cus.getPointsBalance() - pointsCost);
 
             session.setAttribute(AppConstants.SESSION_CUSTOMER_INFO, cus);
             session.setAttribute("successMessage", "Đổi Voucher thành công!");
-            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
+            response.sendRedirect(request.getContextPath() + "/account/dashboard");
             return;
 
         } catch (NumberFormatException e) {
             Logger.getLogger(RedeemVoucherServlet.class.getName()).log(Level.SEVERE, null, e);
 
             session.setAttribute("errorMessage", "Số điểm đổi Voucher không hợp lệ!");
-            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
+            response.sendRedirect(request.getContextPath() + "/account/dashboard");
             return;
 
         } catch (Exception e) {
             Logger.getLogger(RedeemVoucherServlet.class.getName()).log(Level.SEVERE, null, e);
 
             session.setAttribute("errorMessage", e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/customer/loyalty");
+            response.sendRedirect(request.getContextPath() + "/account/dashboard");
             return;
         }
     }

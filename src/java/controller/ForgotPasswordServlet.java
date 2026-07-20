@@ -13,7 +13,7 @@ public class ForgotPasswordServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/auth/forgot_password.jsp").forward(request, response);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class ForgotPasswordServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Vui lòng nhập địa chỉ email hợp lệ.");
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/auth/forgot_password.jsp").forward(request, response);
     }
 }

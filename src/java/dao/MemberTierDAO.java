@@ -68,4 +68,19 @@ public class MemberTierDAO {
         }
         return null;
     }
+        public boolean updateMemberTier(MemberTier tier) {
+        String sql = "UPDATE MemberTiers SET MinWashes = ?, MinSpend = ?, PointsModifier = ?, MaxBookingDays = ?, UpdatedAt = GETDATE() WHERE TierID = ?";
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, tier.getMinWashes());
+            st.setDouble(2, tier.getMinSpend());
+            st.setDouble(3, tier.getPointsModifier());
+            st.setInt(4, tier.getMaxBookingDays());
+            st.setInt(5, tier.getTierId());
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

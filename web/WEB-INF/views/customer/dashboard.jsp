@@ -11,33 +11,10 @@
                     <html lang="vi">
 
                     <head>
-                        <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-                        <link rel="preconnect" href="https://fonts.googleapis.com">
-                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                        <link
-                            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-                            rel="stylesheet">
-                        <style>
-                            body,
-                            .font-sans {
-                                font-family: 'Inter', sans-serif !important;
-                            }
-
-                            .font-display {
-                                font-family: 'Be Vietnam Pro', sans-serif !important;
-                            }
-                        </style>
-                        <meta name="viewport"
-                            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-                        <meta charset="utf-8" />
-                        <title>Auto Wash Pro - Dashboard</title>
-                        <!-- Global CSS & Tailwind Config -->
-                        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-                        <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-                        <script src="https://cdn.tailwindcss.com"></script>
-                        <!-- Icons (Lucide) -->
-                        <script src="https://unpkg.com/lucide@latest"></script>
-                    </head>
+    <title>Auto Wash Pro - Dashboard</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    
+</head>
 
                     <body
                         class="m-0 min-h-screen bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
@@ -45,48 +22,9 @@
                         <div class="flex h-screen overflow-hidden bg-bg-primary">
 
                             <!-- Desktop Sidebar -->
-                            <aside
-                                class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
-                                <a href="${pageContext.request.contextPath}/account/dashboard"
-                                    class="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity">
-                                    <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-                                    <span class="text-xl font-display font-bold tracking-tight text-white">AUTOWASH<span
-                                            class="text-[#00d4ff]">PRO</span></span>
-                                </a>
-
-                                <nav class="flex-1 px-4 py-4 space-y-2 mt-4">
-                                    <a href="${pageContext.request.contextPath}/account/dashboard"
-                                        class="flex items-center gap-3 px-4 py-3 bg-[#00d4ff]/10 text-[#00d4ff] rounded-xl border border-[#00d4ff]/20 transition-colors shadow-[0_0_10px_rgba(0,212,255,0.1)]">
-                                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Tổng quan</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/bookings"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                        <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Đặt lịch dịch vụ</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/customer/booking_history"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                        <i data-lucide="history" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Lịch sử rửa xe</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/vehicles"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                        <i data-lucide="car" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Quản lý xe</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/customer/loyalty"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                        <i data-lucide="award" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Loyalty Program</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/account/profile"
-                                        class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
-                                        <i data-lucide="user" class="w-5 h-5"></i>
-                                        <span class="font-medium text-sm">Hồ sơ cá nhân</span>
-                                    </a>
-                                </nav>
-                            </aside>
+                            <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
+    <jsp:param name="activeMenu" value="dashboard" />
+</jsp:include>
 
                             <!-- Main Content Area -->
                             <main
@@ -102,28 +40,16 @@
                                         <div class="hidden sm:flex flex-col items-end mr-2">
                                             <span class="text-xs text-text-muted">Xin chào,</span>
                                             <span
-                                                class="text-sm font-bold text-white">${sessionScope.USER.fullName}</span>
+                                                class="text-sm font-bold text-white">${sessionScope.CUSTOMER_INFO.fullName}</span>
                                         </div>
                                         <div
                                             class="w-10 h-10 rounded-full bg-[#00d4ff]/20 border border-[#00d4ff] flex items-center justify-center text-[#00d4ff] font-bold">
-                                            ${sessionScope.USER.fullName.substring(0,1)}
+                                            ${sessionScope.CUSTOMER_INFO.fullName.substring(0,1)}
                                         </div>
                                     </div>
                                 </header>
 
                                 <div class="px-4 md:px-8 py-8 max-w-4xl mx-auto space-y-8">
-                                    <% String errMsg=(String)
-                                        session.getAttribute(utils.AppConstants.SESSION_MSG_ERROR); if (errMsg !=null) {
-                                        %>
-                                        <div
-                                            class="bg-error/10 border border-error/20 text-error p-4 rounded-xl flex items-center gap-3">
-                                            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-                                            <span><strong>Lá»—i:</strong>
-                                                <%= errMsg %>
-                                            </span>
-                                        </div>
-                                        <% session.removeAttribute(utils.AppConstants.SESSION_MSG_ERROR); } %>
-
                                             <!-- Membership Card -->
                                             <section aria-labelledby="membership-card-title"
                                                 class="relative w-full max-w-md mx-auto rounded-2xl overflow-hidden bg-gradient-to-br from-bg-primary to-[#0a1128] border border-border-glass shadow-2xl p-6 group">
@@ -152,10 +78,20 @@
                                                             <span
                                                                 class="text-gray-300 text-xs font-medium uppercase tracking-wider mb-1">Hạng
                                                                 Thành Viên</span>
-                                                            <span
-                                                                class="text-amber-400 font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_10px_rgba(251,191,36,0.6)] font-display">
-                                                                <c:out value="${customer.tierStatus}" />
-                                                            </span>
+                                                            <c:choose>
+                                                                <c:when test="${customer.tierStatus == 'Silver'}">
+                                                                    <span class="bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_15px_rgba(156,163,175,0.8)] font-display">Silver</span>
+                                                                </c:when>
+                                                                <c:when test="${customer.tierStatus == 'Gold'}">
+                                                                    <span class="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_20px_rgba(250,204,21,0.9)] font-display">Gold</span>
+                                                                </c:when>
+                                                                <c:when test="${customer.tierStatus == 'Platinum'}">
+                                                                    <span class="bg-gradient-to-r from-cyan-300 via-white to-purple-400 text-transparent bg-clip-text font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_25px_rgba(0,212,255,0.9)] font-display animate-pulse">Platinum</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-slate-300 font-extrabold text-xl uppercase tracking-widest drop-shadow-[0_0_10px_rgba(148,163,184,0.6)] font-display">Member</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </div>
                                                     </div>
 
@@ -229,15 +165,15 @@
                                                 <div class="flex flex-col gap-4">
                                                     <c:choose>
                                                         <c:when test="${not empty upcomingBooking}">
-                                                            <article class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'border-l-amber-500' : 'border-l-[#00d4ff]'} shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden">
-                                                                <div class="absolute -right-10 -top-10 w-32 h-32 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/10' : 'bg-[#00d4ff]/10'} rounded-full blur-2xl">
+                                                            <article class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'border-l-amber-500' : (fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'waitlisted' ? 'border-l-orange-500' : 'border-l-[#00d4ff]')} shadow-lg hover:-translate-y-1 transition-transform relative overflow-hidden">
+                                                                <div class="absolute -right-10 -top-10 w-32 h-32 ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/10' : (fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'waitlisted' ? 'bg-orange-500/10' : 'bg-[#00d4ff]/10')} rounded-full blur-2xl">
                                                                 </div>
                                                                 <div class="flex flex-col sm:flex-row justify-between gap-4">
                                                                     <div class="space-y-3 flex-1">
                                                                         <div class="flex flex-wrap items-center gap-2">
-                                                                            <span class="px-2.5 py-1 rounded ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'pending' ? 'bg-amber-500/20 text-amber-500' : 'bg-[#00d4ff]/20 text-[#00d4ff]'} text-xs font-bold uppercase ${fn:toLowerCase(fn:trim(upcomingBooking.status)) == 'in progress' ? 'animate-pulse' : ''}">
-                                                                                <c:out value="${upcomingBooking.status}" />
-                                                                            </span>
+                                                                            <jsp:include page="../components/status_badge.jsp">
+                                                                                <jsp:param name="status" value="${upcomingBooking.status}" />
+                                                                            </jsp:include>
                                                                             <span class="text-text-muted text-sm font-medium">Mã Đặt: #<c:out value="${upcomingBooking.bookingId}" /></span>
 
                                                                             <c:if test="${customer.tierStatus != 'Member'}">
@@ -267,14 +203,16 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="flex flex-col items-start sm:items-end justify-between border-t sm:border-t-0 sm:border-l border-border-glass pt-4 sm:pt-0 sm:pl-6 mt-2 sm:mt-0 min-w-[140px]">
+                                                                    <div class="flex flex-col items-start sm:items-end justify-center gap-4 h-full border-t sm:border-t-0 sm:border-l border-border-glass pt-4 sm:pt-0 sm:pl-6 mt-2 sm:mt-0 min-w-[140px]">
                                                                         <div class="text-xl font-display font-bold text-[#00d4ff]"><fmt:formatNumber value="${upcomingBooking.finalPrice}" pattern="#,###" /><span class="text-sm font-sans font-normal text-text-muted">VND</span></div>
                                                                         
-                                                                        <!-- QR Code for Automated Check-in -->
-                                                                        <div class="flex flex-col items-center justify-center mt-3 mb-2 p-2 bg-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                                                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${upcomingBooking.bookingId}" alt="QR Code" class="w-16 h-16" />
-                                                                            <span class="text-[10px] text-gray-800 font-bold mt-1 uppercase">Quét tại trạm</span>
-                                                                        </div>
+                                                                        <c:if test="${upcomingBooking.status == 'Pending' || upcomingBooking.status == 'Waitlisted'}">
+                                                                            <!-- QR Code for Automated Check-in -->
+                                                                            <div onclick="openQrModal('https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${upcomingBooking.bookingId}', 'BK-${upcomingBooking.bookingId}')" class="flex flex-col items-center justify-center mt-3 mb-2 p-2 bg-white rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.2)] cursor-pointer hover:scale-105 transition-transform duration-300" title="Nhấn để phóng to">
+                                                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${upcomingBooking.bookingId}" alt="QR Code" class="w-16 h-16 pointer-events-none" />
+                                                                                <span class="text-[10px] text-gray-800 font-bold mt-1 uppercase pointer-events-none">Quét tại trạm</span>
+                                                                            </div>
+                                                                        </c:if>
 
                                                                         <div class="flex gap-2 mt-auto w-full justify-between sm:justify-end">
                                                                             <a href="${pageContext.request.contextPath}/customer/booking_history" class="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-bg-surface hover:bg-bg-surface-hover text-white border border-border-glass text-sm font-semibold transition-colors text-center">
@@ -307,38 +245,60 @@
                             </main>
 
                             <!-- Mobile Bottom Navigation (Chỉ hiện trên điện thoại) -->
-                            <nav class="md:hidden fixed bottom-0 left-0 w-full glass-panel border-t border-border-glass z-50 px-2 py-2"
-                                style="padding-bottom: env(safe-area-inset-bottom);"
-                                aria-label="Điều hướng chính Mobile">
-                                <div class="flex justify-around items-center h-14">
-                                    <a href="${pageContext.request.contextPath}/account/dashboard"
-                                        class="flex flex-col items-center gap-1 w-16 text-[#00d4ff]">
-                                        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                                        <span class="text-[10px] font-medium">Tổng quan</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/bookings"
-                                        class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                                        <i data-lucide="calendar-plus" class="w-6 h-6"></i>
-                                        <span class="text-[10px] font-medium">Đặt lịch</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/customer/booking_history"
-                                        class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                                        <i data-lucide="history" class="w-6 h-6"></i>
-                                        <span class="text-[10px] font-medium">Lịch sử</span>
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/account/profile"
-                                        class="flex flex-col items-center gap-1 w-16 text-text-muted hover:text-white transition-colors">
-                                        <i data-lucide="user" class="w-6 h-6"></i>
-                                        <span class="text-[10px] font-medium">Hồ sơ</span>
-                                    </a>
-                                </div>
-                            </nav>
+                            <jsp:include page="/WEB-INF/views/components/customer_bottom_nav.jsp">
+    <jsp:param name="activeMenu" value="dashboard" />
+</jsp:include>
 
                         </div>
+                        
+                        <!-- QR Code Zoom Modal -->
+                        <div id="qrModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300" onclick="closeQrModal()">
+                            <div class="bg-white p-8 rounded-2xl shadow-[0_0_30px_rgba(0,212,255,0.3)] border border-[#00d4ff]/30 scale-95 transition-transform duration-300" id="qrModalContent" onclick="event.stopPropagation()">
+                                <h3 class="text-xl font-bold text-center text-slate-800 mb-6">Mã QR Check-in</h3>
+                                <div class="flex justify-center mb-6 min-w-[250px] min-h-[250px] bg-white p-2 rounded-xl">
+                                    <img id="qrModalImg" src="" alt="Zoomed QR Code" class="w-[250px] h-[250px]" />
+                                </div>
+                                <div class="text-center text-sm text-slate-500 mb-4 font-mono font-bold tracking-wider" id="qrModalId"></div>
+                                <button onclick="closeQrModal()" class="w-full py-3 bg-gradient-to-r from-cyan-400 to-[#00d4ff] text-black font-bold rounded-xl hover:from-cyan-300 hover:to-cyan-400 transition-all shadow-[0_0_15px_rgba(0,212,255,0.4)]">Đóng lại</button>
+                            </div>
+                        </div>
+
                         <script>
-                            lucide.createIcons();
+                            function openQrModal(imgUrl, code) {
+                                const modal = document.getElementById('qrModal');
+                                const modalContent = document.getElementById('qrModalContent');
+                                const img = document.getElementById('qrModalImg');
+                                const idLabel = document.getElementById('qrModalId');
+                                
+                                img.src = imgUrl;
+                                idLabel.innerText = code;
+                                
+                                modal.classList.remove('hidden');
+                                modal.classList.add('flex');
+                                
+                                // Trigger reflow for animation
+                                void modal.offsetWidth;
+                                
+                                modal.classList.remove('opacity-0');
+                                modalContent.classList.remove('scale-95');
+                                modalContent.classList.add('scale-100');
+                            }
+                            
+                            function closeQrModal() {
+                                const modal = document.getElementById('qrModal');
+                                const modalContent = document.getElementById('qrModalContent');
+                                
+                                modal.classList.add('opacity-0');
+                                modalContent.classList.remove('scale-100');
+                                modalContent.classList.add('scale-95');
+                                
+                                setTimeout(() => {
+                                    modal.classList.remove('flex');
+                                    modal.classList.add('hidden');
+                                }, 300);
+                            }
                         </script>
-                        <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
+<jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 

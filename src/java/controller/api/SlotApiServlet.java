@@ -29,7 +29,7 @@ import dto.User;
 @WebServlet(name = "SlotApiServlet", urlPatterns = {"/api/slots"})
 public class SlotApiServlet extends HttpServlet {
 
-    private static final int SLOT_DURATION_MINS = 60;
+    private static final int SLOT_DURATION_MINS = 30;
     private static final int DEFAULT_MAX_CAPACITY = 3;
 
     @Override
@@ -56,6 +56,12 @@ public class SlotApiServlet extends HttpServlet {
 
         try {
             Date bookingDate = Date.valueOf(dateParam);
+            
+            String durationParam = request.getParameter("duration");
+            int duration = (durationParam != null && !durationParam.isEmpty()) ? Integer.parseInt(durationParam) : 30;
+            int slotsNeeded = (int) Math.ceil(duration / (double) SLOT_DURATION_MINS);
+            if (slotsNeeded < 1) slotsNeeded = 1;
+
             BookingDAO bookingDAO = new BookingDAO();
             
             // Lấy dữ liệu công suất đã được đặt cho từng khung giờ trong ngày
@@ -73,6 +79,7 @@ public class SlotApiServlet extends HttpServlet {
             int openingHour = configDao.getOpeningHour();
             int closingHour = configDao.getClosingHour();
             int minAdvanceBookingMinutes = configDao.getMinAdvanceBookingMinutes();
+            int systemMaxCapacity = configDao.getMaxSlotCapacity();
 
             LocalTime openTime = LocalTime.of(openingHour, 0);
             LocalTime closeTime = LocalTime.of(closingHour, 0);
@@ -94,14 +101,15 @@ public class SlotApiServlet extends HttpServlet {
                 Map<String, Object> slotData = new HashMap<>();
                 slotData.put("time", timeStr);
                 
-                // Nạp thông số Booked/Capacity
+                // Dữ liệu DB (nếu có)
                 if (dbSlotMap.containsKey(timeStr)) {
                     BookingSlotCapacity dbSlot = dbSlotMap.get(timeStr);
                     slotData.put("currentBooked", dbSlot.getCurrentBooked());
                     slotData.put("maxCapacity", dbSlot.getMaxCapacity());
                 } else {
+                    // Chưa có booking nào cho khung giờ này trong DB
                     slotData.put("currentBooked", 0);
-                    slotData.put("maxCapacity", DEFAULT_MAX_CAPACITY);
+                    slotData.put("maxCapacity", systemMaxCapacity);
                 }
 
                 slotData.put("isPast", isPast);
@@ -109,13 +117,40 @@ public class SlotApiServlet extends HttpServlet {
                 int currentBooked = (int) slotData.get("currentBooked");
                 int maxCapacity = (int) slotData.get("maxCapacity");
                 
+                boolean isFull = currentBooked >= maxCapacity;
+                
+                // Thuật toán: Check khả năng phục vụ liên tiếp (Look-ahead)
+                if (!isPast && !isFull && slotsNeeded > 1) {
+                    LocalTime lookAheadTime = currentTime;
+                    for (int i = 1; i < slotsNeeded; i++) {
+                        lookAheadTime = lookAheadTime.plusMinutes(SLOT_DURATION_MINS);
+                        if (lookAheadTime.isAfter(closeTime)) {
+                            isFull = true; // Tràn ra ngoài giờ đóng cửa
+                            break;
+                        }
+                        String lookAheadStr = lookAheadTime.format(formatter);
+                        if (dbSlotMap.containsKey(lookAheadStr)) {
+                            BookingSlotCapacity lookAheadDbSlot = dbSlotMap.get(lookAheadStr);
+                            if (lookAheadDbSlot.getCurrentBooked() >= lookAheadDbSlot.getMaxCapacity()) {
+                                isFull = true; // Một slot tương lai bị đầy
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Nếu bị Full do look-ahead, ta fake currentBooked = maxCapacity để frontend xử lý như cũ
+                if (isFull && currentBooked < maxCapacity) {
+                    slotData.put("currentBooked", maxCapacity);
+                }
+                
                 // Cờ nearlyFull: true nếu chỉ còn đúng 1 chỗ trống
                 boolean nearlyFull = (maxCapacity - currentBooked) == 1;
                 slotData.put("nearlyFull", nearlyFull);
                 
                 responseSlots.add(slotData);
-                // Advance by 60 mins (Mỗi slot cách nhau 1 tiếng)
-                currentTime = currentTime.plusMinutes(60);
+                // Advance by 30 mins
+                currentTime = currentTime.plusMinutes(SLOT_DURATION_MINS);
             }
 
             StringBuilder jsonBuilder = new StringBuilder("[");

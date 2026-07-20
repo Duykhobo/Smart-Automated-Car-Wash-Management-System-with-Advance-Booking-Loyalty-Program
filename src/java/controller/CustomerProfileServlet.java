@@ -13,13 +13,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.CustomerService;
+import dao.BookingDAO;
 import utils.AppConstants;
 
 import javax.servlet.annotation.MultipartConfig;
 import java.io.File;
 import java.nio.file.Paths;
 
-@WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet"})
+@WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet", "/account/profile"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
 public class CustomerProfileServlet extends HttpServlet {
 
@@ -31,11 +32,16 @@ public class CustomerProfileServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         } else {
             Customer customer = customerService.getCustomerByAccountId(user.getUserId());
+            if (customer != null) {
+                BookingDAO bookingDAO = new BookingDAO();
+                customer.setTotalSpend(bookingDAO.getTotalSpend(customer.getCustomerId()));
+                customer.setTotalWashes(bookingDAO.getTotalWashes(customer.getCustomerId()));
+            }
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/customer/profile.jsp").forward(request, response);
         }
     }
 
@@ -45,7 +51,7 @@ public class CustomerProfileServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;
         }
 

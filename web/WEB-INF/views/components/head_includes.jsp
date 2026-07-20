@@ -1,0 +1,31 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body, .font-sans { font-family: 'Inter', sans-serif !important; }
+    .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<meta charset="UTF-8" />
+
+<!-- Global CSS & Tailwind Config -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
+<script charset="UTF-8" src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
+<script charset="UTF-8" src="https://cdn.tailwindcss.com"></script>
+
+<!-- Icons (Lucide) -->
+<script charset="UTF-8" src="https://unpkg.com/lucide@latest"></script>
+
+<!-- Flatpickr (Date Picker) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+
+<!-- TomSelect (Custom Dropdown) -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+<script charset="UTF-8" src="${pageContext.request.contextPath}/js/global.js?v=2"></script>

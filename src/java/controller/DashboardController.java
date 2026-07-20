@@ -23,7 +23,7 @@ import utils.AppConstants;
  * 
  * @author thien
  */
-@WebServlet(name = "DashboardController", urlPatterns = {"/DashboardController"})
+@WebServlet(name = "DashboardController", urlPatterns = {"/DashboardController", "/account/dashboard"})
 public class DashboardController extends HttpServlet {
 
     /**
@@ -56,13 +56,15 @@ public class DashboardController extends HttpServlet {
         processRequest(request, response);
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;
         }
         CustomerDAO cusDAO = new CustomerDAO();
         Customer cus = cusDAO.getCustomerByAccountId(user.getUserId());
         if (cus != null) {
             dao.BookingDAO bookingDAO = new dao.BookingDAO();
+            bookingDAO.autoCancelExpiredBookings();
+            bookingDAO.autoPromoteWaitlist();
             // Lấy dữ liệu thật từ Bookings table
             cus.setTotalWashes(bookingDAO.getTotalWashes(cus.getCustomerId()));
             cus.setTotalSpend(bookingDAO.getTotalSpend(cus.getCustomerId()));
@@ -104,27 +106,59 @@ public class DashboardController extends HttpServlet {
             }
             
             if (nextTier != null) {
-                // Calculate missing points (using min spend for now as an example metric)
-                double spendMissing = nextTier.getMinSpend() - cus.getTotalSpend();
-                if (spendMissing < 0) spendMissing = 0;
-                
-                request.setAttribute("nextTierName", nextTier.getTierName());
-                request.setAttribute("spendToNextTier", spendMissing);
-                
-                // Progress percentage
+                // Calculate progress based on Spend
                 double currentMinSpend = currentTier != null ? currentTier.getMinSpend() : 0;
                 double spendRange = nextTier.getMinSpend() - currentMinSpend;
-                double currentProgress = cus.getTotalSpend() - currentMinSpend;
-                double progressPercent = (currentProgress / spendRange) * 100;
+                double spendProgress = cus.getTotalSpend() - currentMinSpend;
+                double spendPercent = (spendRange > 0) ? (spendProgress / spendRange) * 100 : 100;
+
+                // Calculate progress based on Washes
+                int currentMinWashes = currentTier != null ? currentTier.getMinWashes() : 0;
+                double washesRange = nextTier.getMinWashes() - currentMinWashes;
+                double washesProgress = cus.getTotalWashes() - currentMinWashes;
+                double washesPercent = (washesRange > 0) ? (washesProgress / washesRange) * 100 : 100;
+
+                // Use whichever progress is higher (since rule is Washes OR Spend)
+                double progressPercent = Math.max(spendPercent, washesPercent);
                 if (progressPercent > 100) progressPercent = 100;
                 if (progressPercent < 0) progressPercent = 0;
-                
+
+                // Determine what's missing (show the one that's closer to achieving)
+                if (spendPercent >= washesPercent) {
+                    double spendMissing = nextTier.getMinSpend() - cus.getTotalSpend();
+                    request.setAttribute("missingMetric", String.format("%,.0f VND", spendMissing > 0 ? spendMissing : 0));
+                } else {
+                    int washesMissing = nextTier.getMinWashes() - cus.getTotalWashes();
+                    request.setAttribute("missingMetric", (washesMissing > 0 ? washesMissing : 0) + " lần rửa");
+                }
+
+                request.setAttribute("nextTierName", nextTier.getTierName());
                 request.setAttribute("tierProgressPercent", progressPercent);
             } else {
                 request.setAttribute("tierProgressPercent", 100);
             }
+                // 4. Fetch Reward Catalog
+            dao.RewardCatalogDAO rewardDAO = new dao.RewardCatalogDAO();
+            try {
+                java.util.List<dto.RewardCatalog> rewardCatalog = rewardDAO.getAllActiveRewards();
+                request.setAttribute("rewardCatalog", rewardCatalog);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            // 5. Fetch Customer's Unused Vouchers
+            dao.VoucherDAO voucherDAO = new dao.VoucherDAO();
+            try {
+                java.util.List<dto.Voucher> myVouchers = voucherDAO.getAvailableVouchers(cus.getCustomerId());
+                request.setAttribute("myVouchers", myVouchers);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            request.getRequestDispatcher("/WEB-INF/views/customer/dashboard.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         }
-        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
     }
 
     /**
@@ -152,3 +186,4 @@ public class DashboardController extends HttpServlet {
     }// </editor-fold>
 
 }
+

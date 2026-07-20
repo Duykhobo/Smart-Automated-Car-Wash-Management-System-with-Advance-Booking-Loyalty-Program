@@ -57,7 +57,7 @@ public class AdminFilter implements Filter {
 
             // Chưa đăng nhập -> Trả về trang đăng nhập
             req.setAttribute("errorMessage", "Vui lòng đăng nhập bằng tài khoản quản trị!");
-            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         }
     }
 

@@ -8,16 +8,16 @@ function togglePassword(inputId, button) {
         input.type = 'text';
         eyeOpen.classList.add('hidden');
         eyeClosed.classList.remove('hidden');
-        button.setAttribute('aria-label', 'Ẩn mật khẩu');
+        button.setAttribute('aria-label', '\u1ea8n m\u1eadt kh\u1ea9u');
     } else {
         input.type = 'password';
         eyeOpen.classList.remove('hidden');
         eyeClosed.classList.add('hidden');
-        button.setAttribute('aria-label', 'Hiện mật khẩu');
+        button.setAttribute('aria-label', 'Hi\u1ec7n m\u1eadt kh\u1ea9u');
     }
 }
 
-// Thêm validation khi người dùng rời khỏi ô input (blur)
+// Th\u00eam validation khi ng\u01b0\u1eddi d\u00f9ng r\u1eddi kh\u1ecfi \u00f4 input (blur)
 document.addEventListener('DOMContentLoaded', function() {
     const newPassword = document.getElementById('newPassword');
     const confirmPassword = document.getElementById('confirmPassword');
@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let errorMessages = [];
 
     function showError(message) {
-        // Ẩn lỗi server nếu có để tránh hiện 2 bảng lỗi cùng lúc
+        // \u1ea8n l\u1ed7i server n\u1ebfu c\u00f3 \u0111\u1ec3 tr\u00e1nh hi\u1ec7n 2 b\u1ea3ng l\u1ed7i c\u00f9ng l\u00fac
         const serverAlert = document.getElementById('serverErrorAlert');
         if (serverAlert) serverAlert.classList.add('hidden');
 
-        // Chỉ thêm lỗi nếu chưa có trong mảng (tránh trùng lặp)
+        // Ch\u1ec9 th\u00eam l\u1ed7i n\u1ebfu ch\u01b0a c\u00f3 trong m\u1ea3ng (tr\u00e1nh tr\u00f9ng l\u1eb7p)
         if (!errorMessages.includes(message)) {
             errorMessages.push(message);
         }

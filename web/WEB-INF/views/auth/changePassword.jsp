@@ -5,23 +5,9 @@
 <html lang="vi">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <meta charset="utf-8" />
     <title>Đổi Mật Khẩu - Auto Wash Pro</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body, .font-sans { font-family: 'Inter', sans-serif !important; }
-      .font-display { font-family: 'Be Vietnam Pro', sans-serif !important; }
-    </style>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     
-    <!-- Global CSS & Tailwind -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=5" />
-    <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=5"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
@@ -50,7 +36,7 @@
                 <i data-lucide="car" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Quản lý xe</span>
             </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
+            <a href="${pageContext.request.contextPath}/loyalty" class="flex items-center gap-3 px-4 py-3 text-text-muted hover:text-white hover:bg-bg-surface-hover rounded-xl transition-colors">
                 <i data-lucide="award" class="w-5 h-5"></i>
                 <span class="font-medium text-sm">Loyalty Program</span>
             </a>
@@ -161,7 +147,7 @@
                 <i data-lucide="calendar-plus" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Đặt lịch</span>
             </a>
-            <a href="${pageContext.request.contextPath}/customer/loyalty" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
+            <a href="${pageContext.request.contextPath}/account/dashboard" class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white">
                 <i data-lucide="award" class="w-5 h-5"></i>
                 <span class="text-[10px] font-medium">Loyalty</span>
             </a>
@@ -172,64 +158,7 @@
         </div>
     </nav>
 
-    <script>
-        lucide.createIcons();
-
-        function togglePassword(inputId, buttonElement) {
-            const input = document.getElementById(inputId);
-            const iconEye = buttonElement.querySelector('.icon-eye');
-            const iconEyeOff = buttonElement.querySelector('.icon-eye-off');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                iconEye.classList.add('hidden');
-                iconEyeOff.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                iconEye.classList.remove('hidden');
-                iconEyeOff.classList.add('hidden');
-            }
-        }
-
-        function validatePasswordForm(event) {
-            const currentPass = document.getElementById('txtCurrentPassword').value;
-            const newPass = document.getElementById('txtNewPassword').value;
-            const confirmPass = document.getElementById('txtConfirmNewPassword').value;
-            const errorAlert = document.getElementById('clientErrorAlert');
-            const errorText = document.getElementById('clientErrorText');
-
-            if (!currentPass || !newPass || !confirmPass) {
-                errorText.textContent = "Vui lòng điền đầy đủ các trường bắt buộc.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass.length < 6) {
-                errorText.textContent = "Mật khẩu mới phải có ít nhất 6 ký tự.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass !== confirmPass) {
-                errorText.textContent = "Mật khẩu mới và mật khẩu xác nhận không khớp.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            if (newPass === currentPass) {
-                errorText.textContent = "Mật khẩu mới không được giống với mật khẩu hiện tại.";
-                errorAlert.classList.remove('hidden');
-                event.preventDefault();
-                return false;
-            }
-
-            errorAlert.classList.add('hidden');
-            return true;
-        }
-    </script>
+    <script charset="UTF-8" src="${pageContext.request.contextPath}/js/auth/changePassword.js?v=2"></script>
     
     <c:remove var="errorMessage" scope="session" />
     <c:remove var="successMessage" scope="session" />

@@ -1,47 +1,22 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
     <!DOCTYPE html>
     <html lang="vi">
 
     <head>
-        <!-- Google Fonts (Vietnamese Supported) & Font Fallback -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet">
-        <style>
-            body,
-            .font-sans {
-                font-family: 'Inter', sans-serif !important;
-            }
-
-            .font-display {
-                font-family: 'Be Vietnam Pro', sans-serif !important;
-            }
-        </style>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta charset="UTF-8" />
-        <title>Autowash Pro - Premium Car Wash</title>
-
-        <!-- Global CSS & Tailwind Config -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
-        <script src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        <!-- Icons (Lucide) -->
-        <script src="https://unpkg.com/lucide@latest"></script>
-
-    </head>
+    <title>Autowash Pro - Premium Car Wash</title>
+    <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
+    
+</head>
 
     <body
         class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black">
 
         <!-- Floating Glass Navbar -->
         <nav
-            class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl px-6 py-4 flex items-center justify-between transition-all duration-300">
+            class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between transition-all duration-300">
             <div class="flex items-center gap-2 cursor-pointer">
-                <i data-lucide="droplets" class="text-[#00d4ff] w-8 h-8"></i>
-                <span class="font-display font-bold text-xl tracking-wide text-white">AUTOWASH<span
+                <i data-lucide="droplets" class="text-[#00d4ff] w-6 h-6 sm:w-8 sm:h-8"></i>
+                <span class="font-display font-bold text-lg sm:text-xl tracking-wide text-white">AUTOWASH<span
                         class="text-[#00d4ff]">PRO</span></span>
             </div>
 
@@ -50,17 +25,16 @@
                     Vụ</a>
                 <a href="#benefits" class="text-text-muted hover:text-white transition-colors text-sm font-medium">Đặc
                     Quyền</a>
-                <a href="${pageContext.request.contextPath}/customer/loyalty"
+                <a href="${pageContext.request.contextPath}/loyalty"
                     class="text-text-muted hover:text-white transition-colors text-sm font-medium">Loyalty Program</a>
             </div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 sm:gap-4">
                 <a href="${pageContext.request.contextPath}/auth/login"
-                    class="text-white hover:text-[#00d4ff] transition-colors text-sm font-medium hidden sm:block">Đăng
+                    class="text-white hover:text-[#00d4ff] transition-colors text-xs sm:text-sm font-medium whitespace-nowrap">Đăng
                     Nhập</a>
                 <a href="${pageContext.request.contextPath}/auth/register"
-                    class="btn-glow bg-[#00d4ff] text-black px-5 py-2.5 rounded-xl font-semibold text-sm">Đăng Ký
-                    Ngay</a>
+                    class="btn-glow bg-[#00d4ff] text-black px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm whitespace-nowrap">Đăng Ký Ngay</a>
             </div>
         </nav>
 
@@ -68,7 +42,7 @@
 
             <!-- Hero Section -->
             <section aria-labelledby="hero-title"
-                class="flex w-full flex-col items-center justify-center px-6 py-32 md:py-48 relative min-h-[600px] md:min-h-[800px]">
+                class="flex w-full flex-col items-center justify-center px-4 sm:px-6 py-24 sm:py-32 md:py-48 relative min-h-[500px] md:min-h-[800px]">
                 <!-- Background Image with Blur -->
                 <div class="absolute inset-0 z-0">
                     <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80"
@@ -88,7 +62,7 @@
                     </div>
 
                     <h1 id="hero-title"
-                        class="font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 text-4xl md:text-6xl lg:text-7xl leading-tight md:leading-tight">
+                        class="font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 text-3xl sm:text-4xl md:text-6xl lg:text-7xl leading-tight md:leading-tight">
                         Trải Nghiệm Rửa Xe Chuẩn VIP <br /> <span class="text-[#00d4ff] glow-text">Không Chờ Đợi</span>
                     </h1>
 
@@ -111,7 +85,50 @@
 
                 <!-- Decorative Glow -->
                 <div
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00d4ff]/10 rounded-full blur-[120px] -z-10">
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-[600px] sm:h-[600px] bg-[#00d4ff]/10 rounded-full blur-[100px] sm:blur-[120px] -z-10">
+                </div>
+            </section>
+
+            <!-- Quy trình hoạt động -->
+            <section id="how-it-works" class="flex w-full flex-col items-center gap-16 py-24 relative bg-bg-surface/30">
+                <div class="w-full max-w-7xl px-6 text-center">
+                    <p class="text-[#00d4ff] font-semibold text-sm tracking-widest uppercase mb-2">Đơn giản - Nhanh chóng</p>
+                    <h2 class="font-display font-bold text-white text-3xl md:text-5xl">Quy Trình 3 Bước Tự Động</h2>
+                </div>
+                
+                <div class="w-full max-w-7xl px-6 grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                    <!-- Connector Line (Desktop only) -->
+                    <div class="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-border-glass to-transparent -translate-y-1/2 -z-10"></div>
+                    
+                    <!-- Step 1 -->
+                    <article class="flex flex-col items-center text-center gap-4 group">
+                        <div class="w-20 h-20 rounded-2xl glass-panel flex items-center justify-center text-[#00d4ff] group-hover:-translate-y-2 transition-transform duration-300 relative shadow-[0_0_20px_rgba(0,212,255,0.15)] group-hover:shadow-[0_0_30px_rgba(0,212,255,0.3)]">
+                            <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#00d4ff] text-black font-bold flex items-center justify-center text-sm shadow-lg">1</div>
+                            <i data-lucide="smartphone" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-white mt-2">Đặt Lịch Online</h3>
+                        <p class="text-text-muted text-sm max-w-[250px]">Chọn ngày, giờ và gói dịch vụ phù hợp ngay trên điện thoại hoặc máy tính.</p>
+                    </article>
+
+                    <!-- Step 2 -->
+                    <article class="flex flex-col items-center text-center gap-4 group">
+                        <div class="w-20 h-20 rounded-2xl glass-panel flex items-center justify-center text-amber-400 group-hover:-translate-y-2 transition-transform duration-300 relative shadow-[0_0_20px_rgba(251,191,36,0.15)] group-hover:shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+                            <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-amber-400 text-black font-bold flex items-center justify-center text-sm shadow-lg">2</div>
+                            <i data-lucide="qr-code" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-white mt-2">Đến Trạm & Quét QR</h3>
+                        <p class="text-text-muted text-sm max-w-[250px]">Mang xe đến trạm đúng giờ, quét mã QR booking tại trụ kiosk để xác nhận.</p>
+                    </article>
+
+                    <!-- Step 3 -->
+                    <article class="flex flex-col items-center text-center gap-4 group">
+                        <div class="w-20 h-20 rounded-2xl glass-panel flex items-center justify-center text-emerald-400 group-hover:-translate-y-2 transition-transform duration-300 relative shadow-[0_0_20px_rgba(52,211,153,0.15)] group-hover:shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                            <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-emerald-400 text-black font-bold flex items-center justify-center text-sm shadow-lg">3</div>
+                            <i data-lucide="sparkles" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-white mt-2">Bàn Giao & Nhận Xe</h3>
+                        <p class="text-text-muted text-sm max-w-[250px]">Giao chìa khóa cho nhân viên kỹ thuật và nhận lại xe sạch bóng sau ít phút.</p>
+                    </article>
                 </div>
             </section>
 
@@ -130,39 +147,39 @@
 
                 <div class="w-full max-w-7xl px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Card 1 -->
-                    <article class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group cursor-pointer">
+                    <article class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group hover:-translate-y-2 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] cursor-pointer">
                         <div class="flex justify-between items-start">
                             <div
-                                class="p-3 bg-white/5 rounded-xl text-gray-300 group-hover:text-[#00d4ff] transition-colors">
+                                class="p-3 bg-white/5 rounded-xl text-gray-300 group-hover:text-white transition-colors">
                                 <i data-lucide="car" class="w-8 h-8"></i>
                             </div>
-                            <span class="text-text-muted text-sm font-medium">Bán chạy</span>
+                            <span class="text-text-muted text-sm font-medium">Cơ bản</span>
                         </div>
                         <div>
-                            <h3 class="font-display font-bold text-2xl text-white mb-2">Rửa Bọt Tuyết</h3>
+                            <h3 class="font-display font-bold text-2xl text-white mb-2 group-hover:text-[#00d4ff] transition-colors">Rửa Bọt Tuyết</h3>
                             <p class="text-text-muted text-sm line-clamp-2">Rửa ngoài tiêu chuẩn, làm sạch sâu bụi bẩn
                                 bằng bọt tuyết.</p>
                         </div>
-                        <div class="text-3xl font-display font-bold text-[#00d4ff]">100.000<span
-                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
+                        <div class="text-3xl font-display font-bold text-white">100.000<span
+                                class="text-base text-text-muted font-sans font-normal ml-1">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Xịt gầm</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Xịt gầm</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Rửa bọt tuyết</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Rửa bọt tuyết</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Lau khô vi sợi</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Lau khô vi sợi</li>
                         </ul>
                     </article>
 
                     <!-- Card 2 -->
                     <article
-                        class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group cursor-pointer relative overflow-hidden border-[#00d4ff]/30">
+                        class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group hover:-translate-y-2 transition-all duration-300 relative overflow-hidden border-[#00d4ff]/40 shadow-[0_0_20px_rgba(0,212,255,0.15)] hover:shadow-[0_0_40px_rgba(0,212,255,0.3)] cursor-pointer">
                         <div
-                            class="absolute top-0 right-0 bg-[#00d4ff] text-black text-xs font-bold px-3 py-1 rounded-bl-xl z-10">
-                            RECOMMENDED</div>
+                            class="absolute top-0 right-0 bg-gradient-to-r from-[#00d4ff] to-[#0088ff] text-black text-xs font-bold px-4 py-1.5 rounded-bl-2xl z-10 uppercase tracking-wider">
+                            Đề xuất</div>
                         <div
-                            class="absolute inset-0 bg-gradient-to-b from-accent-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            class="absolute inset-0 bg-gradient-to-b from-accent-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                         </div>
                         <div class="flex justify-between items-start relative z-10">
                             <div class="p-3 bg-[#00d4ff]/10 rounded-xl text-[#00d4ff]">
@@ -175,39 +192,40 @@
                                 tiết không gian bên trong.</p>
                         </div>
                         <div class="text-3xl font-display font-bold text-[#00d4ff] relative z-10">150.000<span
-                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
+                                class="text-base text-text-muted font-sans font-normal ml-1">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6 relative z-10">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Bao gồm Rửa Bọt Tuyết</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Bao gồm Rửa Bọt Tuyết</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Hút bụi toàn diện</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Hút bụi toàn diện</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-success"></i> Lau dưỡng nhựa/da</li>
+                                    class="w-4 h-4 text-emerald-400"></i> Lau dưỡng nhựa/da</li>
                         </ul>
                     </article>
 
                     <!-- Card 3 -->
-                    <article class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group cursor-pointer">
+                    <article class="glass-panel p-8 rounded-3xl flex flex-col gap-6 group hover:-translate-y-2 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(251,191,36,0.15)] cursor-pointer">
                         <div class="flex justify-between items-start">
                             <div
-                                class="p-3 bg-white/5 rounded-xl text-gray-300 group-hover:text-amber-400 transition-colors">
+                                class="p-3 bg-amber-500/10 rounded-xl text-amber-400">
                                 <i data-lucide="shield" class="w-8 h-8"></i>
                             </div>
+                            <span class="text-amber-400/80 text-sm font-medium">Cao cấp</span>
                         </div>
                         <div>
-                            <h3 class="font-display font-bold text-2xl text-white mb-2">Phủ Ceramic Cao Cấp</h3>
+                            <h3 class="font-display font-bold text-2xl text-white mb-2 group-hover:text-amber-400 transition-colors">Phủ Ceramic Nhanh</h3>
                             <p class="text-text-muted text-sm line-clamp-2">Bảo vệ lớp sơn, chống bám nước và duy trì độ
                                 bóng tối đa.</p>
                         </div>
                         <div class="text-3xl font-display font-bold text-amber-400">350.000<span
-                                class="text-base text-text-muted font-sans font-normal">VND</span></div>
+                                class="text-base text-text-muted font-sans font-normal ml-1">VND</span></div>
                         <ul class="flex flex-col gap-3 mt-4 border-t border-border-glass pt-6">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
                                     class="w-4 h-4 text-amber-400"></i> Bao gồm Vệ Sinh Nội Thất</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-amber-400"></i> Tẩy ố sơn xe</li>
+                                    class="w-4 h-4 text-amber-400"></i> Tẩy ố sơn xe nhẹ</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i data-lucide="check"
-                                    class="w-4 h-4 text-amber-400"></i> Phủ Ceramic bảo vệ</li>
+                                    class="w-4 h-4 text-amber-400"></i> Phủ Ceramic bóng nhanh</li>
                         </ul>
                     </article>
                 </div>
@@ -331,7 +349,7 @@
                         class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-accent-cyan to-transparent opacity-50">
                     </div>
                     <div
-                        class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#00d4ff]/20 blur-[80px] rounded-full">
+                        class="absolute -top-16 sm:-top-24 left-1/2 -translate-x-1/2 w-48 h-48 sm:w-64 sm:h-64 bg-[#00d4ff]/20 blur-[60px] sm:blur-[80px] rounded-full">
                     </div>
 
                     <div class="flex flex-col items-center gap-4 w-full relative z-10">
@@ -364,22 +382,7 @@
 
         </main>
 
-        <script>
-            // Initialize Lucide Icons
-            lucide.createIcons();
-
-            // Simple sticky navbar effect
-            window.addEventListener('scroll', () => {
-                const nav = document.querySelector('nav');
-                if (window.scrollY > 20) {
-                    nav.classList.add('bg-bg-primary/90', 'backdrop-blur-xl', 'border-border-glass', 'shadow-lg');
-                    nav.classList.remove('glass-panel');
-                } else {
-                    nav.classList.add('glass-panel');
-                    nav.classList.remove('bg-bg-primary/90', 'backdrop-blur-xl', 'border-border-glass', 'shadow-lg');
-                }
-            });
-        </script>
+        <script charset="UTF-8" src="${pageContext.request.contextPath}/js/index.js?v=2"></script>
         <jsp:include page="/WEB-INF/views/components/confirm_modal.jsp" />
     <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>

@@ -61,7 +61,14 @@ function processQR(code, forceConfirmPayment) {
             showPaymentCard(bookingId, data.amount, data.customerName, data.vehiclePlate, data.serviceName);
         } else if (data.status === 'success') {
             showToast(data.message, "success");
-            setTimeout(resumeScanner, 3000);
+            // If we have currentBookingId, show success card with link
+            if (currentBookingId || data.bookingId) {
+                let bId = currentBookingId || data.bookingId;
+                if (!bId && code) bId = code.replace('BK-', '').trim();
+                showSuccessCard(bId);
+            } else {
+                setTimeout(resumeScanner, 3000);
+            }
         } else {
             showToast(data.message, "error");
             setTimeout(resumeScanner, 3000);

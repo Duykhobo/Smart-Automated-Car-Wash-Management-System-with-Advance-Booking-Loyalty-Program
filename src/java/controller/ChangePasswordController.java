@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import utils.AppConstants;
 import utils.HashUtil;
 import utils.ValidationUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -61,7 +63,7 @@ public class ChangePasswordController extends HttpServlet {
             Customer customer = c.getCustomerByAccountId(user.getUserId());
 
             request.setAttribute("customer", customer);
-            request.getRequestDispatcher("/WEB-INF/views/auth/changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/auth/change_password.jsp").forward(request, response);
         }
     }
 
@@ -85,22 +87,31 @@ public class ChangePasswordController extends HttpServlet {
         String currentpassword = request.getParameter("txtCurrentPassword");
         String newPassword = request.getParameter("txtNewPassword");
         String confirmNewPassword = request.getParameter("txtConfirmNewPassword");
-        // kiểm tra xem nó có trống không 
-        if (ValidationUtil.isAnyEmpty(currentpassword, newPassword, confirmNewPassword)) {
-            request.getSession().setAttribute("errorMessage", "Không được để trống");
-            response.sendRedirect(request.getContextPath() + "/account/change-password");
-            return;
+        
+        Map<String, String> errors = new HashMap<>();
+
+        if (currentpassword == null || currentpassword.trim().isEmpty()) {
+            errors.put("currentPassword", "Mật khẩu cũ không được để trống");
         }
-        //Kiểm tra độ mạnh của mật khẩu mới (ít nhất 8 ký tự, chứa chữ viết hoa và ký tự đặc biệt)
-        String passwordPattern = "^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
-        if (!newPassword.matches(passwordPattern)) {
-            request.getSession().setAttribute("errorMessage", "Mật khẩu mới phải có ít nhất 8 ký tự, chứa chữ viết hoa và ký tự đặc biệt!");
-            response.sendRedirect(request.getContextPath() + "/account/change-password");
-            return;
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            errors.put("newPassword", "Mật khẩu mới không được để trống");
+        } else {
+            String passwordPattern = "^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$";
+            if (!newPassword.matches(passwordPattern)) {
+                errors.put("newPassword", "Mật khẩu mới phải có ít nhất 8 ký tự, chứa chữ IN HOA và ký tự đặc biệt!");
+            }
         }
-        //Kiểm tra xem xác nhận mật khẩu mới có khớp với mk mới không 
-        if (!confirmNewPassword.equals(newPassword)) {
-            request.getSession().setAttribute("errorMessage", "Xác nhận mật khẩu không trùng với mật khẩu mới.Vui lòng kiểm tra lại");
+
+        if (confirmNewPassword == null || confirmNewPassword.trim().isEmpty()) {
+            errors.put("confirmNewPassword", "Xác nhận mật khẩu không được để trống");
+        } else if (!confirmNewPassword.equals(newPassword)) {
+            errors.put("confirmNewPassword", "Xác nhận mật khẩu không trùng với mật khẩu mới!");
+        }
+
+        if (!errors.isEmpty()) {
+            request.getSession().setAttribute("errors", errors);
+            request.getSession().setAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin!");
             response.sendRedirect(request.getContextPath() + "/account/change-password");
             return;
         }

@@ -44,7 +44,7 @@
 </style>
 
 </head>
-<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
     <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
@@ -52,14 +52,14 @@
 </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 md:ml-64 relative min-h-screen pb-[120px] md:pb-32 bg-bg-primary">
+    <main class="flex-1 md:ml-64 relative min-h-screen pb-[140px] md:pb-32 bg-bg-primary">
         <!-- App Bar / Header -->
         <header class="sticky top-0 z-20 glass-panel border-b border-border-glass px-4 md:px-8 py-4 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <button onclick="history.back()" class="w-10 h-10 shrink-0 flex items-center justify-center hover:bg-bg-surface-hover rounded-full transition-colors text-white" aria-label="Quay lại">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </button>
-                <h1 class="text-lg md:text-2xl font-display font-bold truncate text-white">Đặt Lịch Rửa Xe</h1>
+                <h1 class="text-lg md:text-2xl font-display font-bold truncate text-white max-w-[60%] sm:max-w-full">Đặt Lịch Rửa Xe</h1>
             </div>
             
             <!-- User Tier Badge -->
@@ -69,7 +69,7 @@
             </div>
         </header>
 
-        <div class="px-4 md:px-8 py-8 max-w-3xl mx-auto space-y-8">
+        <div class="px-4 md:px-8 py-8 max-w-3xl mx-auto space-y-8 w-full overflow-hidden">
             
             <!-- Tier Perks Banner -->
             <div class="glass-panel p-4 rounded-2xl flex items-start sm:items-center gap-4 border-l-4 ${bannerBorder} shadow-lg">
@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            <form id="bookingForm" action="${pageContext.request.contextPath}/checkout" method="POST" class="space-y-8">
+            <form id="bookingForm" action="${pageContext.request.contextPath}/checkout" method="POST" class="space-y-8" data-auto-validate="true">
             
             <!-- Select Car -->
             <section class="space-y-4">
@@ -265,8 +265,8 @@
             <section class="pt-6 border-t border-border-glass">
                 <h2 class="font-display font-bold text-base text-white mb-3">Mã Khuyến Mãi / Voucher</h2>
                 <div class="flex items-center justify-between p-2 pl-4 glass-panel rounded-xl focus-within:border-[#00d4ff] focus-within:shadow-[0_0_15px_rgba(0,212,255,0.2)] transition-all">
-                    <input type="text" name="voucherCode" id="voucherCode" placeholder="Nhập mã voucher..." class="bg-transparent border-none outline-none text-sm w-full text-white placeholder:text-gray-500 min-w-0 uppercase">
-                    <button type="button" id="btnApplyVoucher" class="px-5 py-2.5 bg-bg-surface-hover hover:bg-white text-white hover:text-black rounded-lg font-bold text-sm transition-colors whitespace-nowrap shrink-0">Áp dụng</button>
+                    <input type="text" name="voucherCode" id="voucherCode" placeholder="Nhập mã voucher..." class="bg-transparent border-none outline-none text-sm w-full text-white placeholder:text-gray-500 min-w-0 uppercase" oninput="this.value = this.value.toUpperCase()">
+                    <button type="button" id="btnApplyVoucher" class="px-3 sm:px-5 py-2.5 bg-bg-surface-hover hover:bg-white text-white hover:text-black rounded-lg font-bold text-sm transition-colors whitespace-nowrap shrink-0">Áp dụng</button>
                 </div>
             </section>
             
@@ -276,13 +276,13 @@
 
     <!-- Bottom Sticky Action Bar (Xác nhận) -->
     <div class="fixed bottom-0 left-0 md:left-64 right-0 glass-panel border-t border-border-glass z-50 bg-[#070b14]/90 backdrop-blur-xl">
-        <div class="max-w-3xl mx-auto px-4 md:px-8 py-4 md:py-5 flex items-center justify-between gap-4" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
+        <div class="max-w-3xl mx-auto px-4 md:px-8 py-4 md:py-5 flex items-center justify-between gap-2 md:gap-4" style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));">
             <div class="flex flex-col gap-1">
                 <span id="timeRangeDisplay" class="text-xs text-[#00d4ff] font-medium hidden">Thời gian: --:-- đến --:--</span>
                 <span class="text-xs md:text-sm text-text-muted font-medium uppercase tracking-wider">Tổng Thanh Toán (Tại quầy)</span>
                 <span id="totalPriceDisplay" class="text-xl md:text-2xl font-display font-bold text-[#00d4ff]">0 <span class="text-sm text-text-muted font-sans font-normal">đ</span></span>
             </div>
-            <button type="submit" form="bookingForm" id="submitBookingBtn" class="btn-glow bg-[#00d4ff] hover:bg-white text-black font-bold px-8 h-12 md:h-14 rounded-xl transition-all text-sm md:text-base flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.3)]">
+            <button type="submit" form="bookingForm" id="submitBookingBtn" class="btn-glow bg-[#00d4ff] hover:bg-white text-black font-bold px-4 sm:px-8 h-12 md:h-14 rounded-xl transition-all text-sm md:text-base flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.3)]">
                 XÁC NHẬN ĐẶT LỊCH
             </button>
         </div>

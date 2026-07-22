@@ -8,7 +8,7 @@
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -16,14 +16,14 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Dashboard</h2>
                 <p class="text-text-muted">Giám sát hoạt động trạm rửa xe tự động hôm nay.</p>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
                 <button class="w-10 h-10 rounded-full glass-panel bg-bg-surface border border-border-glass flex items-center justify-center hover:bg-bg-surface-hover transition-colors">
                     <i data-lucide="bell" class="text-text-muted w-5 h-5"></i>
                 </button>
@@ -34,7 +34,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Doanh Thu -->
             <div class="glass-panel p-6 relative overflow-hidden group rounded-2xl bg-bg-surface border border-border-glass">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-[#00d4ff]/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-[#00d4ff]/20 transition-all"></div>
+                <div class="absolute top-0 right-0 w-full sm:w-32 h-32 bg-[#00d4ff]/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-[#00d4ff]/20 transition-all"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-text-muted text-sm font-medium mb-1">Doanh Thu (Tháng này)</p>
@@ -54,7 +54,7 @@
 
             <!-- Khách Hàng -->
             <div class="glass-panel p-6 relative overflow-hidden group rounded-2xl bg-bg-surface border border-border-glass">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
+                <div class="absolute top-0 right-0 w-full sm:w-32 h-32 bg-purple-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-text-muted text-sm font-medium mb-1">Tổng Lượt Rửa (Hôm nay)</p>
@@ -74,7 +74,7 @@
 
             <!-- Đặt Lịch -->
             <div class="glass-panel p-6 relative overflow-hidden group rounded-2xl bg-bg-surface border border-border-glass">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
+                <div class="absolute top-0 right-0 w-full sm:w-32 h-32 bg-amber-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-text-muted text-sm font-medium mb-1">Booking Chờ Xử Lý</p>

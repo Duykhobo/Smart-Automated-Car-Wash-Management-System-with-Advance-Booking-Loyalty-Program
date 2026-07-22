@@ -87,11 +87,20 @@ function validateCarForm() {
         return false;
     }
 
-    const plateRegex = /^[0-9]{2}[A-Z][0-9A-Z]?-[0-9]{4,5}$/;
-    if (!plateRegex.test(modalPlate.value.trim().toUpperCase())) {
-        formErrorText.textContent = "Biển số xe không hợp lệ (VD: 51H-12345).";
-        formError.classList.remove('hidden');
-        return false;
+    if (typeof ValidationUtils !== 'undefined') {
+        const plateValidation = ValidationUtils.validateType(modalPlate.value.trim().toUpperCase(), 'licensePlate');
+        if (!plateValidation.isValid) {
+            formErrorText.textContent = plateValidation.message;
+            formError.classList.remove('hidden');
+            return false;
+        }
+    } else {
+        const plateRegex = /^[0-9]{2}[A-Z][0-9A-Z]?-[0-9]{4,5}$/;
+        if (!plateRegex.test(modalPlate.value.trim().toUpperCase())) {
+            formErrorText.textContent = "Biển số xe không hợp lệ (VD: 51H-12345).";
+            formError.classList.remove('hidden');
+            return false;
+        }
     }
 
     formError.classList.add('hidden');

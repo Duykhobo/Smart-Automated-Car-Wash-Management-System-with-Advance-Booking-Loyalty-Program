@@ -14,12 +14,15 @@ import dto.BookingDetailDTO;
 /**
  * AdminBookingServlet điều hướng trang Quản lý Đặt Lịch của Admin.
  */
-@WebServlet(name = "AdminBookingServlet", urlPatterns = {"/admin/bookings"})
-public class AdminBookingServlet extends HttpServlet {
+@WebServlet(name = "AdminBookingController", urlPatterns = {"/admin/bookings"})
+public class AdminBookingController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
         
         String status = request.getParameter("status");
         String date = request.getParameter("date");

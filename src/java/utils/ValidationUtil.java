@@ -16,6 +16,15 @@ public class ValidationUtil {
     // Regex cho email
     private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
+    // Regex cho Voucher Code (Tối đa 30 ký tự, cho phép gạch ngang)
+    private static final String VOUCHER_CODE_PATTERN = "^[A-Z0-9_-]{3,30}$";
+
+    // Regex cho RewardType (Tối đa 30 ký tự, ví dụ: 10_PERCENT_OFF, FREE_WASH)
+    private static final String REWARD_TYPE_PATTERN = "^[A-Z0-9_]{3,30}$";
+
+    // Regex cho Tên Voucher / Reward (Tối đa 100 ký tự theo NVARCHAR(100))
+    private static final String REWARD_NAME_PATTERN = "^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\\s%\\-&+,:()]{1,100}$";
+
     /**
      * Hàm kiểm tra xem CÓ BẤT KỲ chuỗi nào bị Null hoặc Rỗng hay không. Trả về
      * true nếu có
@@ -71,6 +80,36 @@ public class ValidationUtil {
     }
 
     /**
+     * Kiểm tra mã Voucher hợp lệ
+     */
+    public static boolean isValidVoucherCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return false;
+        }
+        return Pattern.matches(VOUCHER_CODE_PATTERN, code.trim());
+    }
+
+    /**
+     * Kiểm tra RewardType hợp lệ (dành cho phần loại voucher trong DB)
+     */
+    public static boolean isValidRewardType(String type) {
+        if (type == null || type.trim().isEmpty()) {
+            return false;
+        }
+        return Pattern.matches(REWARD_TYPE_PATTERN, type.trim());
+    }
+
+    /**
+     * Kiểm tra tên Voucher hợp lệ (Tối đa 100 ký tự)
+     */
+    public static boolean isValidRewardName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+        return Pattern.matches(REWARD_NAME_PATTERN, name.trim());
+    }
+
+    /**
      * Kiểm tra mật khẩu hợp lệ (tối thiểu 8 ký tự, không chứa khoảng trắng hai đầu)
      */
     public static boolean isValidPassword(String password) {
@@ -82,6 +121,57 @@ public class ValidationUtil {
         }
         // Có thể thêm regex phức tạp hơn ở đây nếu cần thiết
         return true;
+    }
+
+    /**
+     * Kiểm tra số phải lớn hơn hoặc bằng 0 (không âm)
+     */
+    public static boolean isNonNegative(Number number) {
+        if (number == null) return false;
+        return number.doubleValue() >= 0;
+    }
+
+    /**
+     * Kiểm tra số phải lớn hơn 0 (số dương)
+     */
+    public static boolean isPositive(Number number) {
+        if (number == null) return false;
+        return number.doubleValue() > 0;
+    }
+
+    /**
+     * Kiểm tra % giảm giá phải nằm trong khoảng 1 đến 100
+     */
+    public static boolean isValidDiscountPercentage(Number percentage) {
+        if (percentage == null) return false;
+        double val = percentage.doubleValue();
+        return val > 0 && val <= 100;
+    }
+
+    /**
+     * Parse Integer an toàn, tránh văng NumberFormatException.
+     * Trả về null nếu lỗi.
+     */
+    public static Integer parseIntSafe(String value) {
+        if (value == null || value.trim().isEmpty()) return null;
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Parse Double an toàn, tránh văng NumberFormatException.
+     * Trả về null nếu lỗi.
+     */
+    public static Double parseDoubleSafe(String value) {
+        if (value == null || value.trim().isEmpty()) return null;
+        try {
+            return Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
 }

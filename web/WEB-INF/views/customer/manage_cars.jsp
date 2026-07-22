@@ -9,7 +9,7 @@
     
 </head>
 
-<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
     <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
@@ -99,7 +99,7 @@
                                 
                                 <div class="flex items-center gap-2 w-full md:w-auto justify-end z-10 pt-4 md:pt-0 border-t border-border-glass md:border-t-0 mt-2 md:mt-0">
                                     <c:if test="${not car.isDefault}">
-                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="event.preventDefault(); var form = this; showGlobalConfirmModal('Xác nhận', 'Đặt xe ${car.licensePlate} làm mặc định?', 'Đồng ý', function() { form.submit(); });">
+                                        <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="event.preventDefault(); var form = this; showGlobalConfirmModal('Xác nhận', 'Đặt xe ${car.licensePlate} làm mặc định?', 'Đồng ý', function() { form.submit(); });" data-auto-validate="true">
                                             <input type="hidden" name="action" value="setDefault">
                                             <input type="hidden" name="vehicleId" value="<c:out value='${car.vehicleId}'/>">
                                             <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border border-yellow-500/20 transition-all" title="Đặt làm mặc định">
@@ -121,7 +121,7 @@
                                         <i data-lucide="pencil" class="w-4 h-4"></i>
                                     </button>
                                     
-                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="event.preventDefault(); var form = this; showGlobalConfirmModal('Xác nhận', 'Bạn có chắc chắn muốn xóa xe ${car.licensePlate} không?', 'Xóa xe', function() { form.submit(); });">
+                                    <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" class="inline" onsubmit="event.preventDefault(); var form = this; showGlobalConfirmModal('Xác nhận', 'Bạn có chắc chắn muốn xóa xe ${car.licensePlate} không?', 'Xóa xe', function() { form.submit(); });" data-auto-validate="true">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="vehicleId" value="<c:out value='${car.vehicleId}'/>">
                                         <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 transition-all" title="Xóa">
@@ -160,7 +160,7 @@
                 </button>
             </div>
 
-            <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" enctype="multipart/form-data" class="p-6 space-y-5 overflow-y-auto custom-scrollbar" novalidate onsubmit="return validateCarForm()">
+            <form action="${pageContext.request.contextPath}/vehicles/action" method="POST" enctype="multipart/form-data" class="p-6 space-y-5 overflow-y-auto custom-scrollbar" novalidate onsubmit="return validateCarForm()" data-auto-validate="true">
                 <div id="formError" class="hidden p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl mb-4 flex items-start gap-3">
                     <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
                     <span id="formErrorText">Lỗi</span>

@@ -28,9 +28,9 @@ import dto.User;
 import dto.Voucher;
 import utils.AppConstants;
 
-@WebServlet(name = "CheckoutServlet", urlPatterns = { "/checkout" })
-public class CheckoutServlet extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(CheckoutServlet.class.getName());
+@WebServlet(name = "CheckoutController", urlPatterns = { "/checkout" })
+public class CheckoutController extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(CheckoutController.class.getName());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -318,3 +318,4 @@ public class CheckoutServlet extends HttpServlet {
                 .replace("\t", "\\t");
     }
 }
+

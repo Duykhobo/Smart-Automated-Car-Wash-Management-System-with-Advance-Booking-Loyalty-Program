@@ -8,14 +8,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "AdminUpdateBookingStatusServlet", urlPatterns = {"/admin/update-booking-status"})
-public class AdminUpdateBookingStatusServlet extends HttpServlet {
+@WebServlet(name = "AdminUpdateBookingStatusController", urlPatterns = {"/admin/update-booking-status"})
+public class AdminUpdateBookingStatusController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
         
         String bookingIdStr = request.getParameter("bookingId");
         String newStatus = request.getParameter("newStatus");

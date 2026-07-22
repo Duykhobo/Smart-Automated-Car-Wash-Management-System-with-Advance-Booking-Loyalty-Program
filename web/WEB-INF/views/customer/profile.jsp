@@ -11,7 +11,7 @@
     
 </head>
 
-<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
     <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
@@ -163,7 +163,7 @@
             </div>
 
             <!-- Body Form -->
-            <form action="${pageContext.request.contextPath}/CustomerProfileServlet" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
+            <form action="${pageContext.request.contextPath}/CustomerProfileServlet" method="POST" enctype="multipart/form-data" class="p-6 space-y-5" data-auto-validate="true">
                 <c:if test="${not empty sessionScope.errorMessage}">
                     <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
                         <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>

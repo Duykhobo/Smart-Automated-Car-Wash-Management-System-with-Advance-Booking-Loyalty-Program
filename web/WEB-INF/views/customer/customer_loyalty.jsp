@@ -18,7 +18,7 @@
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
 
-<body class="m-0 min-h-screen bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-text-primary font-sans antialiased w-full overflow-x-hidden">
 
     <div class="flex h-screen overflow-hidden bg-bg-primary">
 
@@ -32,7 +32,7 @@
             <!-- App Bar / Header -->
             <header class="sticky top-0 z-20 glass-panel border-b border-border-glass px-4 md:px-8 py-4 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
-                    <h1 class="text-lg md:text-2xl font-display font-bold text-white">Đổi Điểm Nhận Quà</h1>
+                    <h1 class="text-lg md:text-2xl font-display font-bold text-white truncate max-w-[60%] sm:max-w-full">Đổi Điểm Nhận Quà</h1>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -46,7 +46,7 @@
                 </div>
             </header>
 
-            <div class="px-4 md:px-8 py-8 max-w-6xl mx-auto space-y-8">
+            <div class="px-4 md:px-8 py-8 max-w-6xl mx-auto space-y-8 w-full overflow-hidden">
 
 
                 <!-- Points Overview -->
@@ -215,7 +215,7 @@
                 <h3 class="text-xl font-display font-bold text-white text-center mb-2">Xác Nhận Đổi Voucher</h3>
                 <p class="text-text-muted text-center text-sm mb-6">Bạn có chắc chắn muốn dùng <span id="modalPointsCost" class="font-bold text-amber-400"></span> điểm để đổi lấy <span id="modalRewardName" class="font-bold text-white"></span>?</p>
                 
-                <form action="${pageContext.request.contextPath}/voucher/redeem" method="POST" class="flex flex-col sm:flex-row gap-3 mt-6">
+                <form action="${pageContext.request.contextPath}/voucher/redeem" method="POST" class="flex flex-col sm:flex-row gap-3 mt-6" data-auto-validate="true">
                     <input type="hidden" name="rewardId" id="modalRewardId" value="">
                     
                     <button type="button" onclick="closeRedeemModal()"

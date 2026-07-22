@@ -6,7 +6,7 @@
         <title>Cấu Hình Hệ Thống - AutoWash Pro</title>
         <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     </head>
-    <body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+    <body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
         <!-- Sidebar Component -->
         <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -14,9 +14,9 @@
         </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Cấu Hình Hệ Thống</h2>
                 <p class="text-text-muted">Quản lý các tham số vận hành chung của trạm rửa xe.</p>
@@ -28,7 +28,7 @@
             </button>
         </header>
 
-        <form id="configForm" method="POST" action="${pageContext.request.contextPath}/admin/config" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form id="configForm" method="POST" action="${pageContext.request.contextPath}/admin/config" class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-auto-validate="true">
             
             <!-- Settings Panel: Vận Hành Trạm -->
             <div class="glass-panel p-6 rounded-2xl border border-border-glass bg-bg-surface">
@@ -43,10 +43,10 @@
                     <!-- Giờ hoạt động -->
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Giờ Mở/Đóng Cửa</label>
-                        <div class="flex items-center gap-4">
-                            <input type="time" name="OpeningHour" value="${empty configs['OpeningHour'] ? '07' : (configs['OpeningHour'].length() == 1 ? '0'.concat(configs['OpeningHour']) : configs['OpeningHour'])}:00" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                            <input type="time" name="OpeningHour" value="${empty configs['OpeningHour'] ? '07' : (configs['OpeningHour'].length() == 1 ? '0'.concat(configs['OpeningHour']) : configs['OpeningHour'])}:00" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2.5 h-11 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
                             <span class="text-text-muted">đến</span>
-                            <input type="time" name="ClosingHour" value="${empty configs['ClosingHour'] ? '21' : (configs['ClosingHour'].length() == 1 ? '0'.concat(configs['ClosingHour']) : configs['ClosingHour'])}:00" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
+                            <input type="time" name="ClosingHour" value="${empty configs['ClosingHour'] ? '21' : (configs['ClosingHour'].length() == 1 ? '0'.concat(configs['ClosingHour']) : configs['ClosingHour'])}:00" class="flex-1 bg-black/40 border border-border-glass rounded-xl px-4 py-2.5 h-11 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
                         </div>
                         <p class="text-xs text-text-muted mt-2">Hệ thống Booking sẽ khóa các khung giờ ngoài khoảng thời gian này.</p>
                     </div>
@@ -54,7 +54,7 @@
                     <!-- Sức chứa -->
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Sức Chứa Tối Đa (Slot / Khung Giờ)</label>
-                        <input type="number" name="MaxSlotCapacity" value="${empty configs['MaxSlotCapacity'] ? '3' : configs['MaxSlotCapacity']}" min="1" max="10" class="w-full bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
+                        <input type="number" name="MaxSlotCapacity" value="${empty configs['MaxSlotCapacity'] ? '3' : configs['MaxSlotCapacity']}" min="1" max="10" class="w-full bg-black/40 border border-border-glass rounded-xl px-4 py-2.5 h-11 text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
                         <p class="text-xs text-text-muted mt-2">Số lượng xe tối đa có thể phục vụ trong cùng một khung giờ 30 phút.</p>
                     </div>
                     
@@ -87,7 +87,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-white font-medium">1,000đ</span>
                                 <i data-lucide="arrow-right" class="w-4 h-4 text-text-muted"></i>
-                                <input type="number" name="PointsPerCurrencyUnit" value="${empty configs['PointsPerCurrencyUnit'] ? '1' : configs['PointsPerCurrencyUnit']}" class="w-24 bg-black/40 border border-border-glass rounded-xl px-4 py-2 text-center text-white focus:outline-none focus:border-[#00d4ff]">
+                                <input type="number" name="PointsPerCurrencyUnit" min="0" step="0.1" value="${empty configs['PointsPerCurrencyUnit'] ? '1' : configs['PointsPerCurrencyUnit']}" class="w-24 bg-black/40 border border-border-glass rounded-xl px-4 py-2.5 h-11 text-center text-white focus:outline-none focus:border-[#00d4ff]">
                                 <span class="text-text-muted">điểm</span>
                             </div>
                         </div>
@@ -98,15 +98,15 @@
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-slate-400 text-sm">Silver</span>
-                                    <input type="number" name="Multiplier_Silver" value="${empty configs['Multiplier_Silver'] ? '1.1' : configs['Multiplier_Silver']}" step="0.1" class="w-24 bg-black/40 border border-border-glass rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                    <input type="number" name="Multiplier_Silver" min="0" step="0.1" value="${empty configs['Multiplier_Silver'] ? '1.1' : configs['Multiplier_Silver']}" step="0.1" class="w-24 bg-black/40 border border-border-glass rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-400 text-sm font-medium">Gold</span>
-                                    <input type="number" name="Multiplier_Gold" value="${empty configs['Multiplier_Gold'] ? '1.2' : configs['Multiplier_Gold']}" step="0.1" class="w-24 bg-black/40 border border-amber-500/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-amber-400">
+                                    <input type="number" name="Multiplier_Gold" min="0" step="0.1" value="${empty configs['Multiplier_Gold'] ? '1.2' : configs['Multiplier_Gold']}" step="0.1" class="w-24 bg-black/40 border border-amber-500/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-amber-400">
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-[#00d4ff] text-sm font-bold">Platinum</span>
-                                    <input type="number" name="Multiplier_Platinum" value="${empty configs['Multiplier_Platinum'] ? '1.3' : configs['Multiplier_Platinum']}" step="0.1" class="w-24 bg-black/40 border border-[#00d4ff]/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                    <input type="number" name="Multiplier_Platinum" min="0" step="0.1" value="${empty configs['Multiplier_Platinum'] ? '1.3' : configs['Multiplier_Platinum']}" step="0.1" class="w-24 bg-black/40 border border-[#00d4ff]/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
                                 </div>
                             </div>
                         </div>
@@ -118,15 +118,15 @@
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-slate-400 text-sm">SEDAN</span>
-                                    <input type="number" name="VehicleMultiplier_SEDAN" value="${empty configs['VehicleMultiplier_SEDAN'] ? '1.0' : configs['VehicleMultiplier_SEDAN']}" step="0.1" class="w-24 bg-black/40 border border-border-glass rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                    <input type="number" name="VehicleMultiplier_SEDAN" min="0" step="0.1" value="${empty configs['VehicleMultiplier_SEDAN'] ? '1.0' : configs['VehicleMultiplier_SEDAN']}" step="0.1" class="w-24 bg-black/40 border border-border-glass rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-amber-400 text-sm font-medium">SUV</span>
-                                    <input type="number" name="VehicleMultiplier_SUV" value="${empty configs['VehicleMultiplier_SUV'] ? '1.2' : configs['VehicleMultiplier_SUV']}" step="0.1" class="w-24 bg-black/40 border border-amber-500/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-amber-400">
+                                    <input type="number" name="VehicleMultiplier_SUV" min="0" step="0.1" value="${empty configs['VehicleMultiplier_SUV'] ? '1.2' : configs['VehicleMultiplier_SUV']}" step="0.1" class="w-24 bg-black/40 border border-amber-500/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-amber-400">
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-[#00d4ff] text-sm font-bold">XLARGE</span>
-                                    <input type="number" name="VehicleMultiplier_XLARGE" value="${empty configs['VehicleMultiplier_XLARGE'] ? '1.5' : configs['VehicleMultiplier_XLARGE']}" step="0.1" class="w-24 bg-black/40 border border-[#00d4ff]/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
+                                    <input type="number" name="VehicleMultiplier_XLARGE" min="0" step="0.1" value="${empty configs['VehicleMultiplier_XLARGE'] ? '1.5' : configs['VehicleMultiplier_XLARGE']}" step="0.1" class="w-24 bg-black/40 border border-[#00d4ff]/30 rounded-lg px-3 py-1.5 text-center text-white text-sm focus:outline-none focus:border-[#00d4ff]">
                                 </div>
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                                 </div>
                                 <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="MaintenanceMode" value="true" class="sr-only peer" ${configs['MaintenanceMode'] == 'true' ? 'checked' : ''}>
+                                    <input type="checkbox" name="MaintenanceMode" value="true" class="sr-only peer" ${configs['MaintenanceMode'] == 'true' ? 'checked' : ''} onchange="confirmMaintenanceMode(this)">
                                     <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
                                 </label>
                             </div>

@@ -13,9 +13,11 @@ import javax.servlet.http.HttpSession;
 import service.UserService;
 import utils.AppConstants;
 import utils.ValidationUtil;
+import java.util.HashMap;
+import java.util.Map;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/auth/login"})
-public class LoginServlet extends HttpServlet {
+@WebServlet(name = "LoginController", urlPatterns = {"/auth/login"})
+public class LoginController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,8 +34,19 @@ public class LoginServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String password = request.getParameter("password");
 
-        if (ValidationUtil.isAnyEmpty(phone, password)) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!");
+        Map<String, String> errors = new HashMap<>();
+
+        if (phone == null || phone.trim().isEmpty()) {
+            errors.put("phone", "Vui lòng nhập số điện thoại hoặc tên đăng nhập");
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            errors.put("password", "Vui lòng nhập mật khẩu");
+        }
+
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
+            request.setAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin đăng nhập!");
             request.setAttribute("phone", phone);
             request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
             return;

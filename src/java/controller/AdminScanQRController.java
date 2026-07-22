@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * AdminScanQRServlet điều hướng trang Quét mã QR cho Admin.
  */
-@WebServlet(name = "AdminScanQRServlet", urlPatterns = {"/admin/scan"})
-public class AdminScanQRServlet extends HttpServlet {
+@WebServlet(name = "AdminScanQRController", urlPatterns = {"/admin/scan"})
+public class AdminScanQRController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

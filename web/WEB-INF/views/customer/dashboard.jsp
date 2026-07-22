@@ -17,7 +17,7 @@
 </head>
 
                     <body
-                        class="m-0 min-h-screen bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+                        class="m-0 min-h-screen bg-bg-primary text-text-primary font-sans antialiased w-full overflow-x-hidden">
 
                         <div class="flex h-screen overflow-hidden bg-bg-primary">
 
@@ -40,11 +40,11 @@
                                         <div class="hidden sm:flex flex-col items-end mr-2">
                                             <span class="text-xs text-text-muted">Xin chào,</span>
                                             <span
-                                                class="text-sm font-bold text-white">${sessionScope.CUSTOMER_INFO.fullName}</span>
+                                                class="text-sm font-bold text-white">${sessionScope.USER.fullName}</span>
                                         </div>
                                         <div
                                             class="w-10 h-10 rounded-full bg-[#00d4ff]/20 border border-[#00d4ff] flex items-center justify-center text-[#00d4ff] font-bold">
-                                            ${sessionScope.CUSTOMER_INFO.fullName.substring(0,1)}
+                                            ${sessionScope.USER.fullName.substring(0,1)}
                                         </div>
                                     </div>
                                 </header>

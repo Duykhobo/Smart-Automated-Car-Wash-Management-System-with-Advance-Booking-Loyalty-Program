@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "BookingStatusServlet", urlPatterns = {"/api/booking-status"})
-public class BookingStatusServlet extends HttpServlet {
+@WebServlet(name = "BookingStatusController", urlPatterns = {"/api/booking-status"})
+public class BookingStatusController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

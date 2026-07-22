@@ -10,7 +10,7 @@
     
 </head>
 
-<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
     <aside class="hidden md:flex flex-col w-64 glass-panel border-r border-border-glass fixed h-full z-10 left-0 top-0">
@@ -69,7 +69,7 @@
                     <p class="text-text-muted text-sm">Vui lòng nhập mật khẩu cũ và tạo mật khẩu mới an toàn hơn.</p>
                 </div>
 
-                <form action="${pageContext.request.contextPath}/account/change-password" method="POST" class="space-y-5 relative z-10" novalidate onsubmit="return validatePasswordForm(event)">
+                <form action="${pageContext.request.contextPath}/account/change-password" method="POST" class="space-y-5 relative z-10" novalidate onsubmit="return validatePasswordForm(event)" data-auto-validate="true">
                     
                     <div id="clientErrorAlert" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-400 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
                         <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>

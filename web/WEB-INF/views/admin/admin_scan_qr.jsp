@@ -18,7 +18,7 @@
         }
     </style>
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-hidden selection:bg-[#00d4ff] selection:text-black flex h-screen">
+<body class="bg-bg-primary text-text-primary antialiased overflow-hidden flex h-screen">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -41,7 +41,7 @@
         <div class="absolute inset-0 z-10 flex flex-col pointer-events-none">
             <!-- Top bar -->
             <div class="h-24 bg-black/60 backdrop-blur-sm p-4 md:p-6 flex justify-between items-center md:items-start pointer-events-auto">
-                <div class="flex items-center gap-3">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                     <a href="${pageContext.request.contextPath}/admin/dashboard" class="md:hidden w-10 h-10 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 border border-white/20 backdrop-blur-md">
                         <i data-lucide="chevron-left" class="w-6 h-6"></i>
                     </a>
@@ -50,7 +50,7 @@
                         <p class="text-slate-300 text-[10px] md:text-sm">Hướng camera vào mã QR của khách hàng</p>
                     </div>
                 </div>
-                <button onclick="simulateScan()" class="px-3 md:px-4 py-2 bg-[#00d4ff]/20 text-[#00d4ff] rounded-xl border border-[#00d4ff]/40 hover:bg-[#00d4ff]/30 transition-colors font-medium text-xs md:text-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                <button onclick="simulateScan()" class="px-3 md:px-4 py-2.5 h-11 bg-[#00d4ff]/20 text-[#00d4ff] rounded-xl border border-[#00d4ff]/40 hover:bg-[#00d4ff]/30 transition-colors font-medium text-xs md:text-sm flex items-center gap-2 whitespace-nowrap shrink-0">
                     <i data-lucide="scan-line" class="w-4 h-4"></i> <span class="hidden sm:inline">Giả lập quét</span><span class="sm:hidden">Demo</span>
                 </button>
             </div>

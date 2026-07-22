@@ -7,7 +7,7 @@
     <title>Quản lý Đặt Lịch - AutoWash Pro</title>
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -15,32 +15,32 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Quản lý Đặt Lịch</h2>
                 <p class="text-text-muted">Xem và xử lý các lịch hẹn rửa xe của khách hàng.</p>
             </div>
             
-            <div class="flex items-center gap-4">
-                <form method="GET" action="${pageContext.request.contextPath}/admin/bookings" class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+                <form method="GET" action="${pageContext.request.contextPath}/admin/bookings" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                     <div class="relative">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"></i>
-                        <input type="text" name="search" value="${currentSearch}" placeholder="Tìm biển số, SĐT..." class="pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white w-52 transition-all placeholder:text-gray-500">
+                        <input type="text" name="search" value="${currentSearch}" placeholder="Tìm biển số, SĐT..." class="pl-10 pr-4 py-2.5 h-11 bg-black/20 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white w-full sm:w-52 transition-all placeholder:text-gray-500">
                     </div>
                     
-                    <input type="text" name="date" value="${currentDate}" class="flatpickr-date px-3 py-2 bg-black/20 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white transition-all cursor-pointer w-32">
+                    <input type="text" name="date" value="${currentDate}" class="flatpickr-date px-3 py-2.5 h-11 bg-black/20 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white transition-all cursor-pointer w-full sm:w-32">
                     
                     <input type="hidden" name="status" value="${currentStatus}">
                     
-                    <button type="submit" class="flex items-center gap-2 px-4 py-2 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30 rounded-xl hover:bg-[#00d4ff]/20 transition-colors text-sm font-medium">
+                    <button type="submit" class="flex items-center gap-2 px-4 py-2.5 h-11 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30 rounded-xl hover:bg-[#00d4ff]/20 transition-colors text-sm font-medium">
                         <i data-lucide="filter" class="w-4 h-4"></i>
                         Lọc
                     </button>
                     
                     <c:if test="${not empty currentDate or not empty currentSearch}">
-                        <a href="${pageContext.request.contextPath}/admin/bookings?status=${currentStatus}" class="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors text-sm font-medium">
+                        <a href="${pageContext.request.contextPath}/admin/bookings?status=${currentStatus}" class="flex items-center gap-2 px-4 py-2.5 h-11 bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors text-sm font-medium">
                             <i data-lucide="x" class="w-4 h-4"></i>
                             Xóa lọc
                         </a>
@@ -62,7 +62,7 @@
         <!-- Data Table -->
         <div class="glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative">
             <div class="overflow-x-auto max-h-[60vh] custom-scrollbar">
-                <table class="w-full text-sm text-left">
+                <table class="w-full text-sm text-left whitespace-nowrap">
                     <thead class="text-xs text-text-muted uppercase bg-black/40 border-b border-white/10 sticky top-0 backdrop-blur-md z-10 shadow-sm">
                         <tr>
                             <th class="px-6 py-4 font-medium tracking-wider">Mã BK</th>
@@ -86,41 +86,41 @@
                             <c:otherwise>
                                 <c:forEach var="booking" items="${bookingList}">
                                     <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-mono text-slate-300">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32">Mã Booking:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 font-mono text-slate-300">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Mã Booking:</span>
                                             BK-${booking.bookingId}
                                         </td>
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Khách hàng:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Khách hàng:</span>
                                             <div class="inline-block align-top">
                                                 <div class="font-medium text-white max-w-[150px] sm:max-w-[200px] truncate" title="${booking.customerName}">${booking.customerName}</div>
                                                 <div class="text-xs text-text-muted">${booking.customerPhone}</div>
                                             </div>
                                         </td>
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32">Biển số:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Biển số:</span>
                                             <span class="inline-block whitespace-nowrap px-2.5 py-1 bg-white/10 border border-white/20 rounded text-xs font-mono font-bold tracking-wider">${booking.vehiclePlate}</span>
                                         </td>
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Thời gian hẹn:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Thời gian hẹn:</span>
                                             <div class="inline-block align-top text-white">
                                                 <fmt:formatDate value="${booking.bookingDate}" pattern="dd/MM/yyyy" /> - 
                                                 <fmt:formatDate value="${booking.scheduledTime}" pattern="HH:mm" />
                                             </div>
                                         </td>
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Dịch vụ:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 text-slate-300">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Dịch vụ:</span>
                                             <div class="inline-block align-top max-w-[200px] sm:max-w-xs truncate" title="${booking.serviceName}">${booking.serviceName}</div>
                                         </td>
-                                        <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng thái:</span>
+                                        <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Trạng thái:</span>
                                             <jsp:include page="../components/status_badge.jsp">
                                                 <jsp:param name="status" value="${booking.status}" />
                                             </jsp:include>
                                         </td>
                                         <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
-                                            <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
-                                            <form method="POST" action="${pageContext.request.contextPath}/admin/update-booking-status" class="flex flex-wrap lg:justify-end gap-2" id="updateForm_${booking.bookingId}">
+                                            <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Thao tác:</span>
+                                            <form method="POST" action="${pageContext.request.contextPath}/admin/update-booking-status" class="flex flex-wrap lg:justify-end gap-2" id="updateForm_${booking.bookingId}" data-auto-validate="true">
                                                 <input type="hidden" name="bookingId" value="${booking.bookingId}" />
                                                 <input type="hidden" name="currentFilterStatus" value="${currentStatus}" />
                                                 <input type="hidden" name="currentFilterDate" value="${currentDate}" />
@@ -205,7 +205,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <form id="editBookingForm" action="${pageContext.request.contextPath}/admin/update-booking-time" method="POST">
+                <form id="editBookingForm" action="${pageContext.request.contextPath}/admin/update-booking-time" method="POST" data-auto-validate="true">
                     <input type="hidden" name="bookingId" id="editBookingId">
                     
                     <div class="space-y-4">
@@ -265,6 +265,10 @@
             document.getElementById('editBookingId').value = bookingId;
             document.getElementById('editDate').value = date;
             
+            // Set min date to today for admin as well
+            const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+            document.getElementById('editDate').setAttribute('min', today);
+            
             if (time && time.length >= 5) {
                 document.getElementById('editTime').value = time.substring(0, 5);
             }
@@ -275,6 +279,27 @@
         function hideEditBookingModal() {
             document.getElementById('editBookingModal').classList.add('hidden');
         }
+
+        document.getElementById('editBookingForm').addEventListener('submit', function(e) {
+            const dateStr = document.getElementById('editDate').value;
+            const timeStr = document.getElementById('editTime').value;
+            if (dateStr && timeStr) {
+                const selectedDateTime = new Date(dateStr + 'T' + timeStr);
+                const now = new Date();
+                
+                // Allow a small grace period of 5 minutes for past booking
+                now.setMinutes(now.getMinutes() - 5);
+                
+                if (selectedDateTime < now) {
+                    e.preventDefault();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Không thể dời lịch về quá khứ!', 'error');
+                    } else {
+                        alert('Không thể dời lịch về quá khứ!');
+                    }
+                }
+            }
+        });
     </script>
     <!-- Mobile Bottom Navigation -->
     <jsp:include page="/WEB-INF/views/components/admin_bottom_nav.jsp">

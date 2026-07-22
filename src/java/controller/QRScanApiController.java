@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "QRScanServlet", urlPatterns = {"/api/scan-qr"})
-public class QRScanServlet extends HttpServlet {
+@WebServlet(name = "QRScanApiController", urlPatterns = {"/api/scan-qr"})
+public class QRScanApiController extends HttpServlet {
 
     private final BookingDAO bookingDAO = new BookingDAO();
 
@@ -98,10 +98,11 @@ public class QRScanServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 out.print("{\"status\":\"error\",\"message\":\"Ma Booking ID khong hop le (Invalid ID).\"}");
             } catch (SQLException ex) {
-                Logger.getLogger(QRScanServlet.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(QRScanApiController.class.getName()).log(Level.SEVERE, null, ex);
                 String safeEx = ex.getMessage() != null ? ex.getMessage().replace("\"", "\\\"").replace("\n", " ") : "Unknown Error";
                 out.print("{\"status\":\"error\",\"message\":\"DB Error: " + safeEx + "\"}");
             }
         }
     }
 }
+

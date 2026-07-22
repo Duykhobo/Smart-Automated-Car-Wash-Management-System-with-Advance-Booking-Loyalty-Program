@@ -9,7 +9,7 @@
 </head>
 
     <body
-        class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black">
+        class="bg-bg-primary text-text-primary antialiased overflow-x-hidden ">
 
         <!-- Floating Glass Navbar -->
         <nav

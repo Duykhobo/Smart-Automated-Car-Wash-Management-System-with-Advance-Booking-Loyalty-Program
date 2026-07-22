@@ -8,7 +8,7 @@
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
 
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden ">
 
     <!-- Floating Glass Navbar -->
     <nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass-panel rounded-2xl px-6 py-4 flex items-center justify-between transition-all duration-300">
@@ -204,5 +204,6 @@
     </main>
 
     <script charset="UTF-8" src="https://unpkg.com/lucide@latest"></script>
+    <jsp:include page="/WEB-INF/views/components/toast.jsp" />
 </body>
 </html>

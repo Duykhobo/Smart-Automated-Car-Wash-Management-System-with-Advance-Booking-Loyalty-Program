@@ -7,7 +7,7 @@
     <title>Quản lý Voucher & Điểm - AutoWash Pro</title>
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -15,15 +15,15 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Voucher & Loyalty</h2>
                 <p class="text-text-muted">Cấu hình mã khuyến mãi và hạng thành viên tích điểm.</p>
             </div>
             
-            <button onclick="document.getElementById('createRewardModal').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-blue-500 text-black rounded-xl hover:opacity-90 transition-opacity font-bold shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+            <button onclick="document.getElementById('createRewardModal').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-2.5 h-11 bg-gradient-to-r from-[#00d4ff] to-blue-500 text-black rounded-xl hover:opacity-90 transition-opacity font-bold shadow-[0_0_15px_rgba(0,212,255,0.3)]">
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 Tạo Voucher Mới
             </button>
@@ -143,8 +143,8 @@
                         <c:forEach var="reward" items="${rewardsList}">
                         <!-- Dynamic Row -->
                         <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0 ${not reward.isActive ? 'opacity-60' : ''}">
-                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Mã Code:</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top mt-2">Mã Code:</span>
                                 <div class="inline-flex lg:flex items-center gap-3 align-top">
                                     <c:choose>
                                         <c:when test="${reward.isActive}">
@@ -164,8 +164,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Mức Giảm:</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Mức Giảm:</span>
                                 <span class="${reward.isActive ? 'text-emerald-400' : 'text-slate-400'} font-bold">
                                     <c:choose>
                                         <c:when test="${reward.discountPercent > 0}">
@@ -178,16 +178,16 @@
                                     </c:choose>
                                 </span>
                             </td>
-                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold ${reward.isActive ? 'text-amber-400' : 'text-slate-400'}">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm Quy Đổi:</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 font-display font-bold ${reward.isActive ? 'text-amber-400' : 'text-slate-400'}">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 font-sans font-normal">Điểm Quy Đổi:</span>
                                 <fmt:formatNumber value="${reward.pointsCost}" type="number" maxFractionDigits="0"/> <span class="text-xs font-sans font-normal ${reward.isActive ? 'text-amber-400/70' : ''}">pts</span>
                             </td>
-                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 ${reward.isActive ? 'text-slate-300' : 'text-slate-400'}">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Giới hạn:</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 ${reward.isActive ? 'text-slate-300' : 'text-slate-400'}">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Giới hạn:</span>
                                 Không giới hạn
                             </td>
-                            <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng thái:</span>
+                            <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Trạng thái:</span>
                                 <c:choose>
                                     <c:when test="${reward.isActive}">
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -202,14 +202,14 @@
                                 </c:choose>
                             </td>
                             <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
-                                <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
+                                <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Thao tác:</span>
                                 <div class="flex items-center justify-end gap-2">
                                     <c:choose>
                                         <c:when test="${reward.isActive}">
                                             <button onclick="openEditModal(${reward.rewardId}, '${reward.rewardName}', '${reward.rewardType}', ${reward.pointsCost}, '${reward.description}', '${reward.imageIcon}', ${reward.discountPercent})" class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors">
                                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                             </button>
-                                            <form action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="inline">
+                                            <form action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="inline" data-auto-validate="true">
                                                 <input type="hidden" name="action" value="toggle">
                                                 <input type="hidden" name="rewardId" value="${reward.rewardId}">
                                                 <input type="hidden" name="isActive" value="false">
@@ -219,7 +219,7 @@
                                             </form>
                                         </c:when>
                                         <c:otherwise>
-                                            <form action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="inline">
+                                            <form action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="inline" data-auto-validate="true">
                                                 <input type="hidden" name="action" value="toggle">
                                                 <input type="hidden" name="rewardId" value="${reward.rewardId}">
                                                 <input type="hidden" name="isActive" value="true">
@@ -349,7 +349,7 @@
             
             <!-- Modal Body (Scrollable) -->
             <div class="p-6 overflow-y-auto">
-                <form id="createRewardForm" action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="space-y-4">
+                <form id="createRewardForm" action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="space-y-4" data-auto-validate="true">
                     <input type="hidden" name="action" value="add">
                     
                     <div>
@@ -361,7 +361,7 @@
                     <div>
                         <label class="block text-sm font-medium text-text-muted mb-1">Mã tham chiếu (RewardType)</label>
                         <input type="text" name="rewardType" placeholder="VD: DISCOUNT_50K" 
-                               class="w-full px-4 py-2.5 bg-black/20 border border-border-glass rounded-xl text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
+                               class="w-full px-4 py-2.5 bg-black/20 border border-border-glass rounded-xl text-white focus:outline-none focus:border-[#00d4ff] transition-colors" oninput="this.value = this.value.toUpperCase()">
                     </div>
                     
                     <div>
@@ -395,10 +395,10 @@
             
             <!-- Modal Footer -->
             <div class="px-6 py-4 border-t border-border-glass bg-black/20 flex justify-end gap-3 shrink-0">
-                <button type="button" onclick="document.getElementById('createRewardModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-border-glass text-text-muted hover:text-white transition-colors">
+                <button type="button" onclick="document.getElementById('createRewardModal').classList.add('hidden')" class="px-4 py-2.5 h-11 rounded-xl border border-border-glass text-text-muted hover:text-white transition-colors">
                     Hủy
                 </button>
-                <button type="submit" form="createRewardForm" class="px-6 py-2 rounded-xl bg-[#00d4ff]/10 border border-[#00d4ff]/30 text-[#00d4ff] font-bold hover:bg-[#00d4ff]/20 transition-colors">
+                <button type="submit" form="createRewardForm" class="px-6 py-2.5 h-11 rounded-xl bg-[#00d4ff]/10 border border-[#00d4ff]/30 text-[#00d4ff] font-bold hover:bg-[#00d4ff]/20 transition-colors">
                     Tạo Voucher
                 </button>
             </div>
@@ -422,7 +422,7 @@
             
             <!-- Modal Body (Scrollable) -->
             <div class="p-6 overflow-y-auto">
-                <form id="editRewardForm" action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="space-y-4">
+                <form id="editRewardForm" action="${pageContext.request.contextPath}/admin/loyalty/reward" method="POST" class="space-y-4" data-auto-validate="true">
                     <input type="hidden" name="action" value="edit">
                     <input type="hidden" name="rewardId" id="editRewardId">
                     
@@ -435,7 +435,7 @@
                     <div>
                         <label class="block text-sm font-medium text-text-muted mb-1">Mã tham chiếu (RewardType)</label>
                         <input type="text" name="rewardType" id="editRewardType" 
-                               class="w-full px-4 py-2.5 bg-black/20 border border-border-glass rounded-xl text-white focus:outline-none focus:border-[#00d4ff] transition-colors">
+                               class="w-full px-4 py-2.5 bg-black/20 border border-border-glass rounded-xl text-white focus:outline-none focus:border-[#00d4ff] transition-colors" oninput="this.value = this.value.toUpperCase()">
                     </div>
                     
                     <div>
@@ -469,10 +469,10 @@
             
             <!-- Modal Footer -->
             <div class="px-6 py-4 border-t border-border-glass bg-black/20 flex justify-end gap-3 shrink-0">
-                <button type="button" onclick="document.getElementById('editRewardModal').classList.add('hidden')" class="px-4 py-2 rounded-xl border border-border-glass text-text-muted hover:text-white transition-colors">
+                <button type="button" onclick="document.getElementById('editRewardModal').classList.add('hidden')" class="px-4 py-2.5 h-11 rounded-xl border border-border-glass text-text-muted hover:text-white transition-colors">
                     Hủy
                 </button>
-                <button type="submit" form="editRewardForm" class="px-6 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold hover:bg-amber-500/20 transition-colors">
+                <button type="submit" form="editRewardForm" class="px-6 py-2.5 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold hover:bg-amber-500/20 transition-colors">
                     Lưu Thay Đổi
                 </button>
             </div>
@@ -501,7 +501,7 @@
                 <i data-lucide="settings" class="w-5 h-5 text-[#00d4ff]"></i> Thay đổi mốc hạng thẻ
             </h3>
             
-            <form action="${pageContext.request.contextPath}/admin/loyalty" method="POST">
+            <form action="${pageContext.request.contextPath}/admin/loyalty" method="POST" data-auto-validate="true">
                 <input type="hidden" name="action" value="update_tier">
                 <input type="hidden" id="editTierId" name="tierId">
                 
@@ -536,8 +536,8 @@
                 </div>
                 
                 <div class="mt-6 flex gap-3 justify-end">
-                    <button type="button" onclick="closeEditTierModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
-                    <button type="submit" class="px-4 py-2 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Lưu Cấu Hình</button>
+                    <button type="button" onclick="closeEditTierModal()" class="px-4 py-2.5 h-11 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
+                    <button type="submit" class="px-4 py-2.5 h-11 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Lưu Cấu Hình</button>
                 </div>
             </form>
         </div>

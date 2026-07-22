@@ -9,6 +9,8 @@ import utils.FileUploadUtil;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +42,9 @@ public class VehicleController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
 
         try {
             Object obj = request.getSession().getAttribute(AppConstants.SESSION_CUSTOMER_INFO);
@@ -71,8 +75,9 @@ public class VehicleController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -96,22 +101,39 @@ public class VehicleController extends HttpServlet {
                 case "add": {
                     String licensePlate = request.getParameter("licensePlate");
                     if (licensePlate != null) {
-                        licensePlate = licensePlate.trim().toUpperCase(); // Bổ sung dòng này để chuẩn hóa ghi đè thành chứ in hoa//
+                        licensePlate = licensePlate.trim().toUpperCase();
                     }
                     String vehicleTypeIdStr = request.getParameter("vehicleTypeId");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
-                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleTypeIdStr, color)) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
-                                "Vui lòng nhập đầy đủ các trường bắt buộc!");
-                        response.sendRedirect(request.getContextPath() + "/vehicles");
-                        return;
+                    
+                    Map<String, String> errors = new HashMap<>();
+                    
+                    if (licensePlate == null || licensePlate.isEmpty()) {
+                        errors.put("licensePlate", "Biển số xe không được để trống");
+                    } else if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+                        errors.put("licensePlate", "Định dạng biển số không hợp lệ (VD: 59A-12345)");
                     }
-                    // BỔ SUNG: Kiểm tra định dạng biển số xe khi thêm mới
-                    if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
-                                "Định dạng biển số xe không hợp lệ! (Ví dụ: 59A-12345 hoặc 59A1-12345)");
+                    
+                    if (brand == null || brand.trim().isEmpty()) errors.put("brand", "Hãng xe không được để trống");
+                    if (model == null || model.trim().isEmpty()) errors.put("model", "Dòng xe không được để trống");
+                    if (vehicleTypeIdStr == null || vehicleTypeIdStr.trim().isEmpty()) errors.put("vehicleTypeId", "Vui lòng chọn loại xe");
+                    if (color == null || color.trim().isEmpty()) errors.put("color", "Màu sắc không được để trống");
+                    
+                    if (!errors.isEmpty()) {
+                        request.getSession().setAttribute("errors", errors);
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Vui lòng kiểm tra lại thông tin xe!");
+                        
+                        Map<String, String> formValues = new HashMap<>();
+                        formValues.put("licensePlate", licensePlate);
+                        formValues.put("brand", brand);
+                        formValues.put("model", model);
+                        formValues.put("vehicleTypeId", vehicleTypeIdStr);
+                        formValues.put("color", color);
+                        request.getSession().setAttribute("formValues", formValues);
+                        request.getSession().setAttribute("activeModal", "addVehicleModal");
+                        
                         response.sendRedirect(request.getContextPath() + "/vehicles");
                         return;
                     }
@@ -136,29 +158,48 @@ public class VehicleController extends HttpServlet {
                 }
 
                 case "update": {
-                    int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+                    String vehicleIdStr = request.getParameter("vehicleId");
                     String licensePlate = request.getParameter("licensePlate");
                     if (licensePlate != null) {
-                        licensePlate = licensePlate.trim().toUpperCase(); // Thêm dòng này để chuẩn hóa biển số in hoa khi sửa
+                        licensePlate = licensePlate.trim().toUpperCase();
                     }
                     String vehicleTypeIdStr = request.getParameter("vehicleTypeId");
                     String color = request.getParameter("color");
                     String brand = request.getParameter("brand");
                     String model = request.getParameter("model");
 
-                    if (ValidationUtil.isAnyEmpty(licensePlate, brand, model, vehicleTypeIdStr, color)) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
-                                "Vui lòng nhập đầy đủ các trường bắt buộc!");
+                    Map<String, String> errors = new HashMap<>();
+                    
+                    if (licensePlate == null || licensePlate.isEmpty()) {
+                        errors.put("licensePlate", "Biển số xe không được để trống");
+                    } else if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+                        errors.put("licensePlate", "Định dạng biển số không hợp lệ (VD: 59A-12345)");
+                    }
+                    
+                    if (brand == null || brand.trim().isEmpty()) errors.put("brand", "Hãng xe không được để trống");
+                    if (model == null || model.trim().isEmpty()) errors.put("model", "Dòng xe không được để trống");
+                    if (vehicleTypeIdStr == null || vehicleTypeIdStr.trim().isEmpty()) errors.put("vehicleTypeId", "Vui lòng chọn loại xe");
+                    if (color == null || color.trim().isEmpty()) errors.put("color", "Màu sắc không được để trống");
+                    
+                    if (!errors.isEmpty()) {
+                        request.getSession().setAttribute("errors", errors);
+                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR, "Vui lòng kiểm tra lại thông tin xe!");
+                        
+                        Map<String, String> formValues = new HashMap<>();
+                        formValues.put("vehicleId", vehicleIdStr);
+                        formValues.put("licensePlate", licensePlate);
+                        formValues.put("brand", brand);
+                        formValues.put("model", model);
+                        formValues.put("vehicleTypeId", vehicleTypeIdStr);
+                        formValues.put("color", color);
+                        request.getSession().setAttribute("formValues", formValues);
+                        request.getSession().setAttribute("activeModal", "editVehicleModal");
+                        
                         response.sendRedirect(request.getContextPath() + "/vehicles");
                         return;
                     }
-                    // BỔ SUNG: Kiểm tra định dạng biển số xe khi cập nhật
-                    if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
-                        request.getSession().setAttribute(AppConstants.SESSION_MSG_ERROR,
-                                "Định dạng biển số xe không hợp lệ! (Ví dụ: 59A-12345 hoặc 59A1-12345)");
-                        response.sendRedirect(request.getContextPath() + "/vehicles");
-                        return;
-                    }
+                    
+                    int vehicleId = Integer.parseInt(vehicleIdStr);
                     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
                     String imageUrl = FileUploadUtil.saveFile(request, "carImage", getServletContext().getRealPath(""));
                     int vehicleTypeId = Integer.parseInt(vehicleTypeIdStr);

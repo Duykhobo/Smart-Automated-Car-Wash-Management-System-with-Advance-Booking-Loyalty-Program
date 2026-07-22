@@ -32,7 +32,7 @@
         </style>
 
 </head>
-    <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+    <body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
         <!-- Desktop Sidebar -->
         <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <form id="bookingForm" action="${pageContext.request.contextPath}/customer/booking_history" method="POST" class="space-y-8" onsubmit="return validateForm()">
+                <form id="bookingForm" action="${pageContext.request.contextPath}/customer/booking_history" method="POST" class="space-y-8" onsubmit="return validateForm()" data-auto-validate="true">
 
                     <input type="hidden" name="bookingId" value="${bookingInfo.bookingId}">
                     <input type="hidden" name="action" value="update">

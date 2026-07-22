@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "AdminLoyaltyHistoryServlet", urlPatterns = {"/admin/loyalty/history"})
-public class AdminLoyaltyHistoryServlet extends HttpServlet {
+@WebServlet(name = "AdminLoyaltyHistoryController", urlPatterns = {"/admin/loyalty/history"})
+public class AdminLoyaltyHistoryController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

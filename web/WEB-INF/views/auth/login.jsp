@@ -17,7 +17,7 @@
         </head>
 
         <body
-            class="bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black min-h-screen flex">
+            class="bg-bg-primary text-text-primary font-sans antialiased min-h-screen flex">
 
             <!-- Desktop Left Column (Brand) -->
             <div
@@ -105,16 +105,16 @@
                     </c:if>
 
                     <form action="${pageContext.request.contextPath}/auth/login" method="POST" novalidate
-                        class="space-y-5">
+                        class="space-y-5" data-auto-validate="true">
                         <div class="space-y-2">
-                            <label class="text-gray-300 text-sm font-semibold">Số Điện Thoại</label>
+                            <label class="text-gray-300 text-sm font-semibold">Số điện thoại / Tên đăng nhập</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <i data-lucide="phone" class="w-5 h-5 text-text-muted"></i>
+                                    <i data-lucide="user" class="w-5 h-5 text-text-muted"></i>
                                 </div>
-                                <input type="text" name="phone" placeholder="Nhập số điện thoại..."
+                                <input type="text" id="phone" name="phone" placeholder="Nhập tài khoản..."
                                     value="<c:out value='${phone}'/>" required autocomplete="off"
-                                    class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                    class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                             </div>
                         </div>
 
@@ -130,7 +130,7 @@
                                     <i data-lucide="lock" class="w-5 h-5 text-text-muted"></i>
                                 </div>
                                 <input type="password" name="password" placeholder="Nhập mật khẩu..." required
-                                    class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                    class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                             </div>
                         </div>
 

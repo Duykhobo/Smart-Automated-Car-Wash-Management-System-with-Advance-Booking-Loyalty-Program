@@ -7,7 +7,7 @@
     <title>Quản lý Dịch Vụ - AutoWash Pro</title>
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -15,15 +15,15 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8 w-full overflow-x-hidden">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Quản lý Dịch Vụ</h2>
                 <p class="text-text-muted">Cập nhật bảng giá và các gói rửa xe cung cấp tại trạm.</p>
             </div>
             
-            <button onclick="openCreateModal()" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-blue-500 text-black rounded-xl hover:opacity-90 transition-opacity font-bold shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+            <button onclick="openCreateModal()" class="flex items-center gap-2 px-4 py-2.5 h-11 bg-gradient-to-r from-[#00d4ff] to-blue-500 text-black rounded-xl hover:opacity-90 transition-opacity font-bold shadow-[0_0_15px_rgba(0,212,255,0.3)]">
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 Thêm Dịch Vụ Mới
             </button>
@@ -63,8 +63,8 @@
                             </c:if>
 
                             <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0 <c:if test='${not service.isIsActive()}'>opacity-60 grayscale</c:if>">
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-3">Tên Dịch Vụ:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top mt-3">Tên Dịch Vụ:</span>
                                     <div class="inline-flex lg:flex items-center gap-4 align-top">
                                         <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
                                             <i data-lucide="${iconName}" class="w-6 h-6 ${iconColor}"></i>
@@ -85,14 +85,14 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Giá Cơ Bản:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Giá Cơ Bản:</span>
                                     <span class="font-display font-bold text-base text-slate-300">
                                         <fmt:formatNumber value="${service.basePrice}" type="number" pattern="#,##0"/>đ
                                     </span>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Bảng Giá Cỡ Xe:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Bảng Giá Cỡ Xe:</span>
                                     <span class="font-display text-sm space-x-2">
                                         <span class="px-2 py-0.5 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/20 rounded text-xs">
                                             Sedan: <fmt:formatNumber value="${service.priceSedan}" type="number" pattern="#,##0"/>đ
@@ -105,17 +105,17 @@
                                         </span>
                                     </span>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Thời gian:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Thời gian:</span>
                                     <span class="inline-flex lg:flex items-center gap-1.5 text-slate-300 align-top">
                                         <i data-lucide="clock" class="w-4 h-4 text-text-muted"></i> ${service.durationMinutes} phút
                                     </span>
                                 </td>
-                                <td class="flex justify-between lg:table-cell lg:text-center px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Trạng Thái:</span>
+                                <td class="flex justify-between lg:table-cell lg:text-center px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Trạng Thái:</span>
                                     
                                     <!-- Form đồng bộ để bật/tắt dịch vụ (Tải lại trang, Không AJAX) -->
-                                    <form id="toggleForm_${service.serviceId}" action="${pageContext.request.contextPath}/admin/services" method="POST" class="inline">
+                                    <form id="toggleForm_${service.serviceId}" action="${pageContext.request.contextPath}/admin/services" method="POST" class="inline" data-auto-validate="true">
                                         <input type="hidden" name="action" value="toggle">
                                         <input type="hidden" name="serviceId" value="${service.serviceId}">
                                         <input type="hidden" name="isActive" value="${not service.isIsActive()}">
@@ -127,7 +127,7 @@
                                     </form>
                                 </td>
                                 <td class="flex lg:table-cell justify-between items-center px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Thao tác:</span>
                                     <div class="flex items-center justify-end gap-2">
                                         <button class="w-8 h-8 rounded-lg text-text-muted hover:text-white flex items-center justify-center transition-colors border border-transparent hover:border-border-glass bg-white/5 hover:bg-white/10" 
                                                 onclick="openEditModal(${service.serviceId}, '${service.name.replace("'", "\\'")}', ${service.basePrice}, ${service.durationMinutes}, '${service.isIsActive()}', '${service.serviceType}')">
@@ -151,7 +151,7 @@
                 <i data-lucide="plus-circle" class="w-5 h-5 text-[#00d4ff]"></i> Thêm Dịch Vụ Mới
             </h3>
             
-            <form action="${pageContext.request.contextPath}/admin/services" method="POST">
+            <form action="${pageContext.request.contextPath}/admin/services" method="POST" data-auto-validate="true">
                 <input type="hidden" name="action" value="create">
                 
                 <div class="space-y-4">
@@ -189,8 +189,8 @@
                 </div>
                 
                 <div class="mt-6 flex gap-3 justify-end">
-                    <button type="button" onclick="closeCreateModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
-                    <button type="submit" class="px-4 py-2 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Tạo Mới</button>
+                    <button type="button" onclick="closeCreateModal()" class="px-4 py-2.5 h-11 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
+                    <button type="submit" class="px-4 py-2.5 h-11 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Tạo Mới</button>
                 </div>
             </form>
         </div>
@@ -203,7 +203,7 @@
                 <i data-lucide="edit-3" class="w-5 h-5 text-[#00d4ff]"></i> Chỉnh Sửa Dịch Vụ
             </h3>
             
-            <form action="${pageContext.request.contextPath}/admin/services" method="POST">
+            <form action="${pageContext.request.contextPath}/admin/services" method="POST" data-auto-validate="true">
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" id="editServiceId" name="serviceId">
                 
@@ -250,8 +250,8 @@
                 </div>
                 
                 <div class="mt-6 flex gap-3 justify-end">
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
-                    <button type="submit" class="px-4 py-2 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Lưu Thay Đổi</button>
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 h-11 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-medium transition-colors border border-border-glass">Huỷ</button>
+                    <button type="submit" class="px-4 py-2.5 h-11 bg-[#00d4ff] hover:bg-cyan-400 text-black font-semibold rounded-xl text-sm transition-colors">Lưu Thay Đổi</button>
                 </div>
             </form>
         </div>

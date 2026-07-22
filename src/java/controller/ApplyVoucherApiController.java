@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import utils.AppConstants;
 
-@WebServlet(name = "ApplyVoucherServlet", urlPatterns = {"/api/apply-voucher"})
-public class ApplyVoucherServlet extends HttpServlet {
+@WebServlet(name = "ApplyVoucherApiController", urlPatterns = {"/api/apply-voucher"})
+public class ApplyVoucherApiController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,10 +48,11 @@ public class ApplyVoucherServlet extends HttpServlet {
                 out.print("{\"valid\": true, \"rewardType\": \"" + voucher.getRewardType() + "\", \"discountPercent\": " + voucher.getDiscountPercent() + ", \"message\": \"Áp dụng Voucher thành công!\"}");
             }
         } catch (Exception ex) {
-            Logger.getLogger(ApplyVoucherServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ApplyVoucherApiController.class.getName()).log(Level.SEVERE, null, ex);
             try (PrintWriter out = response.getWriter()) {
                 out.print("{\"valid\": false, \"message\": \"Lỗi hệ thống: " + ex.getMessage() + "\"}");
             }
         }
     }
 }
+

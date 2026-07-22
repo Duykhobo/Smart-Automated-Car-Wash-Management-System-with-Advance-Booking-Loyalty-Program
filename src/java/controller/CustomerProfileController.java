@@ -15,21 +15,27 @@ import javax.servlet.http.HttpServletResponse;
 import service.CustomerService;
 import dao.BookingDAO;
 import utils.AppConstants;
+import utils.ValidationUtil;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.servlet.annotation.MultipartConfig;
 import java.io.File;
 import java.nio.file.Paths;
 
-@WebServlet(name = "CustomerProfileServlet", urlPatterns = {"/CustomerProfileServlet", "/account/profile"})
+@WebServlet(name = "CustomerProfileController", urlPatterns = {"/CustomerProfileServlet", "/account/profile"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 10)
-public class CustomerProfileServlet extends HttpServlet {
+public class CustomerProfileController extends HttpServlet {
 
     private final CustomerService customerService = new CustomerService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
             request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
@@ -48,7 +54,10 @@ public class CustomerProfileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
             request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
@@ -57,6 +66,32 @@ public class CustomerProfileServlet extends HttpServlet {
 
         String fullname = request.getParameter("txtfullname");
         String email = request.getParameter("email");
+        
+        Map<String, String> errors = new HashMap<>();
+        if (fullname == null || fullname.trim().isEmpty()) {
+            errors.put("txtfullname", "Họ và tên không được để trống");
+        } else if (!ValidationUtil.isValidName(fullname)) {
+            errors.put("txtfullname", "Tên không hợp lệ (Không chứa ký tự đặc biệt nguy hiểm)");
+        }
+        
+        if (email == null || email.trim().isEmpty()) {
+            errors.put("email", "Email không được để trống");
+        } else if (!ValidationUtil.isValidEmail(email)) {
+            errors.put("email", "Email không hợp lệ");
+        }
+
+        if (!errors.isEmpty()) {
+            request.getSession().setAttribute("errors", errors);
+            request.getSession().setAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            
+            Map<String, String> formValues = new HashMap<>();
+            formValues.put("txtfullname", fullname);
+            formValues.put("email", email);
+            request.getSession().setAttribute("formValues", formValues);
+            
+            response.sendRedirect(request.getContextPath() + "/account/profile");
+            return;
+        }
 
         String avatarPath = null;
         try {

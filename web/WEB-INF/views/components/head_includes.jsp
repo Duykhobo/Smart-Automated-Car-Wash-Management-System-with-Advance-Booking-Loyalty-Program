@@ -11,7 +11,7 @@
 <meta charset="UTF-8" />
 
 <!-- Global CSS & Tailwind Config -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=4" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/global.css?v=5" />
 <script charset="UTF-8" src="${pageContext.request.contextPath}/assets/js/tailwind-config.js?v=4"></script>
 <script charset="UTF-8" src="https://cdn.tailwindcss.com"></script>
 

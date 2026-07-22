@@ -25,12 +25,12 @@ public class ReportDAO {
     }
 
     public int getWashesToday() {
-        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(BookingDate AS DATE) = CAST(GETDATE() AS DATE)";
+        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(UpdatedAt AS DATE) = CAST(GETDATE() AS DATE)";
         return fetchIntValue(sql);
     }
 
     public int getWashesYesterday() {
-        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(BookingDate AS DATE) = CAST(DATEADD(day, -1, GETDATE()) AS DATE)";
+        String sql = "SELECT COUNT(*) AS Total FROM Bookings WHERE Status = 'Completed' AND CAST(UpdatedAt AS DATE) = CAST(DATEADD(day, -1, GETDATE()) AS DATE)";
         return fetchIntValue(sql);
     }
 

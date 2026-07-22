@@ -7,7 +7,7 @@
     <title>Quản lý Khách Hàng - AutoWash Pro</title>
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
 </head>
-<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden selection:bg-[#00d4ff] selection:text-black flex">
+<body class="bg-bg-primary text-text-primary antialiased overflow-x-hidden flex">
 
     <!-- Sidebar Component -->
     <jsp:include page="/WEB-INF/views/components/admin_sidebar.jsp">
@@ -15,20 +15,20 @@
     </jsp:include>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[100px] md:pb-8">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto pb-[120px] md:pb-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
+        <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h2 class="text-3xl font-display font-bold text-white mb-1">Khách Hàng & Loyalty</h2>
                 <p class="text-text-muted">Quản lý danh sách thành viên, hạng thẻ và lịch sử tích điểm.</p>
             </div>
             
-            <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
                 <form action="${pageContext.request.contextPath}/admin/customers" method="GET" class="relative">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"></i>
-                    <input type="text" name="search" value="<c:out value='${currentSearch}'/>" placeholder="Tìm tên, SĐT, biển số..." class="pl-10 pr-4 py-2 bg-bg-surface border border-border-glass rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white w-64 transition-all">
+                    <input type="text" name="search" value="<c:out value='${currentSearch}'/>" placeholder="Tìm tên, SĐT, biển số..." class="pl-10 pr-4 py-2.5 h-11 bg-slate-800 border border-border-glass rounded-xl text-sm focus:outline-none focus:border-[#00d4ff] text-white w-64 transition-all">
                 </form>
-                <button class="flex items-center gap-2 px-4 py-2 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30 rounded-xl hover:bg-[#00d4ff]/20 transition-colors text-sm font-medium">
+                <button class="flex items-center gap-2 px-4 py-2.5 h-11 bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/30 rounded-xl hover:bg-[#00d4ff]/20 transition-colors text-sm font-medium">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     Xuất Excel
                 </button>
@@ -73,8 +73,8 @@
                     <tbody class="divide-y divide-border-glass">
                         <c:forEach var="cust" items="${customerList}">
                             <tr class="block lg:table-row hover:bg-white/[0.02] transition-colors border-b border-border-glass lg:border-none p-4 lg:p-0">
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top mt-2">Khách hàng:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top mt-2">Khách hàng:</span>
                                     <div class="inline-flex lg:flex items-center gap-3 align-top">
                                         <c:choose>
                                             <c:when test="${not empty cust.avatar}">
@@ -89,15 +89,15 @@
                                         <div class="font-medium text-white">${cust.fullName}</div>
                                     </div>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Liên hệ:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 text-slate-300">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Liên hệ:</span>
                                     <div class="inline-block align-top">
                                         <div>${cust.phone}</div>
                                         <div class="text-xs text-text-muted">${cust.email}</div>
                                     </div>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 align-top">Biển số xe:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 align-top">Biển số xe:</span>
                                     <div class="inline-flex lg:flex flex-col gap-1 align-top">
                                         <c:choose>
                                             <c:when test="${not empty cust.licensePlate}">
@@ -109,8 +109,8 @@
                                         </c:choose>
                                     </div>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Hạng thẻ:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Hạng thẻ:</span>
                                     <c:choose>
                                         <c:when test="${cust.tierStatus eq 'Platinum'}">
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#00d4ff]/20 text-[#00d4ff] border border-[#00d4ff]/40 shadow-[0_0_10px_rgba(0,212,255,0.2)]">
@@ -134,16 +134,16 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 font-display font-bold text-white">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32 font-sans font-normal">Điểm khả dụng:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 font-display font-bold text-white">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32 font-sans font-normal">Điểm khả dụng:</span>
                                     <fmt:formatNumber value="${cust.pointsBalance}" type="number" pattern="#,##0"/> <span class="text-xs font-sans font-normal text-[#00d4ff]">pts</span>
                                 </td>
-                                <td class="block lg:table-cell px-2 lg:px-6 py-2 lg:py-4 text-slate-300">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Lượt rửa:</span>
+                                <td class="block lg:table-cell px-2 lg:px-6 py-2.5 h-11 lg:py-4 text-slate-300">
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Lượt rửa:</span>
                                     ${cust.totalWashes} lượt
                                 </td>
                                 <td class="flex lg:table-cell items-center gap-3 px-2 lg:px-6 py-4 lg:text-right mt-2 lg:mt-0 border-t lg:border-none border-border-glass">
-                                    <span class="inline-block lg:hidden text-text-muted font-medium w-32">Thao tác:</span>
+                                    <span class="inline-block lg:hidden text-text-muted font-medium w-full sm:w-32">Thao tác:</span>
                                     <a href="${pageContext.request.contextPath}/admin/loyalty/history?customerId=${cust.customerId}" class="whitespace-nowrap inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white text-xs font-medium transition-colors border border-border-glass">
                                         Lịch sử điểm
                                     </a>

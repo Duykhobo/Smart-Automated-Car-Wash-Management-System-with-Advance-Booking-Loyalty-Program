@@ -18,8 +18,8 @@ import javax.servlet.http.HttpSession;
  *
  * @author user
  */
-@WebServlet(name="LogoutServlet", urlPatterns={"/auth/logout"})
-public class LogoutServlet extends HttpServlet {
+@WebServlet(name = "LogoutController", urlPatterns={"/auth/logout"})
+public class LogoutController extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

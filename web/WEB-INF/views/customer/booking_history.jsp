@@ -15,7 +15,7 @@
                 </head>
 
                 <body
-                    class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden relative">
+                    class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden relative">
 
                     <!-- Modals injected at bottom -->
 
@@ -179,7 +179,7 @@
                                                                 <form
                                                                     action="${pageContext.request.contextPath}/BookingHistoryController"
                                                                     method="POST" class="flex-1 sm:flex-none m-0 p-0"
-                                                                    id="cancelForm_${booking.bookingId}">
+                                                                    id="cancelForm_${booking.bookingId}" data-auto-validate="true">
                                                                     <input type="hidden" name="action" value="cancel" />
                                                                     <input type="hidden" name="bookingId"
                                                                         value="${booking.bookingId}" />

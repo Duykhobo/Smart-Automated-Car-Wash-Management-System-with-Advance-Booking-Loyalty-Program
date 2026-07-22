@@ -6,6 +6,8 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.HashMap;
+import utils.ValidationUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -33,6 +35,9 @@ public class BookingController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
 
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
@@ -65,6 +70,8 @@ public class BookingController extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         User user = (User) request.getSession().getAttribute(AppConstants.SESSION_USER_ACCOUNT);
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/auth/login");
@@ -79,11 +86,49 @@ public class BookingController extends HttpServlet {
                 return;
             }
 
-            int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
+            String vehicleIdStr = request.getParameter("vehicleId");
             String[] serviceIds = request.getParameterValues("services");
             String dateStr = request.getParameter("date");
             String timeStr = request.getParameter("time");
+            String voucherCode = request.getParameter("voucherCode");
 
+            Map<String, String> errors = new HashMap<>();
+
+            if (vehicleIdStr == null || vehicleIdStr.trim().isEmpty()) {
+                errors.put("vehicleId", "Vui lòng chọn xe");
+            }
+            if (serviceIds == null || serviceIds.length == 0) {
+                errors.put("services", "Vui lòng chọn ít nhất một dịch vụ");
+            }
+            if (dateStr == null || dateStr.trim().isEmpty()) {
+                errors.put("date", "Vui lòng chọn ngày");
+            }
+            if (timeStr == null || timeStr.trim().isEmpty()) {
+                errors.put("time", "Vui lòng chọn giờ");
+            }
+            if (voucherCode != null && !voucherCode.trim().isEmpty() && !ValidationUtil.isValidVoucherCode(voucherCode)) {
+                errors.put("voucherCode", "Mã voucher không hợp lệ (Chữ IN HOA, số, dấu - _)");
+            }
+
+            if (!errors.isEmpty()) {
+                request.getSession().setAttribute("errors", errors);
+                request.getSession().setAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin đặt lịch");
+
+                Map<String, String> formValues = new HashMap<>();
+                formValues.put("vehicleId", vehicleIdStr);
+                formValues.put("date", dateStr);
+                formValues.put("time", timeStr);
+                formValues.put("voucherCode", voucherCode);
+                if (serviceIds != null) {
+                    formValues.put("services", String.join(",", serviceIds));
+                }
+                request.getSession().setAttribute("formValues", formValues);
+
+                response.sendRedirect(request.getContextPath() + "/bookings");
+                return;
+            }
+
+            int vehicleId = Integer.parseInt(vehicleIdStr);
             Date bookingDate = Date.valueOf(LocalDate.parse(dateStr));
             Time scheduledTime = Time.valueOf(LocalTime.parse(timeStr + ":00"));
 
@@ -107,7 +152,6 @@ public class BookingController extends HttpServlet {
 
             String serviceIdsStr = String.join(",", serviceIds);
             
-            String voucherCode = request.getParameter("voucherCode");
             Integer voucherId = null;
             double discountAmount = 0;
             

@@ -7,7 +7,7 @@
     <jsp:include page="/WEB-INF/views/components/head_includes.jsp" />
     
 </head>
-    <body class="bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black min-h-screen flex">
+    <body class="bg-bg-primary text-text-primary font-sans antialiased min-h-screen flex">
 
         <!-- Desktop Left Column (Brand) -->
         <div class="hidden lg:flex flex-col justify-center w-1/2 p-12 lg:p-24 bg-gradient-to-br from-bg-primary to-[#0a1128] border-r border-border-glass relative overflow-hidden">
@@ -70,7 +70,7 @@
 
                 <c:choose>
                     <c:when test="${empty successMessage}">
-                        <form action="${pageContext.request.contextPath}/auth/forgot-password" method="POST" novalidate class="space-y-5">
+                        <form action="${pageContext.request.contextPath}/auth/forgot-password" method="POST" novalidate class="space-y-5" data-auto-validate="true">
                             <div class="space-y-2">
                                 <label class="text-gray-300 text-sm font-semibold">Địa Chỉ Email</label>
                                 <div class="relative">
@@ -78,7 +78,7 @@
                                         <i data-lucide="mail" class="w-5 h-5 text-text-muted"></i>
                                     </div>
                                     <input type="email" name="email" placeholder="VD: nguyenvanA@gmail.com" required autocomplete="email" 
-                                           class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                           class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#00d4ff]/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                                 </div>
                             </div>
 

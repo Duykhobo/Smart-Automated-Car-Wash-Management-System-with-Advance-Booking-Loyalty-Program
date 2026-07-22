@@ -14,7 +14,7 @@
         </style>
 
 </head>
-    <body class="bg-bg-primary text-text-primary font-sans antialiased selection:bg-[#00d4ff] selection:text-black min-h-screen flex">
+    <body class="bg-bg-primary text-text-primary font-sans antialiased min-h-screen flex">
 
         <!-- Desktop Left Column (Brand) -->
         <div class="hidden lg:flex flex-col justify-center w-1/2 p-12 lg:p-24 bg-gradient-to-tr from-bg-primary to-[#0a1128] border-r border-border-glass relative overflow-hidden">
@@ -83,7 +83,7 @@
                     <span id="clientErrorText"></span>
                 </div>
 
-                <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4">
+                <form action="${pageContext.request.contextPath}/auth/register" method="POST" id="registerForm" novalidate onsubmit="return handleRegister(event)" class="space-y-4" data-auto-validate="true">
 
                     <div class="space-y-1 relative">
                         <label for="fullname" class="block text-gray-300 text-sm font-semibold mb-1">Họ và tên *</label>
@@ -92,7 +92,7 @@
                                 <i data-lucide="user" class="w-5 h-5 text-text-muted"></i>
                             </div>
                             <input type="text" id="fullname" name="fullname" placeholder="Nhập họ và tên..." value="<c:out value='${user.fullName}'/>" required
-                                   class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                   class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                         </div>
                         <p class="text-error text-xs mt-1 empty:hidden" id="err-fullname"></p>
                     </div>
@@ -104,7 +104,7 @@
                                 <i data-lucide="phone" class="w-5 h-5 text-text-muted"></i>
                             </div>
                             <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại..." value="<c:out value='${user.phone}'/>" required
-                                   class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                   class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                         </div>
                         <p class="text-error text-xs mt-1 empty:hidden" id="err-phone"></p>
                     </div>
@@ -116,7 +116,7 @@
                                 <i data-lucide="car-front" class="w-5 h-5 text-text-muted"></i>
                             </div>
                             <input type="text" id="plate" name="plate" placeholder="VD: 51H-123.45" value="<c:out value='${user.licensePlate}'/>" required oninput="this.value = this.value.toUpperCase()"
-                                   class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                   class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                         </div>
                         <p class="text-error text-xs mt-1 empty:hidden" id="err-plate"></p>
                     </div>
@@ -129,7 +129,7 @@
                                     <i data-lucide="lock" class="w-5 h-5 text-text-muted"></i>
                                 </div>
                                 <input type="password" id="password" name="password" placeholder="Mật khẩu..." required
-                                       class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                       class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                                 <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
                                 </button>
@@ -144,7 +144,7 @@
                                     <i data-lucide="shield-check" class="w-5 h-5 text-text-muted"></i>
                                 </div>
                                 <input type="password" id="confirm_password" name="confirm_password" placeholder="Nhập lại..." required
-                                       class="w-full bg-bg-surface border border-border-glass text-white rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
+                                       class="w-full bg-slate-800 border border-border-glass text-white rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-accent-cyan/50 focus:border-[#00d4ff] transition-all placeholder:text-gray-600">
                                 <button type="button" onclick="togglePassword('confirm_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors">
                                     <i data-lucide="eye" class="w-5 h-5"></i>
                                 </button>
@@ -156,7 +156,7 @@
                     <div class="pt-3">
                         <label class="flex items-start gap-3 cursor-pointer group">
                             <div class="relative flex items-center justify-center mt-0.5">
-                                <input type="checkbox" id="terms" name="terms" required class="peer appearance-none w-5 h-5 border border-border-glass rounded bg-bg-surface checked:bg-[#00d4ff] checked:border-[#00d4ff] transition-colors cursor-pointer">
+                                <input type="checkbox" id="terms" name="terms" required class="peer appearance-none w-5 h-5 border border-border-glass rounded bg-slate-800 checked:bg-[#00d4ff] checked:border-[#00d4ff] transition-colors cursor-pointer">
                                 <i data-lucide="check" class="absolute w-3.5 h-3.5 text-black opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                             </div>
                             <span class="text-text-muted text-sm leading-relaxed select-none">

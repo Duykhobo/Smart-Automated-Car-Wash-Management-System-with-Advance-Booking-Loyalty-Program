@@ -130,8 +130,6 @@ BEGIN
 END
 GO
 
-
-
 PRINT N'Thêm dữ liệu mẫu thành công!';
 
 -- 6. THÊM SYSTEM CONFIG (CẤU HÌNH HỆ THỐNG)

@@ -13,13 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import service.UserService;
 import utils.ValidationUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author ThanhDuy
  */
-@WebServlet(name = "RegisterServlet", urlPatterns = { "/auth/register" })
-public class RegisterServlet extends HttpServlet {
+@WebServlet(name = "RegisterController", urlPatterns = { "/auth/register" })
+public class RegisterController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
     // + sign on the left to edit the code.">
@@ -75,34 +77,36 @@ public class RegisterServlet extends HttpServlet {
         String licensePlate = request.getParameter("plate");
         String rawPassword = request.getParameter("password");
 
-        // Edge case: Kiểm tra đầu vào trống hoặc null ở phía backend
-        if (ValidationUtil.isAnyEmpty(fullName, phone, licensePlate, rawPassword)) {
-            request.setAttribute("errorMessage", "Vui lòng điền đầy đủ tất cả thông tin đăng ký!");
-            forwardWithError(request, response, fullName, phone, licensePlate);
-            return;
+        // Validate form data và gom lỗi vào Map
+        Map<String, String> errors = new HashMap<>();
+
+        if (fullName == null || fullName.trim().isEmpty()) {
+            errors.put("fullname", "Họ và tên không được để trống");
+        } else if (!ValidationUtil.isValidName(fullName)) {
+            errors.put("fullname", "Họ và tên không hợp lệ! (Không chứa số hoặc ký tự đặc biệt)");
         }
 
-        // Validate Format (Tên, SDT, Biển số)
-        if (!ValidationUtil.isValidName(fullName)) {
-            request.setAttribute("errorMessage", "Họ và tên không hợp lệ! (Không được chứa số hoặc ký tự đặc biệt)");
-            forwardWithError(request, response, fullName, phone, licensePlate);
-            return;
-        }
-        
-        if (!ValidationUtil.isValidVNPhone(phone)) {
-            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ! (Phải có 10 chữ số và bắt đầu bằng số 0)");
-            forwardWithError(request, response, fullName, phone, licensePlate);
-            return;
-        }
-        
-        if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
-            request.setAttribute("errorMessage", "Biển số xe không hợp lệ! (VD chuẩn: 59A-12345 hoặc 59A1-1234)");
-            forwardWithError(request, response, fullName, phone, licensePlate);
-            return;
+        if (phone == null || phone.trim().isEmpty()) {
+            errors.put("phone", "Số điện thoại không được để trống");
+        } else if (!ValidationUtil.isValidVNPhone(phone)) {
+            errors.put("phone", "Số điện thoại không hợp lệ! (Phải có 10 chữ số và bắt đầu bằng 0)");
         }
 
-        if (!ValidationUtil.isValidPassword(rawPassword)) {
-            request.setAttribute("errorMessage", "Mật khẩu không hợp lệ! (Phải từ 6 đến 50 ký tự)");
+        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+            errors.put("plate", "Biển số xe không được để trống");
+        } else if (!ValidationUtil.isValidLicensePlate(licensePlate)) {
+            errors.put("plate", "Biển số xe không hợp lệ! (VD: 59A-12345)");
+        }
+
+        if (rawPassword == null || rawPassword.trim().isEmpty()) {
+            errors.put("password", "Mật khẩu không được để trống");
+        } else if (!ValidationUtil.isValidPassword(rawPassword)) {
+            errors.put("password", "Mật khẩu phải từ 8 ký tự trở lên");
+        }
+
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
+            request.setAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin đăng ký!");
             forwardWithError(request, response, fullName, phone, licensePlate);
             return;
         }

@@ -26,8 +26,8 @@ import dto.User;
  * Trả về danh sách các slot (08:00 đến 17:30) dưới định dạng JSON.
  * Endpoint này chỉ cho phép người dùng đã đăng nhập truy cập để tránh scraping.
  */
-@WebServlet(name = "SlotApiServlet", urlPatterns = {"/api/slots"})
-public class SlotApiServlet extends HttpServlet {
+@WebServlet(name = "SlotApiController", urlPatterns = {"/api/slots"})
+public class SlotApiController extends HttpServlet {
 
     private static final int SLOT_DURATION_MINS = 30;
     private static final int DEFAULT_MAX_CAPACITY = 3;

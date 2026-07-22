@@ -10,7 +10,7 @@
     
 </head>
 
-<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased selection:bg-[#00d4ff] selection:text-black w-full overflow-x-hidden">
+<body class="m-0 min-h-screen bg-bg-primary text-white font-sans antialiased w-full overflow-x-hidden">
 
     <!-- Desktop Sidebar -->
     <jsp:include page="/WEB-INF/views/components/customer_sidebar.jsp">

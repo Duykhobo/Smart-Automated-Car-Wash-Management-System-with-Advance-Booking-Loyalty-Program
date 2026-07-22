@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * AdminDashboardServlet điều hướng yêu cầu tới trang Dashboard của Admin.
  */
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = {"/admin/dashboard"})
-public class AdminDashboardServlet extends HttpServlet {
+@WebServlet(name = "AdminDashboardController", urlPatterns = {"/admin/dashboard"})
+public class AdminDashboardController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
